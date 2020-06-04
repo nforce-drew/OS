@@ -41,10 +41,14 @@ public:
     ~MyClient();
 
 private slots:
-    void slotReadyRead();
-    void slotError(QAbstractSocket::SocketError err);
-    void slotSendToServer();
-    void slotConnected();
+    void slotReadyRead();                               //Принятие данных
+    void slotError(QAbstractSocket::SocketError err);   //Ошибка подключения с сервером
+    void slotSendFilesToServer();                            //Отправка файлов
+    void slotConnected();                               //Клиент подключился к серверу
+public:
+    void slotSendDataToServer(TYPE dataType, char* data, unsigned len); //Отправка данных или запроса
+                                                                         // если дополнительные данные не передаются,
+                                                                          //то присвоить data = NULL и len = 0
 
 private:
     Ui::MyClient *ui;

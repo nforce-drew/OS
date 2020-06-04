@@ -22,7 +22,7 @@ QT_WARNING_PUSH
 QT_WARNING_DISABLE_DEPRECATED
 struct qt_meta_stringdata_MyClient_t {
     QByteArrayData data[8];
-    char stringdata0[98];
+    char stringdata0[103];
 };
 #define QT_MOC_LITERAL(idx, ofs, len) \
     Q_STATIC_BYTE_ARRAY_DATA_HEADER_INITIALIZER_WITH_OFFSET(len, \
@@ -37,13 +37,13 @@ QT_MOC_LITERAL(2, 23, 0), // ""
 QT_MOC_LITERAL(3, 24, 9), // "slotError"
 QT_MOC_LITERAL(4, 34, 28), // "QAbstractSocket::SocketError"
 QT_MOC_LITERAL(5, 63, 3), // "err"
-QT_MOC_LITERAL(6, 67, 16), // "slotSendToServer"
-QT_MOC_LITERAL(7, 84, 13) // "slotConnected"
+QT_MOC_LITERAL(6, 67, 21), // "slotSendFilesToServer"
+QT_MOC_LITERAL(7, 89, 13) // "slotConnected"
 
     },
     "MyClient\0slotReadyRead\0\0slotError\0"
     "QAbstractSocket::SocketError\0err\0"
-    "slotSendToServer\0slotConnected"
+    "slotSendFilesToServer\0slotConnected"
 };
 #undef QT_MOC_LITERAL
 
@@ -83,7 +83,7 @@ void MyClient::qt_static_metacall(QObject *_o, QMetaObject::Call _c, int _id, vo
         switch (_id) {
         case 0: _t->slotReadyRead(); break;
         case 1: _t->slotError((*reinterpret_cast< QAbstractSocket::SocketError(*)>(_a[1]))); break;
-        case 2: _t->slotSendToServer(); break;
+        case 2: _t->slotSendFilesToServer(); break;
         case 3: _t->slotConnected(); break;
         default: ;
         }

@@ -32,4 +32,5 @@ FileHeader  FileHeader::setData(unsigned fileSize, char *fileName)
 {
     this->fileSize = fileSize;
     strncpy(this->fileName, fileName, 64);
+    return (*this);
 }

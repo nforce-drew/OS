@@ -1,6 +1,19 @@
 #include "MyClient.h"
 #include "ui_MyClient.h"
 #include <string.h>
+#include <string>
+
+QString bytes(const char *buf, int size)
+{
+    QString message;
+    for (int i = 0; i < size; i++)
+    {
+        message += QString::number((int)buf[i]) + " ";
+        if ((i + 1) % 4 == 0)
+            message += "| ";
+    }
+    return (message);
+}
 
 MyClient::MyClient(const QString& strHost, int nPort, QWidget *pwgt/*=0*/) :
     QWidget(pwgt),
@@ -25,19 +38,20 @@ MyClient::MyClient(const QString& strHost, int nPort, QWidget *pwgt/*=0*/) :
     m_ptxtInput = new QLineEdit;
 
     connect(m_ptxtInput, SIGNAL(returnPressed()),
-            this,        SLOT(slotSendToServer())
+            this,        SLOT(slotSendFilesToServer())
            );
     m_ptxtInfo->setReadOnly(true);
 
-    QPushButton* pcmd = new QPushButton("&Send");
-    connect(pcmd, SIGNAL(clicked()), SLOT(slotSendToServer()));
+    QPushButton* sendButton = new QPushButton("&Send");
+    connect(sendButton, SIGNAL(clicked()), SLOT(slotSendFilesToServer()));
 
     //Layout setup
     QVBoxLayout* pvbxLayout = new QVBoxLayout;
     pvbxLayout->addWidget(new QLabel("<H1>Client</H1>"));
     pvbxLayout->addWidget(m_ptxtInfo);
     pvbxLayout->addWidget(m_ptxtInput);
-    pvbxLayout->addWidget(pcmd);
+    pvbxLayout->addWidget(sendButton);
+
     setLayout(pvbxLayout);
 }
 
@@ -45,33 +59,54 @@ MyClient::MyClient(const QString& strHost, int nPort, QWidget *pwgt/*=0*/) :
 void MyClient::slotReadyRead()
 {
     QDataStream in(m_pTcpSocket);
-    in.setVersion(QDataStream::Qt_5_9);
-    for (;;)
+    QByteArray  data;
+    MainHeader  mainHeader;
+    FileHeader  fileHeader;
+
+    qDebug() << "Receiving data...";
+    if (m_pTcpSocket->bytesAvailable() < sizeof(MainHeader))
     {
-        if (!m_nNextBlockSize)
-        {
-            if (m_pTcpSocket->bytesAvailable() < sizeof(quint16))
-                break;
-            in >> m_nNextBlockSize;
-        }
-
-        if (m_pTcpSocket->bytesAvailable() < m_nNextBlockSize)
-            break;
-
-        QTime   time;
-        QByteArray fileData;
-
-        in >> fileData;
-
-
-        QFile file("/home/nforce/Desktop/file2.txt");
-        if(!file.open(QIODevice::ReadWrite | QIODevice::Text))
-            QMessageBox::critical(this, "Error", "File2 does not open!");
-        file.write(fileData);
-
-        m_ptxtInfo->append(time.toString() + ": " + QString::number(sizeof(m_nNextBlockSize) + fileData.size()));
-        m_nNextBlockSize = 0;
+        qDebug() << "Error reading data.";
+        QMessageBox::critical(this, "Ошибка", "Ошибка чтения данных!");
+        return;
     }
+    in.readRawData((char*)&mainHeader, sizeof(MainHeader));
+    while (m_pTcpSocket->bytesAvailable() <
+                        qint64(mainHeader.getMsgSize() - sizeof(MainHeader)))
+        if (!m_pTcpSocket->waitForReadyRead(1000))
+        {
+            qDebug() << "Error: reading data.";
+            QMessageBox::critical(this, "Ошибка", "Ошибка чтения данных!");
+            return;
+        }
+    //Если пришли файлы:
+    if (mainHeader.getType() == SEND_FILES)
+    {
+        for (int i = 0; i < mainHeader.getCount(); i++)
+        {
+            in.readRawData((char*)&fileHeader, sizeof(FileHeader));
+            qDebug() << "FileHeader: " << fileHeader.getFileSize() << " " << fileHeader.getFileName();
+            data.resize(fileHeader.getFileSize());
+            in.readRawData(data.data(), data.size());
+
+            //путь для сохранения
+            QFile file("/home/nforce/Desktop/ClientReceive/" + QString(fileHeader.getFileName()));
+            if(!file.open(QIODevice::WriteOnly | QIODevice::Append | QIODevice::Truncate))
+            {
+                qDebug() << "Error: opening the file for writing "
+                            << "/home/nforce/Desktop/ClientReceive/" << fileHeader.getFileName();
+                QMessageBox::critical(this, "Ошибка", "Не удалось открыть файл для записи!");
+            }
+            file.write(data);
+            file.close();
+        }
+    }
+    //Если пришли другие данные:
+    if (mainHeader.getType() == OTHER)
+    {
+        int a = 2 * 2;
+    }
+    qDebug() << "End of data reading.";
 }
 
 // ----------------------------------------------------------------------
@@ -94,9 +129,8 @@ void MyClient::slotError(QAbstractSocket::SocketError err)
     m_lastStatus = false;
     m_pTcpSocket->connectToHost(m_strHost, m_nPort);
 }
-
 // ----------------------------------------------------------------------
-void MyClient::slotSendToServer()
+void MyClient::slotSendFilesToServer()
 {
     QStringList fPaths; // Нужно передать сюда пути к файлом для передачи задачи на сервер
     QFileInfo*  p_fileInfo;
@@ -109,19 +143,16 @@ void MyClient::slotSendToServer()
 
     out.setVersion(QDataStream::Qt_5_9);
     out.setByteOrder(QDataStream::LittleEndian);
-    fPaths << "/home/nforce/Desktop/scrn14.png"
-               << "/home/nforce/Desktop/scrn15.png"
-                   << "/home/nforce/Desktop/scrn16.png"
-                       << "/home/nforce/Desktop/scrn17.png"
-                           << "/home/nforce/Desktop/scrn18.png"; // Удалить
+    fPaths << "/home/nforce/Desktop/AllDesktop/Dzheremi.zip"
+           << "/home/nforce/Desktop/AllDesktop/crock.jpg"
+           << "/home/nforce/Desktop/AllDesktop/crock2.png";// Удалить
     out.writeRawData((char*)&mainHeader, sizeof(MainHeader));
     for (int i = 0; i < fPaths.size(); i++)
     {
-        qDebug() << fPaths[i];
         p_file = new QFile(fPaths[i]);
         if(!p_file->open(QIODevice::ReadOnly))
         {
-            QMessageBox::critical(this, "Error", "File does not open!");
+            QMessageBox::critical(this, "Error", "File " + fPaths[i] + " does not open!");
             qDebug() << "---Файл " << fPaths[i] << " не открыт!!!";
             return;
         }
@@ -138,136 +169,24 @@ void MyClient::slotSendToServer()
     out.device()->seek(0);
     mainHeader.setData(arrBlock.size(), fPaths.size(), SEND_FILES);
     out.writeRawData((char*)&mainHeader, sizeof(MainHeader));
-    int dat = m_pTcpSocket->write(arrBlock);
-//    QMessageBox::information(this, "Message size", QString::number(arrBlock.size()));
-
-
-
-
-
-
-
-
-
-
-//    QByteArray  arrBlock;
-//    QByteArray  fileData;
-//    QString     filePath("/home/nforce/Конспект_23.03.djvu");
-//    QDataStream out(&arrBlock, QIODevice::ReadWrite);
-//    QFile       file(filePath);
-//    QFileInfo   fileInfo(filePath);
-//    MainHeader  mainHeader(77, 2, SEND_FILES);
-//    FileHeader  fileHeader;
-//    int         dat;
-
-//    out.setVersion(QDataStream::Qt_4_5);
-//    out.setByteOrder(QDataStream::LittleEndian);
-
-//    if(!file.open(QIODevice::ReadOnly))
-//        QMessageBox::critical(this, "Error", "File does not open!");
-//    fileData = file.readAll();
-//    fileHeader.setData(unsigned(fileInfo.size()), (char*)fileInfo.fileName().toStdString().data());
-////    QMessageBox::information(this, "Message size", "file size: " + QString::number(fileHeader.getFileSize()));
-//    out.writeRawData((char*)&mainHeader, sizeof(MainHeader));
-//    out.writeRawData((char*)&fileHeader, sizeof(FileHeader));
-//    out.writeRawData(fileData.data(), fileData.size());
-//    file.close();
-//    filePath = "/home/nforce/Desktop/Dzheremi.zip";
-//    QFile file2(filePath);
-//    QFileInfo fileInfo2(filePath);
-//    if(!file2.open(QIODevice::ReadOnly))
-//        QMessageBox::critical(this, "Error", "File does not open!");
-//    fileData = file2.readAll();
-
-//    fileHeader.setData(unsigned(fileInfo2.size()), (char*)fileInfo2.fileName().toStdString().data());
-//    out.writeRawData((char*)&fileHeader, sizeof(FileHeader));
-//    out.writeRawData(fileData.data(), fileData.size());
-//    QMessageBox::information(this, "Message size", QString::number(fileHeader.getFileSize()) + " " +
-//                             fileHeader.getFileName());
-//    dat = m_pTcpSocket->write(arrBlock);
-//    file2.close();
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-//    QMessageBox::information(this, "Message size", QString::number(arrBlock.size()));
-
-//    QFile file2("/home/nforce/Desktop/send2.cpp");
-//    if(!file2.open(QIODevice::WriteOnly))
-//        QMessageBox::critical(this, "Error", "File does not open!");
-//    file2.write(fileData.data(), fileData.size());
-//    file2.close();
-
-//    QString message;
-//    for (int i = 0; i < 50; i++)
-//    {
-//        message += QString::number((int)(arrBlock.data())[i]) + " ";
-//        if ((i + 1) % 4 == 0)
-//            message += "| ";
-//    }
-
-//    QMessageBox::critical(this, "Error", message);
-//    QFile file("/home/nforce/Desktop/screen.png");
-//    if(!file.open(QIODevice::ReadOnly | QIODevice::Text))
-//        QMessageBox::critical(this, "Error", "File does not open!");
-//    QByteArray fileData;
-//    fileData = file.readAll();
-
-
-////    m_ptxtInfo->append("Sended bytes: " + QString::number(fileData.size()));
-//    file.close();
-//    //out << int(273) << int(48) << int(8);
-
-//    //out.device()->seek(0);
-//    //out << quint16(arrBlock.size() - sizeof(quint16));
-//    char *a;
-
-//    QByteArray  arrBlock;
-//    QDataStream out(&arrBlock, QIODevice::ReadWrite);
-//    out.setVersion(QDataStream::Qt_4_5);
-//    out.setByteOrder(QDataStream::LittleEndian);
-//    MainHeader mainHeader;
-//    mainHeader.count = 117;
-//    mainHeader.msgSize = 10;
-//    mainHeader.requestType = SEND_FILES;
-//    out << (char*)&mainHeader << int(10);
-//    QMessageBox::information(this, "Message size", QString::number(arrBlock.size()));
-////    out.device()->seek(0);
-//////    out << uint(arrBlock.size());
-
-
-//    a = arrBlock.data();
-//    QString message;
-//    for (int i = 0; i < 31; i++)
-//    {
-//        message += QString::number((int)a[i]) + " ";
-//        if ((i + 1) % 4 == 0)
-//            message += "| ";
-//    }
-
-//    int dat = m_pTcpSocket->write(arrBlock);
-//    m_ptxtInput->setText(message);
-
-//    QMessageBox::information(this, "Message size", QString::number(sizeof(dat))
-//                             + "  " + QString::number(arrBlock.size())
-//                             + "  " + QString::number(sizeof((char*)&mainHeader)));
-
-//    char *newData;
-//    newData = arrBlock.data();
-
-
+    m_pTcpSocket->write(arrBlock);
+    qDebug() << "Bytes sent: " << arrBlock.size();
 }
+// ------------------------------------------------------------------
+void MyClient::slotSendDataToServer(TYPE dataType, char* data, unsigned len)
+{
+    MainHeader mainHdr;
+    QByteArray  arrBlock;
+    QDataStream out(&arrBlock, QIODevice::ReadWrite);
 
+    out.setVersion(QDataStream::Qt_5_9);
+    out.setByteOrder(QDataStream::LittleEndian);
+    mainHdr.setData(sizeof(MainHeader) + len, 0, dataType);
+    out.writeRawData((char*)&mainHdr, sizeof(MainHeader));
+    if (data != NULL && len != 0)
+    out.writeRawData(data, len);
+    m_pTcpSocket->write(arrBlock);
+}
 // ------------------------------------------------------------------
 void MyClient::slotConnected()
 {
