@@ -4,6 +4,7 @@
 #include "MainHeader.h"
 #include "FileHeader.h"
 #include "LogInWindow.h"
+#include "Headers.h"
 #include <QWidget>
 #include <QTcpSocket>
 #include <QTextEdit>
@@ -29,13 +30,14 @@ class MyClient : public QWidget
     Q_OBJECT
 
 private:
-    QTcpSocket* m_pTcpSocket;
-    QTextEdit*  m_ptxtInfo;
-    QLineEdit*  m_ptxtInput;
-    quint16     m_nNextBlockSize;
-    QString     m_strHost;
-    int         m_nPort;
-    bool        m_lastStatus;
+    QTcpSocket*     m_pTcpSocket;
+    QTextEdit*      m_ptxtInfo;
+    QLineEdit*      m_ptxtInput;
+    void*    m_loginWndw;
+    quint16         m_nNextBlockSize;
+    QString         m_strHost;
+    int             m_nPort;
+    bool            m_lastStatus;
 
 public:
     MyClient(const QString& strHost, int nPort, QWidget *pwgt = 0);

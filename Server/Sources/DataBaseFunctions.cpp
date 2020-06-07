@@ -22,18 +22,17 @@ static int callback(void* sock_fd, int argc, char** argv, char** azColName)
 {
     MainHeader mainHdr;
 
+    std::cout << "!!!!!!!callback()" << std::endl;
     std::cout << argv[0] << " " << argv[1] << " argc = " << argc << std::endl;
 
     if (argc == 2)
         mainHdr.setData(sizeof(MainHeader), 0, PERMISSION_LOGIN);
-    else
-        mainHdr.setData(sizeof(MainHeader), 0, BAN_LOGIN);
-
     // long long sig1 = reinterpret_cast<long long>(sock_fd);
     // int sig = static_cast<int>(sig1);
     cout << "Callback sock_fd = " << *((int*)sock_fd) << endl;
-    sendData(*((int*)sock_fd), mainHdr, NULL, 0);
-
+    int sendBytes = sendData(*((int*)sock_fd), mainHdr, NULL, 0);
+    *((int*)sock_fd) = -1;
+    std::cout << "Bytes sended: " << sendBytes << std::endl;
     return (0);
 }
 
@@ -43,16 +42,21 @@ int checkLoginPermission(sqlite3* db, int sock_fd, char* login, char* password)
     int         rc;
     char*       errMsg;
 
+    std::cout << "checkLoginPermission()" << std::endl;
     query = "SELECT * FROM users_info " \
         "WHERE user_name == '" + std::string(login)
          + "' AND user_password == '" + std::string(password) + "';";
     
-    int x = 10;
-    void *pointer = &x;
-    // *((int*)sig) = sock_fd;
     rc = sqlite3_exec(db, query.c_str(), callback, &sock_fd, &errMsg);
-    // std::cerr << errMsg << std::endl;
-    // errno == 2 ? errno = 0 : errno;
+
+    
+    std::cerr << errMsg << std::endl;
+    if (sock_fd != -1)
+    {
+        MainHeader mainHdr(sizeof(MainHeader), 0, BAN_LOGIN);
+        int sendBytes = sendData(sock_fd, mainHdr, NULL, 0);
+    }
+    errno == 2 ? errno = 0 : errno;
 
     return (rc);
 }

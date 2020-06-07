@@ -6,6 +6,9 @@
 #include <QtSql/QSqlQuery>
 #include <QtSql/QSqlRecord>
 #include <QMessageBox>
+#include <string>
+#include "MyClient.h"
+#include "Headers.h"
 
 namespace Ui {
 class LogInWindow;
@@ -16,7 +19,8 @@ class LogInWindow : public QDialog
     Q_OBJECT
 
 public:
-    explicit    LogInWindow(QWidget *parent = nullptr);
+    LogInWindow();
+    LogInWindow(QWidget *parent = nullptr);
     void        connectDatabase();
     QString     getUserName();
     ~LogInWindow();
@@ -31,6 +35,7 @@ signals:
 
 public slots:
     void slotCheckLogin();
+    void slotIncorrectLogin();
 };
 
 #endif // LOGINWINDOW_H

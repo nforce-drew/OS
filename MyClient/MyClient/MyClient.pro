@@ -32,13 +32,15 @@ SOURCES += \
         MyClient.cpp \
     MainHeader.cpp \
     FileHeader.cpp \
-    LogInWindow.cpp
+    LogInWindow.cpp \
+    Headers.cpp
 
 HEADERS += \
         MyClient.h \
     MainHeader.h \
     FileHeader.h \
-    LogInWindow.h
+    LogInWindow.h \
+    Headers.h
 
 FORMS += \
         MyClient.ui \

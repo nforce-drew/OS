@@ -51,11 +51,11 @@ MyClient::MyClient(const QString& strHost, int nPort, QWidget *pwgt/*=0*/) :
     pvbxLayout->addWidget(m_ptxtInfo);
     pvbxLayout->addWidget(m_ptxtInput);
     pvbxLayout->addWidget(sendButton);
-    LogInWindow* m_loginWndw = new LogInWindow(this);
-    if (m_loginWndw->exec() == QDialog::Accepted)
+    m_loginWndw = new LogInWindow(this);
+    if (((LogInWindow*)m_loginWndw)->exec() == QDialog::Accepted)
     {
-//        slotSendDataToServer();
-        QMessageBox::information(this, "Logged", "User " + m_loginWndw->getUserName() + " logged.");
+
+        QMessageBox::information(this, "Logged", "User " + ((LogInWindow*)m_loginWndw)->getUserName() + " logged.");
     }
 //    m_loginWndw->show();
 
@@ -109,9 +109,15 @@ void MyClient::slotReadyRead()
         }
     }
     //Если пришли другие данные:
-    if (mainHeader.getType() == OTHER)
+    if (mainHeader.getType() == PERMISSION_LOGIN)
     {
-        int a = 2 * 2;
+        qDebug() << "PERMISSION_LOGIN";
+        ((LogInWindow*)m_loginWndw)->hide();
+    }
+    if (mainHeader.getType() == BAN_LOGIN)
+    {
+        qDebug() << "BAN_LOGIN";
+        ((LogInWindow*)m_loginWndw)->slotIncorrectLogin();
     }
     qDebug() << "End of data reading.";
 }
@@ -190,7 +196,8 @@ void MyClient::slotSendDataToServer(TYPE dataType, char* data, unsigned len)
     mainHdr.setData(sizeof(MainHeader) + len, 0, dataType);
     out.writeRawData((char*)&mainHdr, sizeof(MainHeader));
     if (data != NULL && len != 0)
-    out.writeRawData(data, len);
+        out.writeRawData(data, len);
+    qDebug() << bytes(arrBlock.data(), arrBlock.size());
     m_pTcpSocket->write(arrBlock);
 }
 // ------------------------------------------------------------------

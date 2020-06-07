@@ -5,6 +5,9 @@
 enum TYPE
 {
     SEND_FILES,
+    PERMISSION_LOGIN,
+    BAN_LOGIN,
+    CHECK_LOGIN,
     OTHER
 };
 //=================================================================================
