@@ -79,6 +79,17 @@ int recvAll(int sock, char *buf, TYPE &dataType, list<string> *paths)
             }
             fileHeader.setByteArr(buf + curByte);
             paths->push_back(string(SAVE_PATH) + folderName + string(fileHeader.getFileName()));
+
+            ofstream fout;
+            fout.open(paths->back(), ios_base::trunc);
+            if (!fout.is_open())
+            {
+                cerr << "ERROR. Файл " << paths->back() << " для очищения не открыт!\n";
+                return (0);
+            }
+            
+            fout.close();
+
             curByte += sizeof(FileHeader);
             writeBytes = 0;
             while (writeBytes != fileHeader.getFileSize())
@@ -204,7 +215,11 @@ int sendFiles(int sock, list<string> &paths)
     mainHeader.setData(getMessageSize(paths), paths.size(), SEND_FILES);
     sendBytes = sendAll(sock, (char*)&mainHeader, sizeof(MainHeader), 0);
     if (sendBytes <= 0)
+    {
+        cerr << "Sending error. Position - 1. Last bytes sent: " << sendBytes
+                << ". Errno: " << errno << endl;
         return (sendBytes);
+    }
     totalBytes += sendBytes;
     for(string filePath : paths)
     {
@@ -220,16 +235,25 @@ int sendFiles(int sock, list<string> &paths)
         fileHeader.setData(getFileSize(filePath), (char*)fileName(filePath).data());
         sendBytes = sendAll(sock, (char*)&fileHeader, sizeof(FileHeader), 0);
         if (sendBytes <= 0)
+        {
+            cerr << "Sending error. Position - 2. Last bytes sent: " << sendBytes
+                    << ". Errno: " << errno << endl;
             return (sendBytes);
+        }
         totalBytes += sendBytes;
         for (;;)
         {
             readBytes = (unsigned)fin.readsome(buf, (unsigned)BUF_SIZE);
+            cout << "file bytes: " << readBytes << endl;
             if (!readBytes)
                 break;            
             sendBytes = sendAll(sock, buf, readBytes, 0);
             if (sendBytes <= 0)
+            {
+                cerr << "Sending error. Position - 3. Last bytes sent: " << sendBytes 
+                        << ". Errno: " << errno << endl;
                 return (sendBytes);
+            }
             totalBytes += sendBytes;
         }
         fin.close();

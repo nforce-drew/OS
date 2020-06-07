@@ -54,6 +54,7 @@ MyClient::MyClient(const QString& strHost, int nPort, QWidget *pwgt/*=0*/) :
     LogInWindow* m_loginWndw = new LogInWindow(this);
     if (m_loginWndw->exec() == QDialog::Accepted)
     {
+        slotSendDataToServer();
         QMessageBox::information(this, "Logged", "User " + m_loginWndw->getUserName() + " logged.");
     }
 //    m_loginWndw->show();

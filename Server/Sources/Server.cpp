@@ -19,7 +19,7 @@
 using namespace std;
 
 #define BUF_SIZE    1024
-#define PORT_NUMBER 3425
+#define PORT_NUMBER 5307
 
 //=================================================================================
 int main(const int argc, const char** argv)
@@ -56,6 +56,7 @@ int main(const int argc, const char** argv)
     set<int> clients;
     clients.clear();
 
+    cout << "The server is running..." << endl;
     while(1)
     {
         // Заполняем множество сокетов
@@ -70,7 +71,8 @@ int main(const int argc, const char** argv)
         timeval timeout;
         if (argc == 2)
             timeout.tv_sec = atoi(argv[1]);
-        // timeout.tv_sec = 20; //Время работы сервера
+        else
+            timeout.tv_sec = 15; //Время работы сервера
         timeout.tv_usec = 0;
 
         // Ждём события в одном из сокетов
@@ -124,6 +126,7 @@ int main(const int argc, const char** argv)
 
                 // Поступили данные от клиента, читаем их
                 bytes_read = recvAll(*it, buf, dataType, &paths);
+                cout << "Bytes read: " << bytes_read << endl;
                 if (bytes_read <= 0)
                 {
                     // Соединение разорвано, удаляем сокет из множества
@@ -136,7 +139,7 @@ int main(const int argc, const char** argv)
                 cout << "Отправляемые файлы(" << paths.size() << ")" << endl;
                 for (auto el : paths)
                     cout << "\t" << el << endl;
-                
+
                 int bytesSent = sendFiles(*it, paths);
                 cout << "Bytes sent: " << bytesSent << endl;
                 // cout << "Total bytes sent: " << bytesSent << endl;

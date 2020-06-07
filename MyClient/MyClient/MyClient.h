@@ -3,6 +3,7 @@
 
 #include "MainHeader.h"
 #include "FileHeader.h"
+#include "LogInWindow.h"
 #include <QWidget>
 #include <QTcpSocket>
 #include <QTextEdit>

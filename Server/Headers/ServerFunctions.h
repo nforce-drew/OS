@@ -17,7 +17,7 @@
 #include <list>
 using namespace std;
 
-#define     SAVE_PATH   "/home/nforce/Desktop/Server/" // в конце должен быть слэш!!!
+#define     SAVE_PATH   "/home/nforce/OS/Server/" // в конце должен быть слэш!!!
 #define     BUF_SIZE    1024
 
 string      fileName(string pathname); //(Вспомогательная) Вырезает имя файла из пути

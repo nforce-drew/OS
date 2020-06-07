@@ -6,6 +6,9 @@
 
 QT       += core gui
 QT       += network
+QT       += sql
+
+INCLUDEPATH += /usr/include/postgresql
 
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 
@@ -28,12 +31,15 @@ SOURCES += \
         main.cpp \
         MyClient.cpp \
     MainHeader.cpp \
-    FileHeader.cpp
+    FileHeader.cpp \
+    LogInWindow.cpp
 
 HEADERS += \
         MyClient.h \
     MainHeader.h \
-    FileHeader.h
+    FileHeader.h \
+    LogInWindow.h
 
 FORMS += \
-        MyClient.ui
+        MyClient.ui \
+    LogInWindow.ui
