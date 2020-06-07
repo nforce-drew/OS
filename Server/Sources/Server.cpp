@@ -1,5 +1,6 @@
 #include "MainHeader.h"
 #include "FileHeader.h"
+#include "Headers.h"
 #include "ServerFunctions.h"
 #include "DataBaseFunctions.h"
 #include "errno.h"
@@ -21,7 +22,20 @@ using namespace std;
 
 #define BUF_SIZE    1024
 #define PORT_NUMBER 5307
+#define DB_PATH     "/home/nforce/OS/tasks_solver.db"
 
+
+string bytes(const char *buf, int size)
+{
+    string message;
+    for (int i = 0; i < size; i++)
+    {
+        message += to_string((int)buf[i]) + " ";
+        if ((i + 1) % 4 == 0)
+            message += "| ";
+    }
+    return (message);
+}
 //=================================================================================
 int main(const int argc, const char** argv)
 {
@@ -30,9 +44,10 @@ int main(const int argc, const char** argv)
     char buf[BUF_SIZE];
     int bytes_read;
 
-    sqlite3* db = connectDB((char*)"/home/nforce/OS/tasks_solver.db");
-    selectData(db, (char*)"SELECT * FROM users_info WHERE user_name == 'ivan' AND user_password == 'ivan123';");
-    sqlite3_close(db);
+    // sqlite3* db = connectDB((char*)DB_PATH);
+    // checkLoginPermission(db, (char*)"ivan", (char*)"ivan123");
+    // sqlite3_close(db);
+
 
     if (argc > 2)
         return (-1);
@@ -141,13 +156,27 @@ int main(const int argc, const char** argv)
                     cout << "Connection refused with client." << endl;
                     continue;
                 }
-                //ОТПРАВЛЯЕМ ФАЙЛЫ
-                cout << "Отправляемые файлы(" << paths.size() << ")" << endl;
-                for (auto el : paths)
-                    cout << "\t" << el << endl;
+                // ОБРАБОТКА ДАННЫХ
+                if (dataType == CHECK_LOGIN)
+                {
+                    MainHeader mainHdr(buf);
+                    cout << "mainHdr: " << mainHdr.getMsgSize() << " " << mainHdr.getCount() << " " << mainHdr.getType() << endl;
+                    LoginHeader loginHdr(buf + 12);
+                    cout << bytes(buf, 52) << endl;
+                    cout << "loginHdr: " << loginHdr.getUserName() << " " << loginHdr.getUserPassword() << endl;
+                    cout << "On the server sock_fd = " << *it << endl;
+                    sqlite3* db = connectDB((char*)DB_PATH);
+                    checkLoginPermission(db, *it, loginHdr.getUserName(), loginHdr.getUserPassword());
+                    sqlite3_close(db);
+                }
 
-                int bytesSent = sendFiles(*it, paths);
-                cout << "Bytes sent: " << bytesSent << endl;
+                //ОТПРАВЛЯЕМ ФАЙЛЫ
+                // cout << "Отправляемые файлы(" << paths.size() << ")" << endl;
+                // for (auto el : paths)
+                //     cout << "\t" << el << endl;
+
+                // int bytesSent = sendFiles(*it, paths);
+                // cout << "Bytes sent: " << bytesSent << endl;
                 // cout << "Total bytes sent: " << bytesSent << endl;
             }
         }

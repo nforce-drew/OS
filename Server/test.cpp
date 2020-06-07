@@ -1,18 +1,35 @@
-#include <stdio.h>
-#include <sqlite3.h> 
+#include <iostream>
+#include <string>
 
-int main(int argc, char* argv[]) {
-   sqlite3 *db;
-   char *zErrMsg = 0;
-   int rc;
+std::string bytes(const char *buf, int size)
+{
+    std::string message;
+    for (int i = 0; i < size; i++)
+    {
+        message += std::to_string((int)buf[i]) + " ";
+        if ((i + 1) % 4 == 0)
+            message += "| ";
+    }
+    return (message);
+}
 
-   rc = sqlite3_open("test.db", &db);
+int main()
+{
+    // void* vd;
+    //     vd = 0;
+    // int *i;
+    // int a = 12;
+    // i = &a;
 
-   if( rc ) {
-      fprintf(stderr, "Can't open database: %s\n", sqlite3_errmsg(db));
-      return(0);
-   } else {
-      fprintf(stderr, "Opened database successfully\n");
-   }
-   sqlite3_close(db);
+    // vd = i;
+    int x = 10;
+    void *pointer = &x;
+
+
+    int y = *((int *) pointer);
+    std::cout << y << std::endl;
+
+    // std::cout << bytes((char*)vd, sizeof(void*)) << std::endl;
+
+    return (0);
 }

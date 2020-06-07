@@ -58,9 +58,10 @@ int recvAll(int sock, char *buf, TYPE &dataType, list<string> *paths)
     curByte = sizeof(MainHeader);
     blockBytes = totalBytes;
     cerr << mainHeader.getType() << "==" << SEND_FILES << endl;
+    dataType = mainHeader.getType();
     if (mainHeader.getType() == SEND_FILES)
     {
-        dataType = SEND_FILES;
+        // dataType = SEND_FILES;
         for (int i = 0; i < mainHeader.getCount(); i++)
         {
             while (blockBytes - curByte < sizeof(FileHeader))
@@ -126,10 +127,23 @@ int recvAll(int sock, char *buf, TYPE &dataType, list<string> *paths)
         }
     }
 
-    if (mainHeader.getType() == OTHER)
+    if (mainHeader.getType() == CHECK_LOGIN)
     {
-        dataType = OTHER;
-        int a = 2 * 2;
+        blockBytes = totalBytes;
+        while (blockBytes - curByte < sizeof(LoginHeader))
+        {
+            memcpy(buf, buf + curByte, blockBytes - curByte);
+            blockBytes = blockBytes - curByte;
+            curByte = 0;
+            readBytes = recv(sock, buf + blockBytes, BUF_SIZE - blockBytes, 0);
+            if (readBytes <= 0)
+            {
+                cerr << "Error: recvAll() readBytes <= 0" << endl;
+                return (readBytes);
+            }
+            totalBytes += readBytes;
+            blockBytes += readBytes;
+        }
     }
 
     return (totalBytes);
