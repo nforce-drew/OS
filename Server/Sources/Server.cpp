@@ -1,6 +1,7 @@
 #include "MainHeader.h"
 #include "FileHeader.h"
 #include "ServerFunctions.h"
+#include "DataBaseFunctions.h"
 #include "errno.h"
 #include <sys/types.h>
 #include <sys/socket.h>
@@ -28,6 +29,10 @@ int main(const int argc, const char** argv)
     struct sockaddr_in addr;
     char buf[BUF_SIZE];
     int bytes_read;
+
+    sqlite3* db = connectDB((char*)"/home/nforce/OS/tasks_solver.db");
+    selectData(db, (char*)"SELECT * FROM users_info WHERE user_name == 'ivan' AND user_password == 'ivan123';");
+    sqlite3_close(db);
 
     if (argc > 2)
         return (-1);
@@ -116,6 +121,7 @@ int main(const int argc, const char** argv)
 
             clients.insert(sock);
         }
+
 
         for(set<int>::iterator it = clients.begin(); it != clients.end(); it++)
         {
