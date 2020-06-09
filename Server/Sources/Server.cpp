@@ -39,10 +39,11 @@ string bytes(const char *buf, int size)
 //=================================================================================
 int main(const int argc, const char** argv)
 {
-    int listener;
-    struct sockaddr_in addr;
-    char buf[BUF_SIZE];
-    int bytes_read;
+    int     listener;
+    struct  sockaddr_in addr;
+    char    buf[BUF_SIZE];
+    int     bytes_read;
+    string  query;
 
     // sqlite3* db = connectDB((char*)DB_PATH);
     // checkLoginPermission(db, (char*)"ivan", (char*)"ivan123");
@@ -77,6 +78,13 @@ int main(const int argc, const char** argv)
     clients.clear();
 
     cout << "The server is running..." << endl;
+
+    // Очищаем онлайн юзеров в БД
+    sqlite3* db = connectDB((char*)DB_PATH);
+    query = "DELETE FROM online_users;";
+    sqlite3_exec(db, query.c_str(), NULL, NULL, NULL);
+    sqlite3_close(db);
+
     while(1)
     {
         // Заполняем множество сокетов
@@ -135,6 +143,7 @@ int main(const int argc, const char** argv)
             fcntl(sock, F_SETFL, O_NONBLOCK);
 
             clients.insert(sock);
+            cout << "NEW SOCK: " << sock << endl;
         }
 
 
@@ -150,24 +159,43 @@ int main(const int argc, const char** argv)
                 cout << "Bytes read: " << bytes_read << endl;
                 if (bytes_read <= 0)
                 {
-                    // Соединение разорвано, удаляем сокет из множества
+                    // Соединение разорвано, удаляем сокет из множества, удаляем из online в БД
+                    sqlite3* db = connectDB((char*)DB_PATH);
+                    query = "DELETE FROM online_users WHERE sock_num = "
+                        + std::to_string(*it) + ";";
+                    cout << query << endl;
+                    sqlite3_exec(db, query.c_str(), NULL, NULL, NULL);
+                    sqlite3_close(db);
+
                     close(*it);
                     clients.erase(*it);
                     cout << "Connection refused with client." << endl;
                     continue;
                 }
                 // ОБРАБОТКА ДАННЫХ
-                if (dataType == CHECK_LOGIN)
+                switch (dataType)
                 {
-                    MainHeader mainHdr(buf);
-                    cout << "mainHdr: " << mainHdr.getMsgSize() << " " << mainHdr.getCount() << " " << mainHdr.getType() << endl;
-                    LoginHeader loginHdr(buf + 12);
-                    cout << bytes(buf, 52) << endl;
-                    cout << "loginHdr: " << loginHdr.getUserName() << " " << loginHdr.getUserPassword() << endl;
-                    cout << "On the server sock_fd = " << *it << endl;
-                    sqlite3* db = connectDB((char*)DB_PATH);
-                    checkLoginPermission(db, *it, loginHdr.getUserName(), loginHdr.getUserPassword());
-                    sqlite3_close(db);
+                    case CHECK_LOGIN:
+                    {
+                        MainHeader mainHdr(buf);
+                        cout << "mainHdr: " << mainHdr.getMsgSize() << " " << mainHdr.getCount() 
+                            << " " << mainHdr.getType() << endl;
+                        LoginHeader loginHdr(buf + 12);
+                        cout << bytes(buf, 52) << endl;
+                        cout << "loginHdr: " << loginHdr.getUserName() << " " << loginHdr.getUserPassword() << endl;
+                        cout << "On the server sock_fd = " << *it << endl;
+                        sqlite3* db = connectDB((char*)DB_PATH);
+                        checkLoginPermission(db, *it, loginHdr.getUserName(), loginHdr.getUserPassword());
+                        sqlite3_close(db);
+                        cout << "SOCK after callback: " << *it << endl;
+                    }
+                    case SEND_FILES:
+                    {
+                        MainHeader mainHdr(buf);
+                        cout << "mainHdr: " << mainHdr.getMsgSize() << " " 
+                            << mainHdr.getCount() << " " << mainHdr.getType() << endl;
+                        
+                    }
                 }
 
                 //ОТПРАВЛЯЕМ ФАЙЛЫ

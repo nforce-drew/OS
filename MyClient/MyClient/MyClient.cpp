@@ -54,9 +54,11 @@ MyClient::MyClient(const QString& strHost, int nPort, QWidget *pwgt/*=0*/) :
     m_loginWndw = new LogInWindow(this);
     if (((LogInWindow*)m_loginWndw)->exec() == QDialog::Accepted)
     {
-
+        qDebug() << "User " + ((LogInWindow*)m_loginWndw)->getUserName() + " logged.";
+        show();
         QMessageBox::information(this, "Logged", "User " + ((LogInWindow*)m_loginWndw)->getUserName() + " logged.");
     }
+
 //    m_loginWndw->show();
 
     setLayout(pvbxLayout);
@@ -113,6 +115,7 @@ void MyClient::slotReadyRead()
     {
         qDebug() << "PERMISSION_LOGIN";
         ((LogInWindow*)m_loginWndw)->hide();
+        show();
     }
     if (mainHeader.getType() == BAN_LOGIN)
     {

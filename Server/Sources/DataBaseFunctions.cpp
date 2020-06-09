@@ -20,10 +20,13 @@ sqlite3* connectDB(char* db_path)
 
 static int callback(void* sock_fd, int argc, char** argv, char** azColName)
 {
-    MainHeader mainHdr;
+    MainHeader  mainHdr;
+    
 
     std::cout << "!!!!!!!callback()" << std::endl;
     std::cout << argv[0] << " " << argv[1] << " argc = " << argc << std::endl;
+
+    
 
     if (argc == 2)
         mainHdr.setData(sizeof(MainHeader), 0, PERMISSION_LOGIN);
@@ -33,6 +36,7 @@ static int callback(void* sock_fd, int argc, char** argv, char** azColName)
     int sendBytes = sendData(*((int*)sock_fd), mainHdr, NULL, 0);
     *((int*)sock_fd) = -1;
     std::cout << "Bytes sended: " << sendBytes << std::endl;
+
     return (0);
 }
 
@@ -41,7 +45,9 @@ int checkLoginPermission(sqlite3* db, int sock_fd, char* login, char* password)
     std::string query;
     int         rc;
     char*       errMsg;
+    int         trueSock_fd;
 
+    trueSock_fd = sock_fd;
     std::cout << "checkLoginPermission()" << std::endl;
     query = "SELECT * FROM users_info " \
         "WHERE user_name == '" + std::string(login)
@@ -49,13 +55,21 @@ int checkLoginPermission(sqlite3* db, int sock_fd, char* login, char* password)
     
     rc = sqlite3_exec(db, query.c_str(), callback, &sock_fd, &errMsg);
 
-    
-    std::cerr << errMsg << std::endl;
     if (sock_fd != -1)
     {
         MainHeader mainHdr(sizeof(MainHeader), 0, BAN_LOGIN);
         int sendBytes = sendData(sock_fd, mainHdr, NULL, 0);
     }
+    if (sock_fd == -1)
+    {
+        //Добавление в онлайн
+        std::cout << "INSERT\n";
+        query = "INSERT INTO online_users (user_name, sock_num) " \
+            "VALUES ('" + std::string(login) + "', " + std::to_string(trueSock_fd) + ");";
+        rc = sqlite3_exec(db, query.c_str(), NULL, &sock_fd, &errMsg);
+    }
+
+    std::cerr << errMsg << std::endl;
     errno == 2 ? errno = 0 : errno;
 
     return (rc);
