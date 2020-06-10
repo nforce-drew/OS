@@ -13,17 +13,12 @@ private:
         
 public:
     QueueHeader();
-
     QueueHeader(char* userName, unsigned queueNum, char* time);
-
     QueueHeader(char* byteArr);
-
     QueueHeader &setData(char* userName, unsigned queueNum, char* time);
-
+    QueueHeader setByteArr(char* byteArr);
     char*       getUserName();
-
     unsigned    getQueueNum();
-
     char*       getTime();
 };
 

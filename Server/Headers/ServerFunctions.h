@@ -34,7 +34,7 @@ unsigned    appFileData(string folderAndFileName, const char *data, unsigned len
 //recvAll ПРИНИМАЕТ данные в buf, если пришли не файлы.
 //в переменную TYPE &dataType возвращает тип данных
 //если dataType == SEND_FILES, то в list присвоятся пути к файлам:
-int         recvAll(int sock, char *buf, TYPE &dataType, list<string> *paths); 
+int         recvAll(int sock, char *buf, TYPE &dataType, void* data); 
 
 unsigned    getFileSize(string path); //(Вспомогательная) Определяет размер файла
 

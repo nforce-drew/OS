@@ -41,7 +41,7 @@ unsigned appFileData(string folderAndFileName, const char *data, unsigned len)
     return (len);
 }
 
-int recvAll(int sock, char *buf, TYPE &dataType, list<string> *paths)
+int recvAll(int sock, char *buf, TYPE &dataType, void* data)
 {
     int         readBytes;
     unsigned    totalBytes;
@@ -56,7 +56,6 @@ int recvAll(int sock, char *buf, TYPE &dataType, list<string> *paths)
                                     //не путь, а имя папки, которое заканчивается слэшем!!!
                                     //сам путь содержится в h-файле в SAVE_PATH
     
-    paths->clear();
     totalBytes = 0;
     while (totalBytes < sizeof(MainHeader))
     {
@@ -77,6 +76,7 @@ int recvAll(int sock, char *buf, TYPE &dataType, list<string> *paths)
     dataType = mainHeader.getType();
     if (mainHeader.getType() == SEND_FILES)
     {
+        list<string> *paths = new list<string>;
         // Создание папки для сохранения
         string curTime = currentTimeInfo();
         string userName = getUserName(sock);
@@ -87,7 +87,7 @@ int recvAll(int sock, char *buf, TYPE &dataType, list<string> *paths)
         folderName += "/";
 
         joinQueue(userName, curTime);
-        // sendQueue(6); //!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+        sendQueue(6); //!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
 
 
@@ -154,6 +154,7 @@ int recvAll(int sock, char *buf, TYPE &dataType, list<string> *paths)
                 }
             }
         }
+        data = (void*)paths;
     }
 
     if (mainHeader.getType() == CHECK_LOGIN)
@@ -173,6 +174,32 @@ int recvAll(int sock, char *buf, TYPE &dataType, list<string> *paths)
             totalBytes += readBytes;
             blockBytes += readBytes;
         }
+    }
+
+    list<QueueHeader>* queue = new list<QueueHeader>;
+    if (mainHeader.getType() == QUEUE_LIST)
+    {
+        QueueHeader queueHdr;
+        for (int i = 0; i < mainHeader.getCount(); i++)
+        {
+            while (blockBytes - curByte < sizeof(QueueHeader))
+            {
+                memcpy(buf, buf + curByte, blockBytes - curByte);
+                blockBytes = blockBytes - curByte;
+                curByte = 0;
+                readBytes = recv(sock, buf + blockBytes, BUF_SIZE - blockBytes, 0);
+                if (readBytes <= 0)
+                {
+                    cerr << "Error: recvAll() readBytes <= 0" << endl;
+                    return (readBytes);
+                }
+                totalBytes += readBytes;
+                blockBytes += readBytes;
+            }
+            queueHdr.setByteArr(buf + curByte);
+            queue->push_back(queueHdr);         
+        }
+        data = (void*)queue;
     }
 
     return (totalBytes);

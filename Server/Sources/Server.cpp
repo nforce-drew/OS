@@ -147,11 +147,13 @@ int main(const int argc, const char** argv)
         {
             if (FD_ISSET(*it, &readset))
             {
-                list<string> paths;
-                TYPE dataType;
+                list<string>*       paths;
+                list<QueueHeader>*  queue;
+                TYPE                dataType;
+                void*               data;
 
                 // Поступили данные от клиента, читаем их
-                bytes_read = recvAll(*it, buf, dataType, &paths);
+                bytes_read = recvAll(*it, buf, dataType, data);
                 cout << "Bytes read: " << bytes_read << endl;
                 if (bytes_read <= 0)
                 {
@@ -181,15 +183,20 @@ int main(const int argc, const char** argv)
                         cout << "On the server sock_fd = " << *it << endl;
                         sqlite3* db = connectDB((char*)DB_PATH);
                         checkLoginPermission(db, *it, loginHdr.getUserName(), loginHdr.getUserPassword());
-                        sqlite3_close(db);
-
-                        
+                        sqlite3_close(db);    
                     }
                     case SEND_FILES:
                     {
-                        MainHeader mainHdr(buf);
-                        cout << "mainHdr: " << mainHdr.getMsgSize() << " " 
-                            << mainHdr.getCount() << " " << mainHdr.getType() << endl;                      
+                        paths = (list<string>*)data;
+
+                        delete paths;             
+                    }
+                    case QUEUE_LIST:
+                    {
+                        queue = (list<QueueHeader>*)data;
+                        clearQueue();
+                        
+                        delete queue;
                     }
                 }
                 //ОТПРАВЛЯЕМ ФАЙЛЫ
@@ -197,7 +204,7 @@ int main(const int argc, const char** argv)
                 // for (auto el : paths)
                 //     cout << "\t" << el << endl;
 
-                int bytesSent = sendFiles(*it, paths);
+                // int bytesSent = sendFiles(*it, paths);
                 // cout << "Bytes sent: " << bytesSent << endl;
                 // cout << "Total bytes sent: " << bytesSent << endl;
             }

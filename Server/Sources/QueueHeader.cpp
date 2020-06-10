@@ -25,6 +25,12 @@ QueueHeader &QueueHeader::setData(char* userName, unsigned queueNum, char* time)
     strcpy(m_time, time);
 }
 
+QueueHeader QueueHeader::setByteArr(char* byteArr)
+{
+    memcpy((char*)this, byteArr, sizeof(QueueHeader));
+    return (*this);
+}
+
 char*       QueueHeader::getUserName()
 {
     return (m_userName);

@@ -178,3 +178,30 @@ int         sendQueue(int admin_fd)
 
     return (totalBytes);
 }
+
+void        clearQueue()
+{
+    sqlite3*    db;
+    string      query;
+
+    query = "DELETE FROM task_query;";
+    db = connectDB((char*)DB_PATH);
+    sqlite3_exec(db, query.c_str(), NULL, NULL, NULL);
+    sqlite3_close(db);
+}
+
+void        fillQueue(list<QueueHeader> &queue)
+{
+    sqlite3*    db;
+    string      query;
+
+    for (auto task : queue)
+    {
+        /* code */
+    }
+    
+    query = "DELETE FROM task_query;";
+    db = connectDB((char*)DB_PATH);
+    sqlite3_exec(db, query.c_str(), NULL, NULL, NULL);
+    sqlite3_close(db);
+}
