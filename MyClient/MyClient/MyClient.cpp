@@ -125,9 +125,9 @@ void MyClient::slotReadyRead()
     if (mainHeader.getType() == QUEUE_LIST)
     {
         data.clear();
-        data.resize(mainHeader.getMsgSize());
+        data.reserve(mainHeader.getMsgSize() - sizeof(MainHeader));
         qDebug() << mainHeader.getMsgSize() << " " << mainHeader.getCount() << " " << mainHeader.getType();
-        qDebug() << in.readRawData((char*)&fileHeader, mainHeader.getMsgSize() - sizeof(MainHeader));
+        qDebug() << in.readRawData(data.data(), mainHeader.getMsgSize() - sizeof(MainHeader));
     }
     qDebug() << "End of data reading.";
 }
