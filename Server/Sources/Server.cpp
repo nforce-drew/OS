@@ -22,7 +22,6 @@ using namespace std;
 
 #define BUF_SIZE    1024
 #define PORT_NUMBER 5307
-#define DB_PATH     "/home/nforce/OS/tasks_solver.db"
 
 
 string bytes(const char *buf, int size)
@@ -45,11 +44,6 @@ int main(const int argc, const char** argv)
     int     bytes_read;
     string  query;
 
-    // sqlite3* db = connectDB((char*)DB_PATH);
-    // checkLoginPermission(db, (char*)"ivan", (char*)"ivan123");
-    // sqlite3_close(db);
-
-
     if (argc > 2)
         return (-1);
     if (argc == 2 && atoi(argv[1]) == 0)
@@ -61,6 +55,8 @@ int main(const int argc, const char** argv)
         exit(1);
     }
     
+    cout << currentTimeInfo() << endl;
+
     fcntl(listener, F_SETFL, O_NONBLOCK);
     
     addr.sin_family = AF_INET;
@@ -163,7 +159,6 @@ int main(const int argc, const char** argv)
                     sqlite3* db = connectDB((char*)DB_PATH);
                     query = "DELETE FROM online_users WHERE sock_num = "
                         + std::to_string(*it) + ";";
-                    cout << query << endl;
                     sqlite3_exec(db, query.c_str(), NULL, NULL, NULL);
                     sqlite3_close(db);
 
@@ -187,23 +182,22 @@ int main(const int argc, const char** argv)
                         sqlite3* db = connectDB((char*)DB_PATH);
                         checkLoginPermission(db, *it, loginHdr.getUserName(), loginHdr.getUserPassword());
                         sqlite3_close(db);
-                        cout << "SOCK after callback: " << *it << endl;
+
+                        
                     }
                     case SEND_FILES:
                     {
                         MainHeader mainHdr(buf);
                         cout << "mainHdr: " << mainHdr.getMsgSize() << " " 
-                            << mainHdr.getCount() << " " << mainHdr.getType() << endl;
-                        
+                            << mainHdr.getCount() << " " << mainHdr.getType() << endl;                      
                     }
                 }
-
                 //ОТПРАВЛЯЕМ ФАЙЛЫ
                 // cout << "Отправляемые файлы(" << paths.size() << ")" << endl;
                 // for (auto el : paths)
                 //     cout << "\t" << el << endl;
 
-                // int bytesSent = sendFiles(*it, paths);
+                int bytesSent = sendFiles(*it, paths);
                 // cout << "Bytes sent: " << bytesSent << endl;
                 // cout << "Total bytes sent: " << bytesSent << endl;
             }

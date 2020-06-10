@@ -122,6 +122,13 @@ void MyClient::slotReadyRead()
         qDebug() << "BAN_LOGIN";
         ((LogInWindow*)m_loginWndw)->slotIncorrectLogin();
     }
+    if (mainHeader.getType() == QUEUE_LIST)
+    {
+        data.clear();
+        data.resize(mainHeader.getMsgSize());
+        qDebug() << mainHeader.getMsgSize() << " " << mainHeader.getCount() << " " << mainHeader.getType();
+        qDebug() << in.readRawData((char*)&fileHeader, mainHeader.getMsgSize() - sizeof(MainHeader));
+    }
     qDebug() << "End of data reading.";
 }
 

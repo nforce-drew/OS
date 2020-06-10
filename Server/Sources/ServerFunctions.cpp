@@ -10,6 +10,21 @@ string fileName(string pathname)
     return (pathname);
 }
 
+string currentTimeInfo()
+{
+    tm*     timeInfo;
+    time_t  seconds;
+    char timeStr[20];
+
+    seconds = time(NULL);
+    timeInfo = localtime(&seconds);
+    char* format = (char*)"%Y-%m-%d %H:%M:%S";
+    strftime(timeStr, 20, format, timeInfo);
+    // std::cout<<"Current Datetime: "<<timeStr<<std::endl;
+
+    return (string(timeStr));
+}
+
 unsigned appFileData(string folderAndFileName, const char *data, unsigned len)
 {
     ofstream    fout;
@@ -36,10 +51,11 @@ int recvAll(int sock, char *buf, TYPE &dataType, list<string> *paths)
     string      filename;
     MainHeader  mainHeader;
     FileHeader  fileHeader;
-    string      folderName = "Files/"; //В эту строку нужно присвоить имя папки для сохранения файлов
+    string      savePath;
+    string      folderName; //В эту строку нужно присвоить имя папки для сохранения файлов
                                     //не путь, а имя папки, которое заканчивается слэшем!!!
                                     //сам путь содержится в h-файле в SAVE_PATH
-
+    
     paths->clear();
     totalBytes = 0;
     while (totalBytes < sizeof(MainHeader))
@@ -61,7 +77,20 @@ int recvAll(int sock, char *buf, TYPE &dataType, list<string> *paths)
     dataType = mainHeader.getType();
     if (mainHeader.getType() == SEND_FILES)
     {
-        // dataType = SEND_FILES;
+        // Создание папки для сохранения
+        string curTime = currentTimeInfo();
+        string userName = getUserName(sock);
+        mkdir((char*)SAVE_PATH, S_IRWXU);
+        folderName = userName + " " + curTime;
+        savePath = (char*)SAVE_PATH + folderName;
+        mkdir(savePath.c_str(), S_IRWXU);
+        folderName += "/";
+
+        joinQueue(userName, curTime);
+        // sendQueue(6); //!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
+
+
         for (int i = 0; i < mainHeader.getCount(); i++)
         {
             while (blockBytes - curByte < sizeof(FileHeader))
@@ -274,3 +303,4 @@ int sendFiles(int sock, list<string> &paths)
     }
     return (totalBytes);
 }
+

@@ -1,6 +1,7 @@
 #include "MainHeader.h"
 #include "FileHeader.h"
 #include "Headers.h"
+#include "DataBaseFunctions.h"
 #include "errno.h"
 #include <sys/types.h>
 #include <sys/socket.h>
@@ -16,12 +17,17 @@
 #include <string.h>
 #include <fstream>
 #include <list>
+#include <sys/stat.h>
+#include <ctime>
+
 using namespace std;
 
-#define     SAVE_PATH   "/home/nforce/OS/Server/" // в конце должен быть слэш!!!
+#define     SAVE_PATH   "/home/nforce/OS/Server/Tasks/" // в конце должен быть слэш!!!
 #define     BUF_SIZE    1024
 
 string      fileName(string pathname); //(Вспомогательная) Вырезает имя файла из пути
+
+string      currentTimeInfo();
 
 unsigned    appFileData(string folderAndFileName, const char *data, unsigned len); //(Вспомогательная) Добавляет данные в файл
 

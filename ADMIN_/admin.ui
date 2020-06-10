@@ -1,0 +1,185 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>Admin</class>
+ <widget class="QMainWindow" name="Admin">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>800</width>
+    <height>470</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>Admin</string>
+  </property>
+  <widget class="QWidget" name="centralwidget">
+   <widget class="QListWidget" name="listUsers">
+    <property name="geometry">
+     <rect>
+      <x>40</x>
+      <y>40</y>
+      <width>161</width>
+      <height>381</height>
+     </rect>
+    </property>
+    <item>
+     <property name="text">
+      <string>User1</string>
+     </property>
+    </item>
+    <item>
+     <property name="text">
+      <string>User2</string>
+     </property>
+    </item>
+    <item>
+     <property name="text">
+      <string>User3</string>
+     </property>
+    </item>
+   </widget>
+   <widget class="QLabel" name="Users_Lbl">
+    <property name="geometry">
+     <rect>
+      <x>80</x>
+      <y>10</y>
+      <width>121</width>
+      <height>31</height>
+     </rect>
+    </property>
+    <property name="font">
+     <font>
+      <pointsize>15</pointsize>
+     </font>
+    </property>
+    <property name="text">
+     <string>Users</string>
+    </property>
+   </widget>
+   <widget class="QLabel" name="Tasks_lbl">
+    <property name="geometry">
+     <rect>
+      <x>470</x>
+      <y>10</y>
+      <width>101</width>
+      <height>31</height>
+     </rect>
+    </property>
+    <property name="font">
+     <font>
+      <pointsize>16</pointsize>
+     </font>
+    </property>
+    <property name="text">
+     <string>Tasks</string>
+    </property>
+   </widget>
+   <widget class="QPushButton" name="deleteBtn">
+    <property name="geometry">
+     <rect>
+      <x>670</x>
+      <y>430</y>
+      <width>93</width>
+      <height>28</height>
+     </rect>
+    </property>
+    <property name="font">
+     <font>
+      <pointsize>10</pointsize>
+     </font>
+    </property>
+    <property name="text">
+     <string>Delete</string>
+    </property>
+   </widget>
+   <widget class="QTableWidget" name="tableTasks">
+    <property name="geometry">
+     <rect>
+      <x>260</x>
+      <y>50</y>
+      <width>511</width>
+      <height>371</height>
+     </rect>
+    </property>
+    <row>
+     <property name="text">
+      <string>  1</string>
+     </property>
+    </row>
+    <row>
+     <property name="text">
+      <string>  2</string>
+     </property>
+    </row>
+    <row>
+     <property name="text">
+      <string>  3</string>
+     </property>
+    </row>
+    <column>
+     <property name="text">
+      <string>Task</string>
+     </property>
+    </column>
+    <column>
+     <property name="text">
+      <string>User</string>
+     </property>
+    </column>
+    <column>
+     <property name="text">
+      <string>Time</string>
+     </property>
+    </column>
+    <item row="0" column="0">
+     <property name="text">
+      <string>Task1</string>
+     </property>
+    </item>
+    <item row="0" column="1">
+     <property name="text">
+      <string>User2</string>
+     </property>
+    </item>
+    <item row="0" column="2">
+     <property name="text">
+      <string>11:11:11</string>
+     </property>
+    </item>
+    <item row="1" column="0">
+     <property name="text">
+      <string>Task2</string>
+     </property>
+    </item>
+    <item row="1" column="1">
+     <property name="text">
+      <string>User1</string>
+     </property>
+    </item>
+    <item row="1" column="2">
+     <property name="text">
+      <string>13:45:31</string>
+     </property>
+    </item>
+    <item row="2" column="0">
+     <property name="text">
+      <string>Task3</string>
+     </property>
+    </item>
+    <item row="2" column="1">
+     <property name="text">
+      <string>User3</string>
+     </property>
+    </item>
+    <item row="2" column="2">
+     <property name="text">
+      <string>17:12:13</string>
+     </property>
+    </item>
+   </widget>
+  </widget>
+ </widget>
+ <resources/>
+ <connections/>
+</ui>

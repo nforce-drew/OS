@@ -8,6 +8,7 @@ enum TYPE
     PERMISSION_LOGIN,
     BAN_LOGIN,
     CHECK_LOGIN,
+    QUEUE_LIST,
     OTHER
 };
 //=================================================================================
