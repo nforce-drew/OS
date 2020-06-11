@@ -24,9 +24,12 @@ private:
 
 private:
     void    setTable(QList<QueueHeader> queueList);
+    void    setOnlineUsers(QStringList users);
 
-public slots:
-    void    slotQueueChanged();
+private slots:
+//    void    slotQueueChanged();
+    void deleteTask();
+    void setEnabledDeleteBtn();
 };
 
 #endif // ADMIN_H

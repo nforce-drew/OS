@@ -3,19 +3,22 @@
 QueueTable::QueueTable(QWidget *parent)
     : QTableWidget (parent)
 {
-
+    queueList = new QList<QueueHeader>;
 }
 
 void QueueTable::mousePressEvent(QMouseEvent *event)
 {
-    qDebug() << "cool";
     QTableWidgetItem *targetItem = itemAt(event->pos());
     if (event->button() == Qt::LeftButton) {
         // включаем драг и дроп если ячейка выделена
         if (targetItem != 0)
         {
+            qDebug() << "cool";
             if (targetItem->isSelected())
+            {
                 setDragDropMode(QAbstractItemView::DragDrop);
+
+            }
             else
                 setDragDropMode(QAbstractItemView::NoDragDrop);
         }
@@ -23,19 +26,13 @@ void QueueTable::mousePressEvent(QMouseEvent *event)
     QTableWidget::mousePressEvent(event);
 }
 
-void QueueTable::moveEvent(QMoveEvent*    event)
-{
-    queueChanged();
-    QTableWidget::moveEvent(event);
-}
-
 void QueueTable::dropEvent(QDropEvent *event)
 {
     QTableWidgetItem*   targetItem;
+    QStringList         selRowData;
     int                 countCol;
     int                 selRow;
     int                 targetRow;
-
 
     countCol = horizontalHeader()->count();
     // проверяем что источник - родная таблица
@@ -60,46 +57,38 @@ void QueueTable::dropEvent(QDropEvent *event)
     }
 
     selRow = selectedItems()[0]->row();
+    if (selRow == targetRow)
+    {
+        event->accept();  // не будем игнорить сообщение, скажем что обработали и передадим дальше
+        return;
+    }
+    for (int j = 0; j < countCol; j++)
+        selRowData << item(selRow, j)->text();
+
     if (targetRow < selRow)
     {
-        QStringList selRowData;
-        for (int j = 0; j < countCol; j++)
-            selRowData << item(selRow, j)->text();
         qDebug() << selRowData[0] << " " << selRowData[1];
         for (int i = 0; i < (selRow - targetRow); i++)
-        {
-
             for (int j = 0; j < countCol; j++)
-            {
                 setItem(selRow - i, j, new QTableWidgetItem(item(selRow - i - 1, j)->text()));
-            }
-        }
         for (int j = 0; j < countCol; j++)
         {
             qDebug() << "j = " << j << " targetRow = " << targetRow << " selRowData[j] = " << selRowData[j];
             setItem(targetRow, j, new QTableWidgetItem(selRowData[j]));
         }
     }
+
     if (targetRow > selRow)
     {
-        QStringList targetRowData;
-        for (int j = 0; j < countCol; j++)
-            targetRowData << item(targetRow, j)->text();
-        qDebug() << targetRowData[0] << " " << targetRowData[1];
-        for (int i = 0; i < (selRow - targetRow); i++)
-        {
+        for (int i = 0; i < (targetRow - selRow); i++)
             for (int j = 0; j < countCol; j++)
-            {
-                setItem(selRow + i + 1, j, new QTableWidgetItem(item(selRow + i + 2, j)->text()));
-            }
-        }
+                setItem(selRow + i, j, new QTableWidgetItem(item(selRow + i + 1, j)->text()));
         for (int j = 0; j < countCol; j++)
-        {
-            setItem(selRow, j, new QTableWidgetItem(targetRowData[j]));
-        }
+            setItem(targetRow, j, new QTableWidgetItem(selRowData[j]));
     }
-//    QTableWidget::dropEvent(event);
+    setCurrentCell(targetRow, 0);
     queueChanged();
+    emit queueChanged(queueList);
 }
 
 void    QueueTable::queueChanged()
@@ -112,4 +101,9 @@ void    QueueTable::queueChanged()
     for (int i = 0; i < rowCount; i++)
         vertHdrList << QString::number(i + 2);
     this->setVerticalHeaderLabels(vertHdrList);
+}
+
+QueueTable::~QueueTable()
+{
+    delete queueList;
 }

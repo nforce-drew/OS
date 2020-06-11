@@ -18,14 +18,19 @@ Admin::Admin(QWidget *parent) :
     ui->tableTasks->setSelectionBehavior(QAbstractItemView::SelectRows);
     ui->tableTasks->horizontalHeader()->setSectionResizeMode(0, QHeaderView::ResizeToContents);
     ui->tableTasks->horizontalHeader()->setStretchLastSection(true);
+    ui->tableTasks->verticalHeader()->setSectionResizeMode(QHeaderView::ResizeToContents);
     ui->tableTasks->verticalHeader()->setSectionsMovable(true);
-    ui->tableTasks->verticalHeader()->setFixedWidth(25);
+    ui->tableTasks->setEditTriggers(QAbstractItemView::NoEditTriggers);
 
-//    connect(ui->tableTasks->verticalHeader(), SIGNAL(sectionMoved(int, int, int)),
-//            this, SLOT(slotQueueChanged()));
+    ui->deleteBtn->setEnabled(false);
+    connect(ui->tableTasks, SIGNAL(currentCellChanged(int, int, int, int)),
+            this, SLOT(setEnabledDeleteBtn()));
+    connect(ui->deleteBtn, SIGNAL(clicked()), this, SLOT(deleteTask()));
+//    ui->tableTasks->curr
+
     QList<QueueHeader> queueList;
     setTable(queueList);
-//    (qobject_cast<QueueTable*>(ui->tableTasks))->queueChanged();
+    ui->tableTasks->queueChanged();
 
     centralWidget()->setLayout(ui->main_Layout);
 }
@@ -33,8 +38,8 @@ Admin::Admin(QWidget *parent) :
 void Admin::setTable(QList<QueueHeader> queueList)
 {
     QueueHeader queueHdr;
-    qDebug() << "setTable";
-    for (int i = 0; i < 10; i++)
+
+    for (int i = -1; i < 10; i++)
     {
         queueHdr.setData((char*)QString("User " + QString::number(i)).toStdString().c_str() , i + 1, "11:22:11");
         queueList << queueHdr;
@@ -42,24 +47,26 @@ void Admin::setTable(QList<QueueHeader> queueList)
     for (int i = 1; i < queueList.size(); i++)
     {
         qDebug() << queueList[i].getUserName();
-
         ui->tableTasks->insertRow(i - 1);
         ui->tableTasks->setItem(i - 1, 0, new QTableWidgetItem(queueList[i].getUserName()));
         ui->tableTasks->setItem(i - 1, 1, new QTableWidgetItem(queueList[i].getTime()));
     }
-//    ui->tableTasks->setSortingEnabled(Qt::AscendingOrder);
 }
 
-void    Admin::slotQueueChanged()
+void Admin::deleteTask()
 {
-    int         rowCount;
-    QStringList vertHdrList;
+    ui->tableTasks->removeRow(ui->tableTasks->currentRow());
+    ui->tableTasks->queueChanged();
+}
 
-    rowCount =ui->tableTasks->verticalHeader()->count();
-    qDebug() << "slotQueueChanged()";
-    for (int i = 0; i < rowCount; i++)
-        vertHdrList << QString::number(i + 2);
-    ui->tableTasks->setVerticalHeaderLabels(vertHdrList);
+void Admin::setEnabledDeleteBtn()
+{
+    ui->deleteBtn->setEnabled(true);
+}
+
+void Admin::setOnlineUsers(QStringList users)
+{
+    ui->listUsers->addItems(users);
 }
 
 Admin::~Admin()
