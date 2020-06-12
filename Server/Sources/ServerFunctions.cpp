@@ -67,16 +67,15 @@ int recvAll(int sock, char *buf, TYPE &dataType, void* data)
         }
         totalBytes += (int)readBytes;
     }
-    
     mainHeader.setByteArr(buf);
 
     curByte = sizeof(MainHeader);
     blockBytes = totalBytes;
-    cerr << mainHeader.getType() << "==" << SEND_FILES << endl;
+
     dataType = mainHeader.getType();
     if (mainHeader.getType() == SEND_FILES)
     {
-        list<string> *paths = new list<string>;
+        list<string>* paths = (list<string>*)data;
         // Создание папки для сохранения
         string curTime = currentTimeInfo();
         string userName = getUserName(sock);
@@ -85,10 +84,9 @@ int recvAll(int sock, char *buf, TYPE &dataType, void* data)
         savePath = (char*)SAVE_PATH + folderName;
         mkdir(savePath.c_str(), S_IRWXU);
         folderName += "/";
-
         joinQueue(userName, curTime);
-        sendQueue(6); //!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-
+        
+        // sendQueue(6); //!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
 
         for (int i = 0; i < mainHeader.getCount(); i++)
@@ -154,10 +152,14 @@ int recvAll(int sock, char *buf, TYPE &dataType, void* data)
                 }
             }
         }
+        // cout << "path.size = " << paths->size() << endl;
         data = (void*)paths;
+        // cout << data << endl;
+        // cout << reinterpret_cast<void*>(paths) << endl;
+        // cout << "./spath->size = " << ((list<string>*)data)->size() << endl;
+        return (totalBytes);
     }
-
-    if (mainHeader.getType() == CHECK_LOGIN)
+    else if (mainHeader.getType() == CHECK_LOGIN)
     {
         blockBytes = totalBytes;
         while (blockBytes - curByte < sizeof(LoginHeader))
@@ -174,6 +176,8 @@ int recvAll(int sock, char *buf, TYPE &dataType, void* data)
             totalBytes += readBytes;
             blockBytes += readBytes;
         }
+        data = nullptr;
+        return (totalBytes);
     }
 
     list<QueueHeader>* queue = new list<QueueHeader>;
@@ -258,6 +262,7 @@ int sendData(int sock, const MainHeader &mainHdr, char* data, unsigned len)
     int totalBytes;
     int sendBytes;
 
+    totalBytes = 0;
     sendBytes = sendAll(sock, (char*)&mainHdr, sizeof(MainHeader), 0);
     if (sendBytes <= 0)
         return (sendBytes);
@@ -331,3 +336,37 @@ int sendFiles(int sock, list<string> &paths)
     return (totalBytes);
 }
 
+char*       onlineUsersToChar(list<string>* lst)
+{
+    char* users;
+    auto it = lst->begin();
+
+    users = new char[lst->size() * 20];
+    for (int i = 0; i < lst->size(); i++)
+    {
+        it = lst->begin();
+        advance(it, i);
+        strcpy(users + i * 20, (*it).c_str());
+    }
+    return (users);
+}
+
+int         sendOnlineUsers(int admin_fd)
+{
+    list<string>*   lst;
+    MainHeader      mainHdr;
+    char*           users;
+    unsigned        msgSize;
+    int             sentBytes;
+
+                
+    lst = new list<string>;
+    lst = getOnlineUsers(lst);
+    users = onlineUsersToChar(lst);
+    msgSize = sizeof(MainHeader) + lst->size() * 20;
+    mainHdr.setData(msgSize, lst->size(), ONLINE_USERS);
+    for (int i = 0; i < 9999999; i++) {}
+    sentBytes = sendData(admin_fd, mainHdr, users, lst->size() * 20);
+    delete users;
+    return (sentBytes);
+}

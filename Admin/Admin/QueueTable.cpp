@@ -49,6 +49,13 @@ void QueueTable::dropEvent(QDropEvent *event)
         targetRow = targetItem->row();
     else
         targetRow = rowCount();
+    // Запрет замены первой задачи
+    if (targetRow == 0)
+    {
+        QMessageBox::warning(0, "Ошибка", "Невозможно заменить первую задачу. Преостановите решение задачи.");
+        event->accept();  // не будем игнорить сообщение, скажем что обработали и передадим дальше
+        return;
+    }
 
     if (selectedItems().isEmpty())
     {
@@ -62,6 +69,14 @@ void QueueTable::dropEvent(QDropEvent *event)
         event->accept();  // не будем игнорить сообщение, скажем что обработали и передадим дальше
         return;
     }
+    //Запрет перемещения первой задачи
+    if (selRow == 0)
+    {
+        QMessageBox::warning(0, "Ошибка", "Невозможно переместить первую задачу. Преостановите решение задачи.");
+        event->accept();  // не будем игнорить сообщение, скажем что обработали и передадим дальше
+        return;
+    }
+
     for (int j = 0; j < countCol; j++)
         selRowData << item(selRow, j)->text();
 
@@ -99,7 +114,7 @@ void    QueueTable::queueChanged()
     rowCount = this->verticalHeader()->count();
     qDebug() << "slotQueueChanged()";
     for (int i = 0; i < rowCount; i++)
-        vertHdrList << QString::number(i + 2);
+        vertHdrList << QString::number(i + 1);
     this->setVerticalHeaderLabels(vertHdrList);
 }
 

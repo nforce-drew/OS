@@ -23,6 +23,7 @@ using namespace std;
 #define BUF_SIZE    1024
 #define PORT_NUMBER 5307
 
+int admin_fd;
 
 string bytes(const char *buf, int size)
 {
@@ -54,7 +55,8 @@ int main(const int argc, const char** argv)
         cerr << "Error: socket. Errno: " << errno << endl;
         exit(1);
     }
-    
+
+    admin_fd = -1;
     cout << currentTimeInfo() << endl;
 
     fcntl(listener, F_SETFL, O_NONBLOCK);
@@ -71,7 +73,7 @@ int main(const int argc, const char** argv)
     listen(listener, 2);
     
     set<int> clients;
-    clients.clear();
+    // clients.clear(); !!!!!!!!!!!!
 
     cout << "The server is running..." << endl;
 
@@ -135,11 +137,10 @@ int main(const int argc, const char** argv)
                 cerr << "Error: accept. Errno: " << errno << endl;
                 exit(3);
             }
-            cout << "New client connected." << endl;
+            cout << "New client connected. Socket number: " << sock << endl;
             fcntl(sock, F_SETFL, O_NONBLOCK);
 
             clients.insert(sock);
-            cout << "NEW SOCK: " << sock << endl;
         }
 
 
@@ -153,7 +154,10 @@ int main(const int argc, const char** argv)
                 void*               data;
 
                 // Поступили данные от клиента, читаем их
+                list<string>* lst = new list<string>;
+                data = (void*)lst;
                 bytes_read = recvAll(*it, buf, dataType, data);
+                // cout << "main" << data << endl;
                 cout << "Bytes read: " << bytes_read << endl;
                 if (bytes_read <= 0)
                 {
@@ -163,7 +167,9 @@ int main(const int argc, const char** argv)
                         + std::to_string(*it) + ";";
                     sqlite3_exec(db, query.c_str(), NULL, NULL, NULL);
                     sqlite3_close(db);
-
+                    sendOnlineUsers(admin_fd);
+                    if (*it == admin_fd)
+                        admin_fd = -1;
                     close(*it);
                     clients.erase(*it);
                     cout << "Connection refused with client." << endl;
@@ -183,13 +189,20 @@ int main(const int argc, const char** argv)
                         cout << "On the server sock_fd = " << *it << endl;
                         sqlite3* db = connectDB((char*)DB_PATH);
                         checkLoginPermission(db, *it, loginHdr.getUserName(), loginHdr.getUserPassword());
-                        sqlite3_close(db);    
+                        sqlite3_close(db);
+                        sendOnlineUsers(admin_fd);
+                        break;
                     }
                     case SEND_FILES:
                     {
-                        paths = (list<string>*)data;
-
-                        delete paths;             
+                        // cout << "SEND_FILES adm = " << admin_fd << endl;
+                        if (admin_fd != -1)
+                            sendQueue(admin_fd);
+                        cout << "Отправляемые файлы(" << lst->size() << ")" << endl;
+                        for (auto el : *lst)
+                            cout << "\t" << el << endl;
+                        delete lst;
+                        break;        
                     }
                     case QUEUE_LIST:
                     {
@@ -197,6 +210,20 @@ int main(const int argc, const char** argv)
                         clearQueue();
                         
                         delete queue;
+                        break;
+                    }
+                    case ADMIN_LOGGED:
+                    {
+                        list<string>*   lst;
+                        MainHeader      mainHdr;
+                        char*           users;
+                        unsigned        msgSize;
+
+                        admin_fd = *it;
+                        cout << "Admin logged. Socket: " << *it << endl;
+                        sendQueue(admin_fd);                      
+                        sendOnlineUsers(admin_fd);
+                        break;
                     }
                 }
                 //ОТПРАВЛЯЕМ ФАЙЛЫ

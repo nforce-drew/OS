@@ -1,7 +1,8 @@
 #include <iostream>
 #include <string>
+#include <list>
 #include <ctime>
-
+using namespace std;
 std::string bytes(const char *buf, int size)
 {
     std::string message;
@@ -14,46 +15,50 @@ std::string bytes(const char *buf, int size)
     return (message);
 }
 
-int main()
+void func(void* data)
 {
-    // void* vd;
-    //     vd = 0;
-    // int *i;
-    // int a = 12;
-    // i = &a;
-    // time_t      rawTime;
-    // struct tm*  tm_timeInfo;
-    // std::string timeStr;
-
-    // time(&rawTime);
-    // tm_timeInfo = localtime(&rawTime);
-
-    // timeStr = std::to_string(tm_timeInfo->tm_year) + '-'
-    //             + std::to_string(tm_timeInfo->tm_mon) + '-'
-    //             + std::to_string(tm_timeInfo->tm_mday) + ' '
-    //             + std::to_string(tm_timeInfo->tm_hour) + ':'
-    //             + std::to_string(tm_timeInfo->tm_min) + ':'
-    //             + std::to_string(tm_timeInfo->tm_sec);
-    tm*     timeInfo;
-    time_t  seconds;
-    char timeStr[20];
-    char format[18];
-
-    seconds = time(NULL);
-    timeInfo = localtime(&seconds);
-    format = (char*)"%Y-%m-%d %H:%M:%S";
-    strftime(timeStr, 20, format, timeInfo);
-    std::cout<<"Current Datetime: "<<timeStr<<std::endl;
-
-    // tm_timeInfo->tm_hour;
-
-    // std::string timeInfo = asctime(tm_timeInfo);
-// YYYY-MM-DD HH:MM:SS.SSS
-    std::cout << timeStr << std::endl;
-    // std::cout << tm_timeInfo->tm_ << std::endl;
-
+    list<string>* lst = (list<string>*)data;
     
 
+    lst->push_back("first");
+    lst->push_back("second");
+    data = (void*)lst;
+    cout << lst->size() << endl;
+}
+
+
+int main()
+{
+    // void* data;
+    // list<char*>* lst = new list<char*>;
+    // data = (void*)lst;
+    // func(data);
+
+
+    // list<string>* lst2;
+    // std::cout << lst->size() << std::endl;
+    // lst2 = (list<string>*)data;
+    // for(auto el : *lst2)
+    // {
+    //     cout << el << endl;
+    // }
+    // int a;
+
+    // a = 2*2;
+
+    // char str[a];
+
+
+    list<string>* lst = new list<string>;
+    
+
+    lst->push_back("first");
+    lst->push_back("second");
+    lst->push_back("third");
+
+    auto it = lst->begin();
+    advance(it, 2);
+    cout << *it;
 
 
     // vd = i;

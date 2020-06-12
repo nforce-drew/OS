@@ -33,7 +33,7 @@ private:
     QTcpSocket*     m_pTcpSocket;
     QTextEdit*      m_ptxtInfo;
     QLineEdit*      m_ptxtInput;
-    void*    m_loginWndw;
+    void*           m_loginWndw;
     quint16         m_nNextBlockSize;
     QString         m_strHost;
     int             m_nPort;

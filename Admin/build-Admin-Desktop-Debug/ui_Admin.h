@@ -42,6 +42,7 @@ public:
     QHBoxLayout *btn_Layout;
     QSpacerItem *horizontalSpacer;
     QPushButton *deleteBtn;
+    QLabel *statusBar;
 
     void setupUi(QMainWindow *Admin)
     {
@@ -73,9 +74,6 @@ public:
         online_Layout->addWidget(Users_Lbl);
 
         listUsers = new QListWidget(layoutWidget);
-        new QListWidgetItem(listUsers);
-        new QListWidgetItem(listUsers);
-        new QListWidgetItem(listUsers);
         listUsers->setObjectName(QStringLiteral("listUsers"));
 
         online_Layout->addWidget(listUsers);
@@ -125,6 +123,11 @@ public:
 
         main_Layout->addLayout(btn_Layout);
 
+        statusBar = new QLabel(layoutWidget);
+        statusBar->setObjectName(QStringLiteral("statusBar"));
+
+        main_Layout->addWidget(statusBar);
+
         Admin->setCentralWidget(centralwidget);
 
         retranslateUi(Admin);
@@ -136,19 +139,9 @@ public:
     {
         Admin->setWindowTitle(QApplication::translate("Admin", "Admin", Q_NULLPTR));
         Users_Lbl->setText(QApplication::translate("Admin", "Online users", Q_NULLPTR));
-
-        const bool __sortingEnabled = listUsers->isSortingEnabled();
-        listUsers->setSortingEnabled(false);
-        QListWidgetItem *___qlistwidgetitem = listUsers->item(0);
-        ___qlistwidgetitem->setText(QApplication::translate("Admin", "User1", Q_NULLPTR));
-        QListWidgetItem *___qlistwidgetitem1 = listUsers->item(1);
-        ___qlistwidgetitem1->setText(QApplication::translate("Admin", "User2", Q_NULLPTR));
-        QListWidgetItem *___qlistwidgetitem2 = listUsers->item(2);
-        ___qlistwidgetitem2->setText(QApplication::translate("Admin", "User3", Q_NULLPTR));
-        listUsers->setSortingEnabled(__sortingEnabled);
-
         Tasks_lbl->setText(QApplication::translate("Admin", "Tasks", Q_NULLPTR));
         deleteBtn->setText(QApplication::translate("Admin", "Delete", Q_NULLPTR));
+        statusBar->setText(QApplication::translate("Admin", "TextLabel", Q_NULLPTR));
     } // retranslateUi
 
 };

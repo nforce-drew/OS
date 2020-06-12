@@ -114,9 +114,6 @@ static int callback_sendQueue(void* data, int argc, char** argv, char** azColNam
     QueueHeader         queueHdr;
 
     queue = (list<QueueHeader>*)data;
-    // for (int i = 0; i < argc; i += 3)
-    //     cout << argv[i] << " " << argv[i + 1] << " " << argv[i + 2] << endl;
-        
     for (int i = 0; i < argc; i += 3)
     {
         queueHdr.setData(argv[i], (unsigned)atoi(argv[i + 1]), argv[i + 2]);
@@ -204,4 +201,31 @@ void        fillQueue(list<QueueHeader> &queue)
     db = connectDB((char*)DB_PATH);
     sqlite3_exec(db, query.c_str(), NULL, NULL, NULL);
     sqlite3_close(db);
+}
+
+static int callback_getOnlineUsers(void* data, int argc, char** argv, char** azColName)
+{
+    list<string>* lst;
+    
+    lst = (list<string>*)data;
+    lst->push_back(argv[0]);
+    data = (void*)lst;
+    
+    return (0);
+}
+
+list<string>*   getOnlineUsers(list<string>* lst)
+{
+    sqlite3*    db;
+    string      query;
+    void*       data;
+
+    
+    query = "SELECT user_name FROM online_users ORDER BY user_name;";
+    data = (void*)lst;
+    db = connectDB((char*)DB_PATH);
+    sqlite3_exec(db, query.c_str(), callback_getOnlineUsers, data, NULL);
+    sqlite3_close(db);
+    
+    return (lst);
 }

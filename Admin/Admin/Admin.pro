@@ -5,6 +5,7 @@
 #-------------------------------------------------
 
 QT       += core gui
+QT       += network
 
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 
@@ -27,12 +28,14 @@ SOURCES += \
         main.cpp \
         Admin.cpp \
     QueueHeader.cpp \
-    QueueTable.cpp
+    QueueTable.cpp \
+    MainHeader.cpp
 
 HEADERS += \
         Admin.h \
     QueueHeader.h \
-    QueueTable.h
+    QueueTable.h \
+    MainHeader.h
 
 FORMS += \
         Admin.ui

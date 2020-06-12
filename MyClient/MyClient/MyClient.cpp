@@ -37,9 +37,9 @@ MyClient::MyClient(const QString& strHost, int nPort, QWidget *pwgt/*=0*/) :
     m_ptxtInfo  = new QTextEdit;
     m_ptxtInput = new QLineEdit;
 
-    connect(m_ptxtInput, SIGNAL(returnPressed()),
-            this,        SLOT(slotSendFilesToServer())
-           );
+//    connect(m_ptxtInput, SIGNAL(returnPressed()),
+//            this,        SLOT(slotSendFilesToServer())
+//           );
     m_ptxtInfo->setReadOnly(true);
 
     QPushButton* sendButton = new QPushButton("&Send");
@@ -164,6 +164,7 @@ void MyClient::slotSendFilesToServer()
     FileHeader  fileHeader;
     QDataStream out(&arrBlock, QIODevice::ReadWrite);
 
+    qDebug() << "Why send files";
     out.setVersion(QDataStream::Qt_5_9);
     out.setByteOrder(QDataStream::LittleEndian);
     fPaths << "/home/nforce/Desktop/AllDesktop/Конспект_24.03.pdf"
