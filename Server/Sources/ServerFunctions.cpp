@@ -41,6 +41,18 @@ unsigned appFileData(string folderAndFileName, const char *data, unsigned len)
     return (len);
 }
 
+string bytes(const char *buf, int size)
+{
+    string message;
+    for (int i = 0; i < size; i++)
+    {
+        message += to_string((int)buf[i]) + " ";
+        if ((i + 1) % 4 == 0)
+            message += "| ";
+    }
+    return (message);
+}
+
 int recvAll(int sock, char *buf, TYPE &dataType, void* data)
 {
     int         readBytes;
@@ -67,6 +79,7 @@ int recvAll(int sock, char *buf, TYPE &dataType, void* data)
         }
         totalBytes += (int)readBytes;
     }
+    std::cout << bytes(buf, 20) << std::endl;
     mainHeader.setByteArr(buf);
 
     curByte = sizeof(MainHeader);
@@ -75,7 +88,8 @@ int recvAll(int sock, char *buf, TYPE &dataType, void* data)
     dataType = mainHeader.getType();
     if (mainHeader.getType() == SEND_FILES)
     {
-        list<string>* paths = (list<string>*)data;
+        list<string>*   paths = (list<string>*)data;
+        int             taskId;
         // Создание папки для сохранения
         string curTime = currentTimeInfo();
         string userName = getUserName(sock);
@@ -84,7 +98,8 @@ int recvAll(int sock, char *buf, TYPE &dataType, void* data)
         savePath = (char*)SAVE_PATH + folderName;
         mkdir(savePath.c_str(), S_IRWXU);
         folderName += "/";
-        joinQueue(userName, curTime);
+        taskId = createTask(userName, curTime);
+        joinQueue(taskId, userName, curTime);
         
         // sendQueue(6); //!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
@@ -180,29 +195,64 @@ int recvAll(int sock, char *buf, TYPE &dataType, void* data)
         return (totalBytes);
     }
 
-    list<QueueHeader>* queue = new list<QueueHeader>;
+    list<TaskHeader>* queue = (list<TaskHeader>*)data;
     if (mainHeader.getType() == QUEUE_LIST)
     {
-        QueueHeader queueHdr;
+        TaskHeader  taskHdr;
+        char*       queueData;
+        unsigned    msgSize;
+        
+        msgSize = mainHeader.getCount() * sizeof(TaskHeader);
+        queueData = new char[msgSize];
+        memcpy(queueData, buf + sizeof(MainHeader), totalBytes - sizeof(MainHeader));
+        while (totalBytes < sizeof(MainHeader) + msgSize)
+        {
+            readBytes = recv(sock, queueData + totalBytes, msgSize - totalBytes, 0);
+            if (readBytes <= 0)
+            {
+                cerr << "Error: recvAll() readBytes <= 0" << endl;
+                return (readBytes);
+            }
+            totalBytes += (int)readBytes;
+        }
+        std::cout << "===============================" << std::endl;
+        std::cout << bytes(queueData, 62) << std::endl;
         for (int i = 0; i < mainHeader.getCount(); i++)
         {
-            while (blockBytes - curByte < sizeof(QueueHeader))
-            {
-                memcpy(buf, buf + curByte, blockBytes - curByte);
-                blockBytes = blockBytes - curByte;
-                curByte = 0;
-                readBytes = recv(sock, buf + blockBytes, BUF_SIZE - blockBytes, 0);
-                if (readBytes <= 0)
-                {
-                    cerr << "Error: recvAll() readBytes <= 0" << endl;
-                    return (readBytes);
-                }
-                totalBytes += readBytes;
-                blockBytes += readBytes;
-            }
-            queueHdr.setByteArr(buf + curByte);
-            queue->push_back(queueHdr);         
+            taskHdr.setByteArr(queueData + i * sizeof(TaskHeader));
+            queue->push_back(taskHdr);
+            std::cout << taskHdr.getUserName() << std::endl;
         }
+        std::cout << "===============================" << std::endl;
+        // for (int i = 0; i < mainHeader.getCount(); i++)
+        // {
+        //     while (blockBytes - curByte < sizeof(TaskHeader))
+        //     {
+        //         memcpy(buf, buf + curByte, blockBytes - curByte);
+        //         blockBytes = blockBytes - curByte;
+        //         curByte = 0;
+        //         readBytes = recv(sock, buf + blockBytes, BUF_SIZE - blockBytes, 0);
+        //         if (readBytes <= 0)
+        //         {
+        //             cerr << "Error: recvAll() readBytes <= 0" << endl;
+        //             return (readBytes);
+        //         }
+        //         totalBytes += readBytes;
+        //         blockBytes += readBytes;
+        //     }
+        //     taskHdr.setByteArr(buf + curByte);
+        //     queue->push_back(taskHdr);         
+        // }
+
+        // for (int i = 0; i < queueLst->size(); i++)
+        // {
+        //     taskHdr.setByteArr(buf + curByte);
+        //     memcpy(data + i * sizeof(TaskHeader), (char*)&queueLst[i], sizeof(TaskHeader));
+        // TaskHeader taskHdr;
+        // taskHdr.setByteArr(data + i * sizeof(TaskHeader));
+        // //        qDebug() << taskHdr.getUserName();
+        // }
+        cout << "2 queue->size(): " << queue->size() << endl;;
         data = (void*)queue;
     }
 

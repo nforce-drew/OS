@@ -3,7 +3,7 @@
 QueueTable::QueueTable(QWidget *parent)
     : QTableWidget (parent)
 {
-    queueList = new QList<QueueHeader>;
+    m_queueList = new QList<TaskHeader>;
 }
 
 void QueueTable::mousePressEvent(QMouseEvent *event)
@@ -103,22 +103,30 @@ void QueueTable::dropEvent(QDropEvent *event)
     }
     setCurrentCell(targetRow, 0);
     queueChanged();
-    emit queueChanged(queueList);
+    emit queueChanged(m_queueList);
 }
 
 void    QueueTable::queueChanged()
 {
     int         rowCount;
     QStringList vertHdrList;
+    TaskHeader  taskHdr;
 
     rowCount = this->verticalHeader()->count();
     qDebug() << "slotQueueChanged()";
     for (int i = 0; i < rowCount; i++)
         vertHdrList << QString::number(i + 1);
     this->setVerticalHeaderLabels(vertHdrList);
+    m_queueList->clear();
+    for (int i = 0; i < rowCount; i++)
+    {
+        taskHdr.setData(item(i, 0)->text().toInt(), (char*)item(i, 1)->text().toStdString().c_str(),
+                        i + 1, (char*)item(i, 2)->text().toStdString().c_str());
+        m_queueList->push_back(taskHdr);
+    }
 }
 
 QueueTable::~QueueTable()
 {
-    delete queueList;
+    delete m_queueList;
 }

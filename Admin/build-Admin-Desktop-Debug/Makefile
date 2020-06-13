@@ -52,15 +52,15 @@ OBJECTS_DIR   = ./
 
 SOURCES       = ../Admin/main.cpp \
 		../Admin/Admin.cpp \
-		../Admin/QueueHeader.cpp \
 		../Admin/QueueTable.cpp \
-		../Admin/MainHeader.cpp moc_Admin.cpp \
+		../Admin/MainHeader.cpp \
+		../Admin/TaskHeader.cpp moc_Admin.cpp \
 		moc_QueueTable.cpp
 OBJECTS       = main.o \
 		Admin.o \
-		QueueHeader.o \
 		QueueTable.o \
 		MainHeader.o \
+		TaskHeader.o \
 		moc_Admin.o \
 		moc_QueueTable.o
 DIST          = /usr/lib/x86_64-linux-gnu/qt5/mkspecs/features/spec_pre.prf \
@@ -138,13 +138,13 @@ DIST          = /usr/lib/x86_64-linux-gnu/qt5/mkspecs/features/spec_pre.prf \
 		/usr/lib/x86_64-linux-gnu/qt5/mkspecs/features/yacc.prf \
 		/usr/lib/x86_64-linux-gnu/qt5/mkspecs/features/lex.prf \
 		../Admin/Admin.pro ../Admin/Admin.h \
-		../Admin/QueueHeader.h \
 		../Admin/QueueTable.h \
-		../Admin/MainHeader.h ../Admin/main.cpp \
+		../Admin/MainHeader.h \
+		../Admin/TaskHeader.h ../Admin/main.cpp \
 		../Admin/Admin.cpp \
-		../Admin/QueueHeader.cpp \
 		../Admin/QueueTable.cpp \
-		../Admin/MainHeader.cpp
+		../Admin/MainHeader.cpp \
+		../Admin/TaskHeader.cpp
 QMAKE_TARGET  = Admin
 DESTDIR       = 
 TARGET        = Admin
@@ -330,8 +330,8 @@ distdir: FORCE
 	@test -d $(DISTDIR) || mkdir -p $(DISTDIR)
 	$(COPY_FILE) --parents $(DIST) $(DISTDIR)/
 	$(COPY_FILE) --parents /usr/lib/x86_64-linux-gnu/qt5/mkspecs/features/data/dummy.cpp $(DISTDIR)/
-	$(COPY_FILE) --parents ../Admin/Admin.h ../Admin/QueueHeader.h ../Admin/QueueTable.h ../Admin/MainHeader.h $(DISTDIR)/
-	$(COPY_FILE) --parents ../Admin/main.cpp ../Admin/Admin.cpp ../Admin/QueueHeader.cpp ../Admin/QueueTable.cpp ../Admin/MainHeader.cpp $(DISTDIR)/
+	$(COPY_FILE) --parents ../Admin/Admin.h ../Admin/QueueTable.h ../Admin/MainHeader.h ../Admin/TaskHeader.h $(DISTDIR)/
+	$(COPY_FILE) --parents ../Admin/main.cpp ../Admin/Admin.cpp ../Admin/QueueTable.cpp ../Admin/MainHeader.cpp ../Admin/TaskHeader.cpp $(DISTDIR)/
 	$(COPY_FILE) --parents ../Admin/Admin.ui $(DISTDIR)/
 
 
@@ -367,7 +367,7 @@ moc_predefs.h: /usr/lib/x86_64-linux-gnu/qt5/mkspecs/features/data/dummy.cpp
 compiler_moc_header_make_all: moc_Admin.cpp moc_QueueTable.cpp
 compiler_moc_header_clean:
 	-$(DEL_FILE) moc_Admin.cpp moc_QueueTable.cpp
-moc_Admin.cpp: ../Admin/QueueHeader.h \
+moc_Admin.cpp: ../Admin/TaskHeader.h \
 		../Admin/QueueTable.h \
 		../Admin/Admin.h \
 		../Admin/MainHeader.h \
@@ -377,7 +377,7 @@ moc_Admin.cpp: ../Admin/QueueHeader.h \
 	/usr/lib/qt5/bin/moc $(DEFINES) --include ./moc_predefs.h -I/usr/lib/x86_64-linux-gnu/qt5/mkspecs/linux-g++ -I/home/nforce/OS/Admin/Admin -I/usr/include/x86_64-linux-gnu/qt5 -I/usr/include/x86_64-linux-gnu/qt5/QtWidgets -I/usr/include/x86_64-linux-gnu/qt5/QtGui -I/usr/include/x86_64-linux-gnu/qt5/QtNetwork -I/usr/include/x86_64-linux-gnu/qt5/QtCore -I. -I/usr/include/c++/7 -I/usr/include/x86_64-linux-gnu/c++/7 -I/usr/include/c++/7/backward -I/usr/lib/gcc/x86_64-linux-gnu/7/include -I/usr/local/include -I/usr/lib/gcc/x86_64-linux-gnu/7/include-fixed -I/usr/include/x86_64-linux-gnu -I/usr/include ../Admin/Admin.h -o moc_Admin.cpp
 
 moc_QueueTable.cpp: ../Admin/Admin.h \
-		../Admin/QueueHeader.h \
+		../Admin/TaskHeader.h \
 		../Admin/QueueTable.h \
 		../Admin/MainHeader.h \
 		../Admin/QueueTable.h \
@@ -394,7 +394,7 @@ ui_Admin.h: ../Admin/Admin.ui \
 		/usr/lib/qt5/bin/uic \
 		../Admin/QueueTable.h \
 		../Admin/Admin.h \
-		../Admin/QueueHeader.h \
+		../Admin/TaskHeader.h \
 		../Admin/QueueTable.h \
 		../Admin/MainHeader.h
 	/usr/lib/qt5/bin/uic ../Admin/Admin.ui -o ui_Admin.h
@@ -410,32 +410,32 @@ compiler_clean: compiler_moc_predefs_clean compiler_moc_header_clean compiler_ui
 ####### Compile
 
 main.o: ../Admin/main.cpp ../Admin/Admin.h \
-		../Admin/QueueHeader.h \
+		../Admin/TaskHeader.h \
 		../Admin/QueueTable.h \
 		../Admin/MainHeader.h
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o main.o ../Admin/main.cpp
 
 Admin.o: ../Admin/Admin.cpp ../Admin/Admin.h \
-		../Admin/QueueHeader.h \
+		../Admin/TaskHeader.h \
 		../Admin/QueueTable.h \
 		../Admin/MainHeader.h \
 		ui_Admin.h
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o Admin.o ../Admin/Admin.cpp
 
-QueueHeader.o: ../Admin/QueueHeader.cpp ../Admin/QueueTable.h \
-		../Admin/Admin.h \
-		../Admin/QueueHeader.h \
-		../Admin/MainHeader.h
-	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o QueueHeader.o ../Admin/QueueHeader.cpp
-
 QueueTable.o: ../Admin/QueueTable.cpp ../Admin/QueueTable.h \
 		../Admin/Admin.h \
-		../Admin/QueueHeader.h \
+		../Admin/TaskHeader.h \
 		../Admin/MainHeader.h
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o QueueTable.o ../Admin/QueueTable.cpp
 
 MainHeader.o: ../Admin/MainHeader.cpp ../Admin/MainHeader.h
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o MainHeader.o ../Admin/MainHeader.cpp
+
+TaskHeader.o: ../Admin/TaskHeader.cpp ../Admin/QueueTable.h \
+		../Admin/Admin.h \
+		../Admin/TaskHeader.h \
+		../Admin/MainHeader.h
+	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o TaskHeader.o ../Admin/TaskHeader.cpp
 
 moc_Admin.o: moc_Admin.cpp 
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o moc_Admin.o moc_Admin.cpp

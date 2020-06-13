@@ -13,8 +13,8 @@ sqlite3* connectDB(char* db_path)
             << sqlite3_errmsg(db);
         return (nullptr);
     }
-    else
-        std::cout << "Opened database successfully" << std::endl;
+    // else
+    //     std::cout << "Opened database successfully" << std::endl;
     return (db);
 }
 
@@ -89,13 +89,36 @@ string      getUserName(int sock_fd)
     return (string((char*)data));
 }
 
-void        joinQueue(string userName, string time)
+static int callback_createTask(void* data, int argc, char** argv, char** azColName)
+{
+    strcpy((char*)data, argv[0]);
+    return (0);
+}
+
+int         createTask(string userName, string time)
+{
+    sqlite3*    db;
+    string      query;
+    char        taskId[10];
+
+    query = "INSERT INTO tasks(user_name, time) " \
+            "VALUES ('" + userName + "', '" + time + "');";
+    db = connectDB((char*)DB_PATH);
+    sqlite3_exec(db, query.c_str(), NULL, NULL, NULL);
+    query = "SELECT task_id FROM tasks " \
+            "WHERE user_name == '" + userName + "' AND time == '" + time + "';";
+    sqlite3_exec(db, query.c_str(), callback_createTask, (void*)&taskId, NULL);
+    sqlite3_close(db);
+    return (atoi(taskId));
+}
+
+void        joinQueue(int taskId, string userName, string time)
 {
     sqlite3*    db;
     string      query;
 
-    query = "INSERT INTO task_queue(user_name, queue_num, time) " \
-            "VALUES ('" + userName + "', " \
+    query = "INSERT INTO task_queue(task_id, user_name, queue_num, time) " \
+            "VALUES (" + std::to_string(taskId) + ", '" + userName + "', " \
                         "(SELECT CASE " \
                                     "WHEN (SELECT MAX(queue_num) FROM task_queue) > 0 " \
                                     "THEN (SELECT MAX(queue_num) FROM task_queue) + 1 " \
@@ -110,15 +133,12 @@ void        joinQueue(string userName, string time)
 
 static int callback_sendQueue(void* data, int argc, char** argv, char** azColName)
 {
-    list<QueueHeader>*  queue;
-    QueueHeader         queueHdr;
+    list<TaskHeader>*  queue;
+    TaskHeader         taskHdr;
 
-    queue = (list<QueueHeader>*)data;
-    for (int i = 0; i < argc; i += 3)
-    {
-        queueHdr.setData(argv[i], (unsigned)atoi(argv[i + 1]), argv[i + 2]);
-        queue->push_back(queueHdr);
-    }
+    queue = (list<TaskHeader>*)data;
+    taskHdr.setData(atoi(argv[0]), argv[1], (unsigned)atoi(argv[2]), argv[3]);
+    queue->push_back(taskHdr);
     data = (void*)queue;
     
     return (0);
@@ -129,15 +149,15 @@ int         sendQueue(int admin_fd)
     sqlite3*    db;
     string      query;
     void*       data;
-    list<QueueHeader>*  queue;
+    list<TaskHeader>*  queue;
 
-    queue = new list<QueueHeader>;
+    queue = new list<TaskHeader>;
     data = (void*)queue;
     query = "SELECT * FROM task_queue ORDER BY queue_num;";
     db = connectDB((char*)DB_PATH);
     sqlite3_exec(db, query.c_str(), callback_sendQueue, data, NULL);
     sqlite3_close(db);
-    queue = (list<QueueHeader>*)data;
+    queue = (list<TaskHeader>*)data;
     std::cout << "Размер очереди: " << queue->size() << std::endl;
     for (auto el : *queue)
         std::cout << el.getUserName() << " " << el.getQueueNum() << " " << el.getTime() << std::endl;
@@ -148,7 +168,7 @@ int         sendQueue(int admin_fd)
     int         totalBytes;  
     unsigned    msgSize;
 
-    msgSize = sizeof(MainHeader) + queue->size() * sizeof(QueueHeader);
+    msgSize = sizeof(MainHeader) + queue->size() * sizeof(TaskHeader);
     // msgSize = sizeof(MainHeader);
     totalBytes = 0;
     mainHeader.setData(msgSize, queue->size(), QUEUE_LIST);
@@ -162,7 +182,7 @@ int         sendQueue(int admin_fd)
     totalBytes += sendBytes;
     for(auto task : *queue)
     {
-        sendBytes = sendAll(admin_fd, (char*)&task, sizeof(QueueHeader), 0);
+        sendBytes = sendAll(admin_fd, (char*)&task, sizeof(TaskHeader), 0);
         if (sendBytes <= 0)
         {
             cerr << "Sending error. Position - 2. Last bytes sent: " << sendBytes
@@ -187,19 +207,29 @@ void        clearQueue()
     sqlite3_close(db);
 }
 
-void        fillQueue(list<QueueHeader> &queue)
+void        fillQueue(list<TaskHeader>* queue)
 {
     sqlite3*    db;
     string      query;
-
-    for (auto task : queue)
-    {
-        /* code */
-    }
+    char*       errmsg;
     
-    query = "DELETE FROM task_query;";
+    query = "DELETE FROM task_queue;";
     db = connectDB((char*)DB_PATH);
-    sqlite3_exec(db, query.c_str(), NULL, NULL, NULL);
+    sqlite3_exec(db, query.c_str(), NULL, NULL, &errmsg);
+    cerr << errmsg << endl;
+    for (auto task : *queue)
+    {
+        cout << task.getTaskId() << " "<< task.getUserName() << " " << task.getQueueNum() << " " << task.getTime() <<endl;
+        query = "INSERT INTO task_queue(task_id, user_name, queue_num, time) " \
+                "VALUES (" + std::to_string(task.getTaskId()) + " ,'"
+                        + task.getUserName() + "', "
+                        + std::to_string(task.getQueueNum()) + ", '"
+                        + task.getTime() + "');";
+        sqlite3_exec(db, query.c_str(), NULL, NULL, &errmsg);
+        cout << query << endl;
+        cerr << errmsg << endl;
+    }
+
     sqlite3_close(db);
 }
 

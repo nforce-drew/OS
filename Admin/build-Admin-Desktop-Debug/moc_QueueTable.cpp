@@ -23,7 +23,7 @@ QT_WARNING_PUSH
 QT_WARNING_DISABLE_DEPRECATED
 struct qt_meta_stringdata_QueueTable_t {
     QByteArrayData data[5];
-    char stringdata0[55];
+    char stringdata0[54];
 };
 #define QT_MOC_LITERAL(idx, ofs, len) \
     Q_STATIC_BYTE_ARRAY_DATA_HEADER_INITIALIZER_WITH_OFFSET(len, \
@@ -35,11 +35,11 @@ static const qt_meta_stringdata_QueueTable_t qt_meta_stringdata_QueueTable = {
 QT_MOC_LITERAL(0, 0, 10), // "QueueTable"
 QT_MOC_LITERAL(1, 11, 12), // "queueChanged"
 QT_MOC_LITERAL(2, 24, 0), // ""
-QT_MOC_LITERAL(3, 25, 19), // "QList<QueueHeader>*"
-QT_MOC_LITERAL(4, 45, 9) // "queueList"
+QT_MOC_LITERAL(3, 25, 18), // "QList<TaskHeader>*"
+QT_MOC_LITERAL(4, 44, 9) // "queueList"
 
     },
-    "QueueTable\0queueChanged\0\0QList<QueueHeader>*\0"
+    "QueueTable\0queueChanged\0\0QList<TaskHeader>*\0"
     "queueList"
 };
 #undef QT_MOC_LITERAL
@@ -78,14 +78,14 @@ void QueueTable::qt_static_metacall(QObject *_o, QMetaObject::Call _c, int _id, 
         QueueTable *_t = static_cast<QueueTable *>(_o);
         Q_UNUSED(_t)
         switch (_id) {
-        case 0: _t->queueChanged((*reinterpret_cast< QList<QueueHeader>*(*)>(_a[1]))); break;
+        case 0: _t->queueChanged((*reinterpret_cast< QList<TaskHeader>*(*)>(_a[1]))); break;
         case 1: _t->queueChanged(); break;
         default: ;
         }
     } else if (_c == QMetaObject::IndexOfMethod) {
         int *result = reinterpret_cast<int *>(_a[0]);
         {
-            typedef void (QueueTable::*_t)(QList<QueueHeader> * );
+            typedef void (QueueTable::*_t)(QList<TaskHeader> * );
             if (*reinterpret_cast<_t *>(_a[1]) == static_cast<_t>(&QueueTable::queueChanged)) {
                 *result = 0;
                 return;
@@ -131,7 +131,7 @@ int QueueTable::qt_metacall(QMetaObject::Call _c, int _id, void **_a)
 }
 
 // SIGNAL 0
-void QueueTable::queueChanged(QList<QueueHeader> * _t1)
+void QueueTable::queueChanged(QList<TaskHeader> * _t1)
 {
     void *_a[] = { nullptr, const_cast<void*>(reinterpret_cast<const void*>(&_t1)) };
     QMetaObject::activate(this, &staticMetaObject, 0, _a);

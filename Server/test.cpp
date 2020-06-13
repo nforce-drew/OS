@@ -2,46 +2,51 @@
 #include <string>
 #include <list>
 #include <ctime>
+// #include "TaskHeader.h"
 using namespace std;
-std::string bytes(const char *buf, int size)
-{
-    std::string message;
-    for (int i = 0; i < size; i++)
-    {
-        message += std::to_string((int)buf[i]) + " ";
-        if ((i + 1) % 4 == 0)
-            message += "| ";
-    }
-    return (message);
-}
+// std::string bytes(const char *buf, int size)
+// {
+//     std::string message;
+//     for (int i = 0; i < size; i++)
+//     {
+//         message += std::to_string((int)buf[i]) + " ";
+//         if ((i + 1) % 4 == 0)
+//             message += "| ";
+//     }
+//     return (message);
+// }
 
-void func(void* data)
-{
-    list<string>* lst = (list<string>*)data;
-    
+// void func(void* data)
+// {
+//     list<TaskHeader>* lst = (list<TaskHeader>*)data;
+//     TaskHeader taskHeader;
 
-    lst->push_back("first");
-    lst->push_back("second");
-    data = (void*)lst;
-    cout << lst->size() << endl;
-}
+//     taskHeader.setData(1, (char*)"ivan", 1, (char*)"time1");
+//     lst->push_back(taskHeader);
+//     taskHeader.setData(2, (char*)"peter", 2, (char*)"time2");
+//     lst->push_back(taskHeader);
+//     data = (void*)lst;
+//     cout << lst->size() << endl;
+// }
 
 
 int main()
 {
     // void* data;
-    // list<char*>* lst = new list<char*>;
+    // list<string>* lst = new list<string>;
     // data = (void*)lst;
     // func(data);
 
 
-    // list<string>* lst2;
-    // std::cout << lst->size() << std::endl;
-    // lst2 = (list<string>*)data;
+    // list<TaskHeader>* lst2;
+    
+    // lst2 = (list<TaskHeader>*)data;
+    // std::cout << lst2->size() << std::endl;
     // for(auto el : *lst2)
     // {
-    //     cout << el << endl;
+    //     cout << el.getUserName() << endl;
     // }
+    std::cout << (int)((unsigned char)(-100)) << std::endl;
     // int a;
 
     // a = 2*2;
@@ -49,16 +54,16 @@ int main()
     // char str[a];
 
 
-    list<string>* lst = new list<string>;
+    // list<string>* lst = new list<string>;
     
 
-    lst->push_back("first");
-    lst->push_back("second");
-    lst->push_back("third");
+    // lst->push_back("first");
+    // lst->push_back("second");
+    // lst->push_back("third");
 
-    auto it = lst->begin();
-    advance(it, 2);
-    cout << *it;
+    // auto it = lst->begin();
+    // advance(it, 2);
+    // cout << *it;
 
 
     // vd = i;

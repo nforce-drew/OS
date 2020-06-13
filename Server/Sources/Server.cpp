@@ -25,17 +25,17 @@ using namespace std;
 
 int admin_fd;
 
-string bytes(const char *buf, int size)
-{
-    string message;
-    for (int i = 0; i < size; i++)
-    {
-        message += to_string((int)buf[i]) + " ";
-        if ((i + 1) % 4 == 0)
-            message += "| ";
-    }
-    return (message);
-}
+// string bytes(const char *buf, int size)
+// {
+//     string message;
+//     for (int i = 0; i < size; i++)
+//     {
+//         message += to_string((int)buf[i]) + " ";
+//         if ((i + 1) % 4 == 0)
+//             message += "| ";
+//     }
+//     return (message);
+// }
 //=================================================================================
 int main(const int argc, const char** argv)
 {
@@ -149,7 +149,7 @@ int main(const int argc, const char** argv)
             if (FD_ISSET(*it, &readset))
             {
                 list<string>*       paths;
-                list<QueueHeader>*  queue;
+                list<TaskHeader>*   queue;
                 TYPE                dataType;
                 void*               data;
 
@@ -184,7 +184,6 @@ int main(const int argc, const char** argv)
                         cout << "mainHdr: " << mainHdr.getMsgSize() << " " << mainHdr.getCount() 
                             << " " << mainHdr.getType() << endl;
                         LoginHeader loginHdr(buf + 12);
-                        cout << bytes(buf, 52) << endl;
                         cout << "loginHdr: " << loginHdr.getUserName() << " " << loginHdr.getUserPassword() << endl;
                         cout << "On the server sock_fd = " << *it << endl;
                         sqlite3* db = connectDB((char*)DB_PATH);
@@ -206,9 +205,9 @@ int main(const int argc, const char** argv)
                     }
                     case QUEUE_LIST:
                     {
-                        queue = (list<QueueHeader>*)data;
+                        queue = (list<TaskHeader>*)data;
                         clearQueue();
-                        
+                        fillQueue(queue);                        
                         delete queue;
                         break;
                     }

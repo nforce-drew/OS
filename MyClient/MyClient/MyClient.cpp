@@ -149,7 +149,10 @@ void MyClient::slotError(QAbstractSocket::SocketError err)
         m_ptxtInfo->append(strError);
         m_pTcpSocket->close();
     }
+
     m_lastStatus = false;
+//    delete m_pTcpSocket;
+//    m_pTcpSocket = new QTcpSocket(this);
     m_pTcpSocket->connectToHost(m_strHost, m_nPort);
 }
 // ----------------------------------------------------------------------

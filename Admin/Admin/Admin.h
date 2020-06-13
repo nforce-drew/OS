@@ -1,7 +1,7 @@
 #ifndef ADMIN_H
 #define ADMIN_H
 
-#include "QueueHeader.h"
+#include "TaskHeader.h"
 #include "QueueTable.h"
 #include "MainHeader.h"
 #include <QMainWindow>
@@ -27,20 +27,23 @@ private:
     QString         m_strHost;
     int             m_nPort;
     bool            m_lastStatus;
-
+signals:
+    void reconnect();
 private:
-    void    setTable(QList<QueueHeader> queueList);
+    void    setTable(QList<TaskHeader> queueList);
     void    setOnlineUsers(QStringList users);
 
 private slots:
 //    void    slotQueueChanged();
     void deleteTask();
     void setEnabledDeleteBtn();
+    void slotSendQueue(QList<TaskHeader>* queueLst);
+    void slotReconnect();
 
     void slotReadyRead();                               //Принятие данных
     void slotError(QAbstractSocket::SocketError err);   //Ошибка подключения с сервером
     void slotConnected();
-    void slotSendDataToServer(TYPE dataType, char* data, unsigned len); //Отправка данных или запроса
+    void slotSendDataToServer(TYPE dataType, unsigned count, char* data, unsigned len); //Отправка данных или запроса
                                                                          // если дополнительные данные не передаются,
                                                                           //то присвоить data = NULL и len = 0
 };

@@ -27,15 +27,15 @@ DEFINES += QT_DEPRECATED_WARNINGS
 SOURCES += \
         main.cpp \
         Admin.cpp \
-    QueueHeader.cpp \
     QueueTable.cpp \
-    MainHeader.cpp
+    MainHeader.cpp \
+    TaskHeader.cpp
 
 HEADERS += \
         Admin.h \
-    QueueHeader.h \
     QueueTable.h \
-    MainHeader.h
+    MainHeader.h \
+    TaskHeader.h
 
 FORMS += \
         Admin.ui
