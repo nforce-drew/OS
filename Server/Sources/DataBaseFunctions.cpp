@@ -64,10 +64,23 @@ int checkLoginPermission(sqlite3* db, int sock_fd, char* login, char* password)
     return (rc);
 }
 
+void            addOnlineUser(int sock_fd, string userName)
+{
+    std::string query;
+    sqlite3*    db;
+    char*       errMsg;
+
+    query = "INSERT INTO online_users (user_name, sock_num) " \
+            "VALUES ('" + std::string(userName) + "', " + std::to_string(sock_fd) + ");";
+    db = connectDB((char*)DB_PATH);
+    sqlite3_exec(db, query.c_str(), NULL, NULL, &errMsg);
+    std::cerr << errMsg << std::endl;
+    sqlite3_close(db);
+}
+
 static int callback_getUserName(void* data, int argc, char** argv, char** azColName)
 {
     strcpy((char*)data, argv[0]);
-
     return (0);
 }
 
@@ -159,8 +172,6 @@ int         sendQueue(int admin_fd)
     sqlite3_close(db);
     queue = (list<TaskHeader>*)data;
     std::cout << "Размер очереди: " << queue->size() << std::endl;
-    for (auto el : *queue)
-        std::cout << el.getUserName() << " " << el.getQueueNum() << " " << el.getTime() << std::endl;
 
     char        buf[BUF_SIZE];
     MainHeader  mainHeader;
@@ -219,14 +230,12 @@ void        fillQueue(list<TaskHeader>* queue)
     cerr << errmsg << endl;
     for (auto task : *queue)
     {
-        cout << task.getTaskId() << " "<< task.getUserName() << " " << task.getQueueNum() << " " << task.getTime() <<endl;
         query = "INSERT INTO task_queue(task_id, user_name, queue_num, time) " \
                 "VALUES (" + std::to_string(task.getTaskId()) + " ,'"
                         + task.getUserName() + "', "
                         + std::to_string(task.getQueueNum()) + ", '"
                         + task.getTime() + "');";
         sqlite3_exec(db, query.c_str(), NULL, NULL, &errmsg);
-        cout << query << endl;
         cerr << errmsg << endl;
     }
 

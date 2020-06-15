@@ -9,7 +9,7 @@
 class QueueTable : public QTableWidget
 {
     Q_OBJECT
-private:
+public:
     QList<TaskHeader>*  m_queueList;
 public:
     QueueTable(QWidget * parent = 0);

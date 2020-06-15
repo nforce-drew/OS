@@ -25,17 +25,17 @@ using namespace std;
 
 int admin_fd;
 
-// string bytes(const char *buf, int size)
-// {
-//     string message;
-//     for (int i = 0; i < size; i++)
-//     {
-//         message += to_string((int)buf[i]) + " ";
-//         if ((i + 1) % 4 == 0)
-//             message += "| ";
-//     }
-//     return (message);
-// }
+string bytes(const char *buf, int size)
+{
+    string message;
+    for (int i = 0; i < size; i++)
+    {
+        message += to_string((int)buf[i]) + " ";
+        if ((i + 1) % 4 == 0)
+            message += "| ";
+    }
+    return (message);
+}
 //=================================================================================
 int main(const int argc, const char** argv)
 {
@@ -180,12 +180,11 @@ int main(const int argc, const char** argv)
                 {
                     case CHECK_LOGIN:
                     {
-                        MainHeader mainHdr(buf);
-                        cout << "mainHdr: " << mainHdr.getMsgSize() << " " << mainHdr.getCount() 
-                            << " " << mainHdr.getType() << endl;
-                        LoginHeader loginHdr(buf + 12);
-                        cout << "loginHdr: " << loginHdr.getUserName() << " " << loginHdr.getUserPassword() << endl;
-                        cout << "On the server sock_fd = " << *it << endl;
+                        MainHeader  mainHdr(buf);
+                        LoginHeader loginHdr(buf + sizeof(MainHeader));
+
+                        std::cout << "\t-> CHECK_LOGIN - username: \"" << loginHdr.getUserName()  
+                                << "\" password: " << loginHdr.getUserPassword() << "\"" << std::endl;
                         sqlite3* db = connectDB((char*)DB_PATH);
                         checkLoginPermission(db, *it, loginHdr.getUserName(), loginHdr.getUserPassword());
                         sqlite3_close(db);
@@ -194,12 +193,12 @@ int main(const int argc, const char** argv)
                     }
                     case SEND_FILES:
                     {
-                        // cout << "SEND_FILES adm = " << admin_fd << endl;
+                        cout << "\t-> SEND_FILES - count files: " << lst->size() << endl;
                         if (admin_fd != -1)
                             sendQueue(admin_fd);
-                        cout << "Отправляемые файлы(" << lst->size() << ")" << endl;
+                        // cout << "Отправляемые файлы(" << lst->size() << ")" << endl;
                         for (auto el : *lst)
-                            cout << "\t" << el << endl;
+                            cout << "\t\t" << el << endl;
                         delete lst;
                         break;        
                     }
@@ -219,9 +218,17 @@ int main(const int argc, const char** argv)
                         unsigned        msgSize;
 
                         admin_fd = *it;
-                        cout << "Admin logged. Socket: " << *it << endl;
+                        cout << "\t-> ADMIN_LOGGED. Socket: " << *it << endl;
                         sendQueue(admin_fd);                      
                         sendOnlineUsers(admin_fd);
+                        break;
+                    }
+                    case RECONNECT:
+                    {
+                        std::cout << "\t-> RECONNECT - user name: \"" 
+                                    << buf << "\"" << std::endl;
+                        std::cout << bytes(buf, 20) << std::endl;
+                        addOnlineUser(*it, std::string(buf));
                         break;
                     }
                 }

@@ -11,6 +11,7 @@ enum TYPE
     QUEUE_LIST,
     ADMIN_LOGGED,
     ONLINE_USERS,
+    RECONNECT,
     OTHER
 };
 //=================================================================================

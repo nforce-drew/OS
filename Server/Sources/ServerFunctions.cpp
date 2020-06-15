@@ -41,17 +41,17 @@ unsigned appFileData(string folderAndFileName, const char *data, unsigned len)
     return (len);
 }
 
-string bytes(const char *buf, int size)
-{
-    string message;
-    for (int i = 0; i < size; i++)
-    {
-        message += to_string((int)buf[i]) + " ";
-        if ((i + 1) % 4 == 0)
-            message += "| ";
-    }
-    return (message);
-}
+// string bytes(const char *buf, int size)
+// {
+//     string message;
+//     for (int i = 0; i < size; i++)
+//     {
+//         message += to_string((int)buf[i]) + " ";
+//         if ((i + 1) % 4 == 0)
+//             message += "| ";
+//     }
+//     return (message);
+// }
 
 int recvAll(int sock, char *buf, TYPE &dataType, void* data)
 {
@@ -79,7 +79,7 @@ int recvAll(int sock, char *buf, TYPE &dataType, void* data)
         }
         totalBytes += (int)readBytes;
     }
-    std::cout << bytes(buf, 20) << std::endl;
+    // std::cout << bytes(buf, 20) << std::endl;
     mainHeader.setByteArr(buf);
 
     curByte = sizeof(MainHeader);
@@ -167,11 +167,7 @@ int recvAll(int sock, char *buf, TYPE &dataType, void* data)
                 }
             }
         }
-        // cout << "path.size = " << paths->size() << endl;
         data = (void*)paths;
-        // cout << data << endl;
-        // cout << reinterpret_cast<void*>(paths) << endl;
-        // cout << "./spath->size = " << ((list<string>*)data)->size() << endl;
         return (totalBytes);
     }
     else if (mainHeader.getType() == CHECK_LOGIN)
@@ -216,7 +212,7 @@ int recvAll(int sock, char *buf, TYPE &dataType, void* data)
             totalBytes += (int)readBytes;
         }
         std::cout << "===============================" << std::endl;
-        std::cout << bytes(queueData, 62) << std::endl;
+        // std::cout << bytes(queueData, 62) << std::endl;
         for (int i = 0; i < mainHeader.getCount(); i++)
         {
             taskHdr.setByteArr(queueData + i * sizeof(TaskHeader));
@@ -224,36 +220,27 @@ int recvAll(int sock, char *buf, TYPE &dataType, void* data)
             std::cout << taskHdr.getUserName() << std::endl;
         }
         std::cout << "===============================" << std::endl;
-        // for (int i = 0; i < mainHeader.getCount(); i++)
-        // {
-        //     while (blockBytes - curByte < sizeof(TaskHeader))
-        //     {
-        //         memcpy(buf, buf + curByte, blockBytes - curByte);
-        //         blockBytes = blockBytes - curByte;
-        //         curByte = 0;
-        //         readBytes = recv(sock, buf + blockBytes, BUF_SIZE - blockBytes, 0);
-        //         if (readBytes <= 0)
-        //         {
-        //             cerr << "Error: recvAll() readBytes <= 0" << endl;
-        //             return (readBytes);
-        //         }
-        //         totalBytes += readBytes;
-        //         blockBytes += readBytes;
-        //     }
-        //     taskHdr.setByteArr(buf + curByte);
-        //     queue->push_back(taskHdr);         
-        // }
-
-        // for (int i = 0; i < queueLst->size(); i++)
-        // {
-        //     taskHdr.setByteArr(buf + curByte);
-        //     memcpy(data + i * sizeof(TaskHeader), (char*)&queueLst[i], sizeof(TaskHeader));
-        // TaskHeader taskHdr;
-        // taskHdr.setByteArr(data + i * sizeof(TaskHeader));
-        // //        qDebug() << taskHdr.getUserName();
-        // }
         cout << "2 queue->size(): " << queue->size() << endl;;
         data = (void*)queue;
+    }
+    if (dataType == RECONNECT)
+    {
+        // string* userName = (string*)data;
+
+        curByte = sizeof(MainHeader);
+        memcpy(buf, buf + curByte, totalBytes - sizeof(MainHeader));
+        curByte = totalBytes - sizeof(MainHeader);
+        while (totalBytes < mainHeader.getMsgSize())
+        {
+            readBytes = recv(sock, buf + curByte, mainHeader.getMsgSize() - totalBytes, 0);
+            if (readBytes <= 0)
+            {
+                cerr << "Error: recvAll() readBytes <= 0" << endl;
+                return (readBytes);
+            }
+            totalBytes += (int)readBytes;
+        }
+        // userName->copy(buf, mainHeader.getMsgSize() - sizeof(MainHeader) - 1);
     }
 
     return (totalBytes);
@@ -304,7 +291,7 @@ int sendAll(int sock_fd, char *buf, int len, int flags)
         if(n == -1) { break; }
         total += n;
     }
-    return (n==-1 ? -1 : total);
+    return (n == -1 ? -1 : total);
 }
 
 int sendData(int sock, const MainHeader &mainHdr, char* data, unsigned len)
@@ -317,12 +304,14 @@ int sendData(int sock, const MainHeader &mainHdr, char* data, unsigned len)
     if (sendBytes <= 0)
         return (sendBytes);
     totalBytes += sendBytes;
-
+    
+    if (len == 0 || data == NULL)
+        return (totalBytes);
     sendBytes = sendAll(sock, data, len, 0);
     if (sendBytes <= 0)
         return (sendBytes);
     totalBytes += sendBytes;
-    return (totalBytes);
+    
 }
 
 int sendFiles(int sock, list<string> &paths)

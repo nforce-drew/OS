@@ -19,6 +19,7 @@
 #include <QMessageBox>
 #include <QStringList>
 #include <QDebug>
+#include <QTimer>
 
 //=================================================================================
 namespace Ui {
@@ -38,6 +39,7 @@ private:
     QString         m_strHost;
     int             m_nPort;
     bool            m_lastStatus;
+    QString         m_userName;
 
 public:
     MyClient(const QString& strHost, int nPort, QWidget *pwgt = 0);
@@ -48,6 +50,7 @@ private slots:
     void slotError(QAbstractSocket::SocketError err);   //Ошибка подключения с сервером
     void slotSendFilesToServer();                            //Отправка файлов
     void slotConnected();                               //Клиент подключился к серверу
+    void slotReconnect();
 public:
     void slotSendDataToServer(TYPE dataType, char* data, unsigned len); //Отправка данных или запроса
                                                                          // если дополнительные данные не передаются,

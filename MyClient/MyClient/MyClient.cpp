@@ -55,10 +55,11 @@ MyClient::MyClient(const QString& strHost, int nPort, QWidget *pwgt/*=0*/) :
     if (((LogInWindow*)m_loginWndw)->exec() == QDialog::Accepted)
     {
         qDebug() << "User " + ((LogInWindow*)m_loginWndw)->getUserName() + " logged.";
-        show();
+//        show();
         QMessageBox::information(this, "Logged", "User " + ((LogInWindow*)m_loginWndw)->getUserName() + " logged.");
     }
-
+    m_userName = ((LogInWindow*)m_loginWndw)->getUserName();
+    qDebug() << "logged: " << m_userName;
 //    m_loginWndw->show();
 
     setLayout(pvbxLayout);
@@ -135,8 +136,9 @@ void MyClient::slotReadyRead()
 // ----------------------------------------------------------------------
 void MyClient::slotError(QAbstractSocket::SocketError err)
 {
-    if (m_lastStatus)
-    {
+
+//    if (m_lastStatus)
+//    {
         QString strError =
                 "Error: " + (err == QAbstractSocket::HostNotFoundError ?
                                  "The host was not found." :
@@ -148,11 +150,18 @@ void MyClient::slotError(QAbstractSocket::SocketError err)
                                          );
         m_ptxtInfo->append(strError);
         m_pTcpSocket->close();
-    }
+        QTimer::singleShot(0, this, SLOT(slotReconnect()));
+//    }
 
-    m_lastStatus = false;
+//    m_lastStatus = false;
 //    delete m_pTcpSocket;
 //    m_pTcpSocket = new QTcpSocket(this);
+//    m_pTcpSocket->connectToHost(m_strHost, m_nPort);
+}
+// ----------------------------------------------------------------------
+void MyClient::slotReconnect()
+{
+    qDebug() << "reconnect";
     m_pTcpSocket->connectToHost(m_strHost, m_nPort);
 }
 // ----------------------------------------------------------------------
@@ -211,13 +220,17 @@ void MyClient::slotSendDataToServer(TYPE dataType, char* data, unsigned len)
     out.writeRawData((char*)&mainHdr, sizeof(MainHeader));
     if (data != NULL && len != 0)
         out.writeRawData(data, len);
-    qDebug() << bytes(arrBlock.data(), arrBlock.size());
     m_pTcpSocket->write(arrBlock);
 }
 // ------------------------------------------------------------------
 void MyClient::slotConnected()
 {
     m_lastStatus = true;
+    if (m_userName.size() != 0)
+    {
+        slotSendDataToServer(RECONNECT, (char*)m_userName.toStdString().c_str(), m_userName.size() + 1);
+    }
+
     m_ptxtInfo->append("Received the connected() signal");
 }
 

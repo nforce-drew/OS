@@ -25,6 +25,7 @@ void LogInWindow::slotCheckLogin()
     connectDatabase();
     QString userName = ui->login_lineEdit   ->text();
     QString password = ui->password_lineEdit->text();
+    m_userName = userName;
 
     LoginHeader loginHdr((char*)userName.toStdString().c_str(), (char*)password.toStdString().c_str());
     (qobject_cast<MyClient*>(this->parent()))->slotSendDataToServer(CHECK_LOGIN, (char*)&loginHdr, sizeof(loginHdr));

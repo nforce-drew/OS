@@ -24,6 +24,7 @@ void            clearQueue();
 void            fillQueue(list<TaskHeader>* queue);
 static int      callback_getOnlineUsers(void* data, int argc, char** argv, char** azColName);
 list<string>*   getOnlineUsers(list<string>* lst);
+void            addOnlineUser(int sock_fd, string userName);
 
 
 #endif // DATABASEFUNCTIONS_H

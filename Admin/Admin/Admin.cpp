@@ -88,6 +88,7 @@ void Admin::deleteTask()
 {
     ui->tableTasks->removeRow(ui->tableTasks->currentRow());
     ui->tableTasks->queueChanged();
+    slotSendQueue(ui->tableTasks->m_queueList);
 }
 
 void Admin::setEnabledDeleteBtn()
@@ -130,7 +131,6 @@ void Admin::slotSendQueue(QList<TaskHeader>* queueLst)
 void Admin::slotReconnect()
 {
     qDebug() << "reconnect";
-//    QThread::sleep(500);
     m_pTcpSocket->connectToHost(m_strHost, m_nPort);
 }
 
@@ -206,7 +206,7 @@ void Admin::slotError(QAbstractSocket::SocketError err)
 //        QMessageBox::critical(this, "Ошибка", strError);
 //        m_pTcpSocket->abort();
         m_pTcpSocket->close();
-        QTimer::singleShot(1000, this, SLOT(slotReconnect()));
+        QTimer::singleShot(0, this, SLOT(slotReconnect()));
 //        QTimer::singleShot(0, m_pTcpSocket, SLOT(connectToHost()));
 //    }
 //    qDebug() << "m_lastStatus = " << m_lastStatus;
