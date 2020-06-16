@@ -53,8 +53,9 @@ unsigned appFileData(string folderAndFileName, const char *data, unsigned len)
 //     return (message);
 // }
 
-int recvAll(int sock, char *buf, TYPE &dataType, void* data)
+int recvAll(int sock, char *strData, TYPE &dataType, void* data)
 {
+    char        buf[BUF_SIZE];
     int         readBytes;
     unsigned    totalBytes;
     unsigned    blockBytes;
@@ -95,7 +96,16 @@ int recvAll(int sock, char *buf, TYPE &dataType, void* data)
         string userName = getUserName(sock);
         mkdir((char*)SAVE_PATH, S_IRWXU);
         folderName = userName + " " + curTime;
+        int i;
+        string change = "_";
+        for (int j = 0; j < folderName.length() - 1; j++)
+        {
+            i = folderName.find(" ");
+            if(i == j)
+                folderName.replace(i, change.length(), change);
+        }
         savePath = (char*)SAVE_PATH + folderName;
+
         mkdir(savePath.c_str(), S_IRWXU);
         folderName += "/";
         taskId = createTask(userName, curTime);
@@ -168,6 +178,7 @@ int recvAll(int sock, char *buf, TYPE &dataType, void* data)
             }
         }
         data = (void*)paths;
+        memcpy(strData, (char*)&taskId, sizeof(int));
         return (totalBytes);
     }
     else if (mainHeader.getType() == CHECK_LOGIN)
@@ -188,6 +199,7 @@ int recvAll(int sock, char *buf, TYPE &dataType, void* data)
             blockBytes += readBytes;
         }
         data = nullptr;
+        memcpy(strData, buf, BUF_SIZE);
         return (totalBytes);
     }
 
@@ -225,8 +237,6 @@ int recvAll(int sock, char *buf, TYPE &dataType, void* data)
     }
     if (dataType == RECONNECT)
     {
-        // string* userName = (string*)data;
-
         curByte = sizeof(MainHeader);
         memcpy(buf, buf + curByte, totalBytes - sizeof(MainHeader));
         curByte = totalBytes - sizeof(MainHeader);
@@ -240,6 +250,7 @@ int recvAll(int sock, char *buf, TYPE &dataType, void* data)
             }
             totalBytes += (int)readBytes;
         }
+        memcpy(strData, buf, 20);
         // userName->copy(buf, mainHeader.getMsgSize() - sizeof(MainHeader) - 1);
     }
 

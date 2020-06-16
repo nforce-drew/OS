@@ -18,12 +18,63 @@
 #include <string.h>
 #include <fstream>
 #include <list>
+#include <thread>
+#include <chrono>
+#include <sys/stat.h>
 using namespace std;
 
 #define BUF_SIZE    1024
 #define PORT_NUMBER 5307
+#define SOLUTIONS_PATH "/home/nforce/OS/Server/Solutions/" // в конце должен быть слэш!!!
 
-int admin_fd;
+int     admin_fd;
+bool    isSolverFree;
+
+void solver()
+{
+    isSolverFree = false;
+    std::cout << "===SOLVER STARTED===" << std::endl;
+
+    this_thread::sleep_for(chrono::milliseconds(5000));
+    int taskId = getFirstTask();
+    if (taskId == -1)
+    {
+        std::cout << "===SOLVER END===" << std::endl;
+        isSolverFree = true;
+        return;
+    }
+    list<string> pathes = getTaskPathes(taskId);
+
+    string userName = getUserNameByTaskId(taskId);
+    string curTime = currentTimeInfo();
+    string folderName;
+    // string savePath;
+    // string shellCommand;
+
+    // // this_thread::sleep_for(chrono::milliseconds(10000));
+
+    // mkdir((char*)SOLUTIONS_PATH, S_IRWXU);
+    // folderName = userName + " " + curTime;
+    // int i;
+    // string change = "_";
+    // for (int j = 0; j < folderName.length() - 1; j++)
+    // {
+    //     i = folderName.find(" ");
+    //     if(i == j)
+    //         folderName.replace(i, change.length(), change);
+    // }
+    // savePath = (char*)SOLUTIONS_PATH + folderName;
+    // mkdir(savePath.c_str(), S_IRWXU);
+
+    // for (auto el : *files)
+    // {
+    //     shellCommand = "cp " + el + " " + savePath;
+    //     system(shellCommand.c_str());
+    // }
+    setTaskState(taskId, "Готово");
+    std::cout << "===SOLVER END===" << std::endl;
+    isSolverFree = true;
+}
 
 string bytes(const char *buf, int size)
 {
@@ -44,6 +95,7 @@ int main(const int argc, const char** argv)
     char    buf[BUF_SIZE];
     int     bytes_read;
     string  query;
+    thread  solverTh;
 
     if (argc > 2)
         return (-1);
@@ -57,8 +109,9 @@ int main(const int argc, const char** argv)
     }
 
     admin_fd = -1;
+    isSolverFree = true;
     cout << currentTimeInfo() << endl;
-
+    std::cout << "First task id: " << getFirstTask() << std::endl;
     fcntl(listener, F_SETFL, O_NONBLOCK);
     
     addr.sin_family = AF_INET;
@@ -193,12 +246,23 @@ int main(const int argc, const char** argv)
                     }
                     case SEND_FILES:
                     {
+                        int taskId;
+
                         cout << "\t-> SEND_FILES - count files: " << lst->size() << endl;
                         if (admin_fd != -1)
                             sendQueue(admin_fd);
-                        // cout << "Отправляемые файлы(" << lst->size() << ")" << endl;
-                        for (auto el : *lst)
-                            cout << "\t\t" << el << endl;
+                        taskId = *((int*)buf);
+                        std::cout << "\t\t tsk id: " << taskId << std::endl;
+                        addTaskPathes(taskId, *lst);
+                        if (isSolverFree)
+                        {
+                            
+                            this_thread::sleep_for(chrono::milliseconds(100));
+                            solverTh = thread(solver);
+                            solverTh.detach();
+                        }
+                        // for (auto el : *lst)
+                        //     cout << "\t\t" << el << endl;
                         delete lst;
                         break;        
                     }

@@ -38,6 +38,7 @@ int checkLoginPermission(sqlite3* db, int sock_fd, char* login, char* password)
     char*       errMsg;
     int         trueSock_fd;
 
+    cout << "!!!!!!!!!" << login << endl;
     trueSock_fd = sock_fd;
     query = "SELECT * FROM users_info " \
         "WHERE user_name == '" + std::string(login)
@@ -102,6 +103,38 @@ string      getUserName(int sock_fd)
     return (string((char*)data));
 }
 
+static int callback_result(void* data, int argc, char** argv, char** azColName)
+{
+    vector<vector<string>>* res;
+    vector<string>          row;
+
+    res = (vector<vector<string>>*)data;
+    for (int i = 0; i < argc; i++)
+        row.push_back(string(argv[i]));
+    res->push_back(row);
+    return (0);
+}
+
+string          getUserNameByTaskId(int taskId)
+{
+    vector<vector<string>>* res;
+    string                  userName;
+    string                  query;
+    sqlite3*                db;
+    void*                   data;
+    
+    res = new vector<vector<string>>;
+    data = (void*)res;
+    db = connectDB((char*)DB_PATH);
+    query = "SELECT user_name FROM tasks " \
+            "WHERE task_id == " + std::to_string(taskId) + ";";
+    sqlite3_exec(db, query.c_str(), callback_result, data, NULL);
+    sqlite3_close(db);
+    userName = (*res)[0][0];
+    delete res;
+    return (userName);
+}
+
 static int callback_createTask(void* data, int argc, char** argv, char** azColName)
 {
     strcpy((char*)data, argv[0]);
@@ -114,8 +147,8 @@ int         createTask(string userName, string time)
     string      query;
     char        taskId[10];
 
-    query = "INSERT INTO tasks(user_name, time) " \
-            "VALUES ('" + userName + "', '" + time + "');";
+    query = "INSERT INTO tasks(user_name, time, state) " \
+            "VALUES ('" + userName + "', '" + time + "', 'В очереди');";
     db = connectDB((char*)DB_PATH);
     sqlite3_exec(db, query.c_str(), NULL, NULL, NULL);
     query = "SELECT task_id FROM tasks " \
@@ -268,3 +301,110 @@ list<string>*   getOnlineUsers(list<string>* lst)
     
     return (lst);
 }
+
+void            addTaskPathes(int taskId, list<string> pathes)
+{
+    sqlite3*    db;
+    string      query;
+    char*       errMsg;
+
+    db = connectDB((char*)DB_PATH);
+    for (string path : pathes)
+    {
+        query = "INSERT INTO task_pathes(task_id, file_path) " \
+                "VALUES (" + std::to_string(taskId) + ", '" + path + "');";
+        sqlite3_exec(db, query.c_str(), NULL, NULL, &errMsg);
+    }
+    std::cerr << errMsg << std::endl;
+    sqlite3_close(db);
+}
+
+int             getFirstTask()
+{
+    vector<vector<string>>* res;
+    sqlite3*                db;
+    string                  query;
+    char*                   errMsg;
+    void*                   data;
+    int                     taskId;
+
+    res = new vector<vector<string>>;
+    data = (void*)res;
+    db = connectDB((char*)DB_PATH);
+    query = "SELECT task_id FROM task_queue WHERE queue_num == 1;";
+    sqlite3_exec(db, query.c_str(), callback_result, data, &errMsg);
+    std::cerr << errMsg << std::endl;
+    sqlite3_close(db);
+    res->size() == 0 ? taskId = -1 : taskId = std::stoi((*res)[0][0]);
+    delete res;
+
+    return (taskId);
+}
+
+list<string>    getTaskPathes(int taskId)
+{
+    vector<vector<string>>* res;
+    list<string>            pathes;
+    sqlite3*                db;
+    string                  query;
+    char*                   errMsg;
+    void*                   data;
+
+    res = new vector<vector<string>>;
+    data = (void*)res;
+    db = connectDB((char*)DB_PATH);
+    query = "SELECT file_path FROM task_pathes " \
+            "WHERE task_id == " + std::to_string(taskId) + ";";
+    std::cout << query << std::endl;
+    sqlite3_exec(db, query.c_str(), callback_result, data, &errMsg);
+    std::cerr << errMsg << std::endl;
+    sqlite3_close(db);
+    for (auto path : *res)
+        pathes.push_back(path[0]);
+    delete res;
+
+    return (pathes);
+}
+
+void            setTaskState(int taskId, string state)
+{
+    sqlite3*                db;
+    string                  query;
+    char*                   errMsg;
+
+    db = connectDB((char*)DB_PATH);
+    query = "UPDATE tasks SET state = '" + state + "' " \
+            "WHERE task_id == " + std::to_string(taskId) + ";";
+    std::cout << query << std::endl;
+    sqlite3_exec(db, query.c_str(), NULL, NULL, &errMsg);
+    std::cerr << errMsg << std::endl;
+    if (state == "Готово")
+    {
+        query = "DELETE FROM task_queue " \
+                "WHERE task_id = " + std::to_string(taskId) + ";";
+        sqlite3_exec(db, query.c_str(), NULL, NULL, &errMsg);
+        std::cerr << errMsg << std::endl;
+    }
+    sqlite3_close(db);
+}
+
+// bool            isSolverFree()
+// {
+//     vector<vector<string>>* res;
+//     sqlite3*                db;
+//     string                  query;
+//     char*                   errMsg;
+//     void*                   data;
+//     bool                    isFree;
+    
+//     res = new vector<vector<string>>;
+//     data = (void*)res;
+//     db = connectDB((char*)DB_PATH);
+//     query = "SELECT * FROM tasks WHERE state == 'Решается';";
+//     sqlite3_exec(db, query.c_str(), callback_result, data, &errMsg);
+//     std::cerr << errMsg << std::endl;
+//     sqlite3_close(db);
+//     res->size() == 0 ? isFree = true : isFree = false;
+//     delete res;
+//     return (isFree);
+// }

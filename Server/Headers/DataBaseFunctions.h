@@ -8,6 +8,7 @@
 #include <iostream>
 #include <string>
 #include <list>
+#include <vector>
 #include <stdlib.h>
 
 #define DB_PATH     "/home/nforce/OS/tasks_solver.db"
@@ -16,6 +17,8 @@ sqlite3*        connectDB(char* db_path);
 static int      callback(void* notUsed, int argc, char** argv, char** azColName);
 int             checkLoginPermission(sqlite3* db, int sock_fd, char* login, char* password);
 string          getUserName(int sock_fd);
+static int      callback_result(void* data, int argc, char** argv, char** azColName);
+string          getUserNameByTaskId(int taskId);
 int             createTask(string userName, string time);
 void            joinQueue(int taskId, string userName, string time);
 static int      callback_sendQueue(void* data, int argc, char** argv, char** azColName);
@@ -25,6 +28,9 @@ void            fillQueue(list<TaskHeader>* queue);
 static int      callback_getOnlineUsers(void* data, int argc, char** argv, char** azColName);
 list<string>*   getOnlineUsers(list<string>* lst);
 void            addOnlineUser(int sock_fd, string userName);
-
-
+void            addTaskPathes(int taskId, list<string> pathes);
+int             getFirstTask();
+list<string>    getTaskPathes(int taskId);
+void            setTaskState(int taskId, string state);
+// bool            isSolverFree();
 #endif // DATABASEFUNCTIONS_H
