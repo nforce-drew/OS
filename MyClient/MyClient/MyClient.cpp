@@ -34,6 +34,27 @@ MyClient::MyClient(const QString& strHost, int nPort, QWidget *pwgt/*=0*/) :
             this,         SLOT(slotError(QAbstractSocket::SocketError))
            );
 
+    QFile      file("/home/nforce/Desktop/AllDesktop/scrn28.png");
+    QByteArray  arrBlock;
+    QFileInfo   fileInfo(file);
+    if(!file.open(QIODevice::ReadOnly))
+        qDebug() << "---Файл " << " не открыт!!!";
+
+    qDebug() << "Размер файла" << fileInfo.size();
+    arrBlock.clear();
+    arrBlock = file.read(1024);
+    qDebug() << "Readed" << arrBlock.size();
+    arrBlock.clear();
+    arrBlock = file.read(1024);
+    qDebug() << "Readed" << arrBlock.size();
+    arrBlock.clear();
+    arrBlock = file.read(1024);
+    qDebug() << "Readed" << arrBlock.size();
+
+
+    file.close();
+
+
     m_ptxtInfo  = new QTextEdit;
     m_ptxtInput = new QLineEdit;
 
@@ -60,6 +81,8 @@ MyClient::MyClient(const QString& strHost, int nPort, QWidget *pwgt/*=0*/) :
     }
     m_userName = ((LogInWindow*)m_loginWndw)->getUserName();
     qDebug() << "logged: " << m_userName;
+
+
 //    m_loginWndw->show();
 
     setLayout(pvbxLayout);
@@ -161,7 +184,7 @@ void MyClient::slotError(QAbstractSocket::SocketError err)
 // ----------------------------------------------------------------------
 void MyClient::slotReconnect()
 {
-    qDebug() << "reconnect";
+//    qDebug() << "reconnect";
     m_pTcpSocket->connectToHost(m_strHost, m_nPort);
 }
 // ----------------------------------------------------------------------
@@ -171,17 +194,50 @@ void MyClient::slotSendFilesToServer()
     QFileInfo*  p_fileInfo;
     QFile*      p_file;
     QByteArray  arrBlock;
-    QByteArray  fileData;
     MainHeader  mainHeader;
     FileHeader  fileHeader;
     QDataStream out(&arrBlock, QIODevice::ReadWrite);
+    unsigned    msgSize;
+    QVector<QVector<QString>>   filesInfo;
+    QVector<QString>            info;
+    qint64                      totalSent(0);
+    int                         readBytes;
 
     qDebug() << "Why send files";
     out.setVersion(QDataStream::Qt_5_9);
     out.setByteOrder(QDataStream::LittleEndian);
-    fPaths << "/home/nforce/Desktop/AllDesktop/Конспект_24.03.pdf"
+    fPaths << "/home/nforce/Desktop/AllDesktop/Dzheremi.djvu"
+           << "/home/nforce/Desktop/AllDesktop/scrn29.png"
+           << "/home/nforce/Desktop/AllDesktop/Конспект_24.03.pdf"
            << "/home/nforce/Desktop/AllDesktop/crock.jpg";// Удалить
+    msgSize = sizeof(MainHeader);
+    for (QString path : fPaths)
+    {
+        info.clear();
+        p_file = new QFile(path);
+        if(!p_file->open(QIODevice::ReadOnly))
+        {
+            QMessageBox::critical(this, "Error", "File " + path + " does not open!");
+            qDebug() << "---Файл " << path << " не открыт!!!";
+            return;
+        }
+        p_fileInfo = new QFileInfo(*p_file);
+        msgSize += sizeof(FileHeader);
+        msgSize += p_fileInfo->size();
+        info.push_back(QString::number(p_fileInfo->size()));
+        info.push_back(p_fileInfo->fileName());
+        filesInfo.push_back(info);
+        p_file->close();
+        delete p_fileInfo;
+        delete p_file;
+    }
+    qDebug() << "msgSize = " << msgSize;
+    mainHeader.setData(msgSize, fPaths.size(), SEND_FILES);
+    arrBlock.clear();
+    out.device()->seek(0);
     out.writeRawData((char*)&mainHeader, sizeof(MainHeader));
+    totalSent = m_pTcpSocket->write(arrBlock);
+    qDebug() << "sent =" << totalSent;
     for (int i = 0; i < fPaths.size(); i++)
     {
         p_file = new QFile(fPaths[i]);
@@ -191,21 +247,40 @@ void MyClient::slotSendFilesToServer()
             qDebug() << "---Файл " << fPaths[i] << " не открыт!!!";
             return;
         }
-        fileData.clear();
-        fileData = p_file->readAll();
-        p_fileInfo = new QFileInfo(*p_file);
-        fileHeader.setData(unsigned(p_fileInfo->size()), (char*)p_fileInfo->fileName().toStdString().data());
+        arrBlock.clear();
+        fileHeader.setData(unsigned(filesInfo[i][0].toInt()), (char*)filesInfo[i][1].toStdString().data());
+        qDebug() << fileHeader.getFileSize() << fileHeader.getFileName();
+        out.device()->seek(0);
         out.writeRawData((char*)&fileHeader, sizeof(FileHeader));
-        out.writeRawData(fileData.data(), fileData.size());
+        totalSent = m_pTcpSocket->write(arrBlock);
+        qDebug() << "sent =" << totalSent;
+        readBytes = 1;
+//        int j = 0;
+        while (readBytes > 0)
+        {
+            arrBlock.clear();
+//            p_file->seek(j * 1024);
+            arrBlock = p_file->read(1024);
+
+            qDebug() << "Read bytes =" << arrBlock.size();
+            readBytes = arrBlock.size();
+            if (readBytes > 0)
+            {
+                out.device()->seek(0);
+                out.writeRawData(arrBlock.data(), arrBlock.size());
+                totalSent = m_pTcpSocket->write(arrBlock);
+                qDebug() << "sent =" << totalSent;
+            }
+//            j++;
+        }
         p_file->close();
-        delete p_fileInfo;
         delete p_file;
     }
-    out.device()->seek(0);
-    mainHeader.setData(arrBlock.size(), fPaths.size(), SEND_FILES);
-    out.writeRawData((char*)&mainHeader, sizeof(MainHeader));
-    m_pTcpSocket->write(arrBlock);
-    qDebug() << "Bytes sent: " << arrBlock.size();
+//    out.device()->seek(0);
+//    mainHeader.setData(arrBlock.size(), fPaths.size(), SEND_FILES);
+//    out.writeRawData((char*)&mainHeader, sizeof(MainHeader));
+//    m_pTcpSocket->write(arrBlock);
+    qDebug() << "Bytes sent: " << totalSent;
 }
 // ------------------------------------------------------------------
 void MyClient::slotSendDataToServer(TYPE dataType, char* data, unsigned len)
