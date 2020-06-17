@@ -35,7 +35,7 @@ void solver()
     isSolverFree = false;
     std::cout << "===SOLVER STARTED===" << std::endl;
 
-    this_thread::sleep_for(chrono::milliseconds(5000));
+    this_thread::sleep_for(chrono::milliseconds(12000));
     int taskId = getFirstTask();
     if (taskId == -1)
     {
@@ -48,32 +48,36 @@ void solver()
     string userName = getUserNameByTaskId(taskId);
     string curTime = currentTimeInfo();
     string folderName;
-    // string savePath;
-    // string shellCommand;
+    string savePath;
+    string shellCommand;
 
     // // this_thread::sleep_for(chrono::milliseconds(10000));
 
-    // mkdir((char*)SOLUTIONS_PATH, S_IRWXU);
-    // folderName = userName + " " + curTime;
-    // int i;
-    // string change = "_";
-    // for (int j = 0; j < folderName.length() - 1; j++)
-    // {
-    //     i = folderName.find(" ");
-    //     if(i == j)
-    //         folderName.replace(i, change.length(), change);
-    // }
-    // savePath = (char*)SOLUTIONS_PATH + folderName;
-    // mkdir(savePath.c_str(), S_IRWXU);
+    mkdir((char*)SOLUTIONS_PATH, S_IRWXU);
+    folderName = userName + " " + curTime;
+    int i;
+    string change = "_";
+    for (int j = 0; j < folderName.length() - 1; j++)
+    {
+        i = folderName.find(" ");
+        if(i == j)
+            folderName.replace(i, change.length(), change);
+    }
+    savePath = (char*)SOLUTIONS_PATH + folderName;
+    mkdir(savePath.c_str(), S_IRWXU);
 
-    // for (auto el : *files)
-    // {
-    //     shellCommand = "cp " + el + " " + savePath;
-    //     system(shellCommand.c_str());
-    // }
+    for (auto el : pathes)
+    {
+        shellCommand = "cp " + el + " " + savePath;
+        system(shellCommand.c_str());
+    }
     setTaskState(taskId, "Готово");
+    sendQueue(admin_fd);
     std::cout << "===SOLVER END===" << std::endl;
+    if (getFirstTask() != -1)
+        solver();
     isSolverFree = true;
+    return;
 }
 
 string bytes(const char *buf, int size)
