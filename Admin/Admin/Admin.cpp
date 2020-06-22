@@ -119,6 +119,7 @@ void Admin::slotSendQueue(QList<TaskHeader>* queueLst)
     dataSize = queueLst->size() * sizeof(TaskHeader);
     out.setVersion(QDataStream::Qt_5_9);
     out.setByteOrder(QDataStream::LittleEndian);
+    qDebug() << "=== Queue sended ===";
     mainHdr.setData(sizeof(MainHeader) + dataSize, queueLst->size(), QUEUE_LIST);
     out.writeRawData((char*)&mainHdr, sizeof(MainHeader));
     for (TaskHeader task : *queueLst)
@@ -130,7 +131,7 @@ void Admin::slotSendQueue(QList<TaskHeader>* queueLst)
 
 void Admin::slotReconnect()
 {
-    qDebug() << "reconnect";
+//    qDebug() << "reconnect";
     m_pTcpSocket->connectToHost(m_strHost, m_nPort);
 }
 

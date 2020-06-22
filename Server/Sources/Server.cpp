@@ -35,14 +35,15 @@ void solver()
     isSolverFree = false;
     std::cout << "===SOLVER STARTED===" << std::endl;
 
-    this_thread::sleep_for(chrono::milliseconds(12000));
     int taskId = getFirstTask();
     if (taskId == -1)
     {
+
         std::cout << "===SOLVER END===" << std::endl;
         isSolverFree = true;
         return;
     }
+    this_thread::sleep_for(chrono::milliseconds(12000));
     list<string> pathes = getTaskPathes(taskId);
 
     string userName = getUserNameByTaskId(taskId);
@@ -101,6 +102,8 @@ int main(const int argc, const char** argv)
     string  query;
     thread  solverTh;
 
+    solverTh = thread(solver);
+    solverTh.detach();
     if (argc > 2)
         return (-1);
     if (argc == 2 && atoi(argv[1]) == 0)
@@ -272,6 +275,7 @@ int main(const int argc, const char** argv)
                     }
                     case QUEUE_LIST:
                     {
+                        cout << "=== Queue sended ===" << endl;
                         queue = (list<TaskHeader>*)data;
                         clearQueue();
                         fillQueue(queue);                        
@@ -297,6 +301,11 @@ int main(const int argc, const char** argv)
                                     << buf << "\"" << std::endl;
                         std::cout << bytes(buf, 20) << std::endl;
                         addOnlineUser(*it, std::string(buf));
+                        if (admin_fd != -1)
+                        {
+                            sendQueue(admin_fd);                      
+                            sendOnlineUsers(admin_fd);
+                        }
                         break;
                     }
                 }

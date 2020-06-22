@@ -382,6 +382,7 @@ void            setTaskState(int taskId, string state)
     {
         query = "DELETE FROM task_queue " \
                 "WHERE task_id = " + std::to_string(taskId) + ";";
+        cout << query << endl;
         sqlite3_exec(db, query.c_str(), NULL, NULL, &errMsg);
         std::cerr << errMsg << std::endl;
     }
