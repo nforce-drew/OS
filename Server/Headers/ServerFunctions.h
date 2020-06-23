@@ -40,3 +40,4 @@ int         sendData(int sock, const MainHeader &mainHdr, char* data, unsigned l
 int         sendFiles(int sock, list<string> &paths); //ОТПРАВЛЯЕТ ФАЙЛЫ, пути к которым передаются в список
 char*       onlineUsersToChar(list<string>* lst);
 int         sendOnlineUsers(int admin_fd);
+int         sendTasksInfo(int sock_fd, string userName);

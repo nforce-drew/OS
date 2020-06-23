@@ -28,6 +28,7 @@ DEFINES += QT_DEPRECATED_WARNINGS
 
 
 SOURCES += \
+    DropZone.cpp \
         main.cpp \
         MyClient.cpp \
     MainHeader.cpp \
@@ -36,6 +37,7 @@ SOURCES += \
     Headers.cpp
 
 HEADERS += \
+    DropZone.h \
         MyClient.h \
     MainHeader.h \
     FileHeader.h \

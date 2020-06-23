@@ -33,31 +33,44 @@ static int callback(void* sock_fd, int argc, char** argv, char** azColName)
 
 int checkLoginPermission(sqlite3* db, int sock_fd, char* login, char* password)
 {
-    std::string query;
-    int         rc;
-    char*       errMsg;
-    int         trueSock_fd;
+    vector<vector<string>>* res;
+    std::string             query;
+    MainHeader              mainHdr;
+    int                     rc;
+    char*                   errMsg;
+    void*                   data;
 
-    cout << "!!!!!!!!!" << login << endl;
-    trueSock_fd = sock_fd;
+    res = new vector<vector<string>>;
+    data = (void*)res;
+
+    query = "SELECT user_name FROM online_users " \
+            "WHERE user_name == '" +  std::string(login) + "';";
+    // cout << "res.size() = " << res->size() << endl;
+    rc = sqlite3_exec(db, query.c_str(), callback_result, data, &errMsg);
+    if (res->size() != 0)
+    {
+        mainHdr.setData(sizeof(MainHeader), 0, BAN_LOGIN);
+        sendData(sock_fd, mainHdr, NULL, 0);
+        return (rc);
+    }
+    res->clear();
     query = "SELECT * FROM users_info " \
         "WHERE user_name == '" + std::string(login)
          + "' AND user_password == '" + std::string(password) + "';";
     
-    rc = sqlite3_exec(db, query.c_str(), callback, &sock_fd, &errMsg);
+    rc = sqlite3_exec(db, query.c_str(), callback_result, data, &errMsg);
 
-    if (sock_fd != -1)
+    if (res->size() == 0)
+        mainHdr.setData(sizeof(MainHeader), 0, BAN_LOGIN);
+    else
     {
-        MainHeader mainHdr(sizeof(MainHeader), 0, BAN_LOGIN);
-        int sendBytes = sendData(sock_fd, mainHdr, NULL, 0);
-    }
-    if (sock_fd == -1)
-    {
+        mainHdr.setData(sizeof(MainHeader), 0, PERMISSION_LOGIN);
         //Добавление в онлайн
         query = "INSERT INTO online_users (user_name, sock_num) " \
-            "VALUES ('" + std::string(login) + "', " + std::to_string(trueSock_fd) + ");";
+                "VALUES ('" + std::string(login) + "', " + std::to_string(sock_fd) + ");";
         rc = sqlite3_exec(db, query.c_str(), NULL, &sock_fd, &errMsg);
     }
+    sendData(sock_fd, mainHdr, NULL, 0);
 
     std::cerr << errMsg << std::endl;
     errno == 2 ? errno = 0 : errno;
@@ -389,6 +402,42 @@ void            setTaskState(int taskId, string state)
     sqlite3_close(db);
 }
 
+list<TaskStateHeader> &getTasksInfo(string userName, list<TaskStateHeader>& tasksList)
+{
+    vector<vector<string>>* res;
+    TaskStateHeader         task;
+    sqlite3*                db;
+    string                  query;
+    char*                   errMsg;
+    void*                   data;
+
+    tasksList.clear();
+    res = new vector<vector<string>>;
+    data = (void*)res;
+    db = connectDB((char*)DB_PATH);
+    query = "SELECT state, time, task_id FROM tasks " \
+            "WHERE user_name == '" + userName + "';";
+    sqlite3_exec(db, query.c_str(), callback_result, data, &errMsg);
+    std::cerr << errMsg << std::endl;
+    sqlite3_close(db);
+    for (int i = 0; i < res->size(); i++)
+    {
+        STATE state;
+        if ((*res)[i][0] == "Готово")       state = DONE;
+        if ((*res)[i][0] == "В очереди")    state = SOLVING;
+        if ((*res)[i][0] == "Отменено")     state = CANCEL;
+        char* time = (char*)((*res)[i][1]).c_str();
+        int test = std::stoi("45");
+        unsigned taskId = (unsigned)(std::stoi((*res)[i][2]));
+        task.setData(state, time, taskId);
+        tasksList.push_back(task);
+        std::cout << task.getState() << " " << task.getTime() << " " << task.getTaskId() << std::endl;
+    }
+    
+    delete (res);
+
+    return (tasksList);
+}
 // bool            isSolverFree()
 // {
 //     vector<vector<string>>* res;

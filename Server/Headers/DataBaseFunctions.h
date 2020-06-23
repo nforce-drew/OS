@@ -4,6 +4,7 @@
 #include "ServerFunctions.h"
 #include "MainHeader.h"
 #include "TaskHeader.h"
+#include "TaskStateHeader.h"
 #include <sqlite3.h>
 #include <iostream>
 #include <string>
@@ -32,5 +33,7 @@ void            addTaskPathes(int taskId, list<string> pathes);
 int             getFirstTask();
 list<string>    getTaskPathes(int taskId);
 void            setTaskState(int taskId, string state);
+
+list<TaskStateHeader> &getTasksInfo(string userName, list<TaskStateHeader>& tasksList);
 // bool            isSolverFree();
 #endif // DATABASEFUNCTIONS_H

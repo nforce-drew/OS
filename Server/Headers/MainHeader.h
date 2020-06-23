@@ -12,6 +12,7 @@ enum TYPE
     ADMIN_LOGGED,
     ONLINE_USERS,
     RECONNECT,
+    TASKS_INFO,
     OTHER
 };
 //=================================================================================

@@ -45,6 +45,10 @@
         "ctime": "cpp",
         "ratio": "cpp",
         "chrono": "cpp",
-        "thread": "cpp"
+        "thread": "cpp",
+        "bit": "cpp",
+        "functional": "cpp",
+        "numeric": "cpp",
+        "random": "cpp"
     }
 }

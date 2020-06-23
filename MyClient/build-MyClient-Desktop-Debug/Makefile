@@ -52,21 +52,25 @@ OBJECTS_DIR   = ./
 
 ####### Files
 
-SOURCES       = ../MyClient/main.cpp \
+SOURCES       = ../MyClient/DropZone.cpp \
+		../MyClient/main.cpp \
 		../MyClient/MyClient.cpp \
 		../MyClient/MainHeader.cpp \
 		../MyClient/FileHeader.cpp \
 		../MyClient/LogInWindow.cpp \
 		../MyClient/Headers.cpp qrc_Resources.cpp \
+		moc_DropZone.cpp \
 		moc_MyClient.cpp \
 		moc_LogInWindow.cpp
-OBJECTS       = main.o \
+OBJECTS       = DropZone.o \
+		main.o \
 		MyClient.o \
 		MainHeader.o \
 		FileHeader.o \
 		LogInWindow.o \
 		Headers.o \
 		qrc_Resources.o \
+		moc_DropZone.o \
 		moc_MyClient.o \
 		moc_LogInWindow.o
 DIST          = /usr/lib/x86_64-linux-gnu/qt5/mkspecs/features/spec_pre.prf \
@@ -144,11 +148,13 @@ DIST          = /usr/lib/x86_64-linux-gnu/qt5/mkspecs/features/spec_pre.prf \
 		/usr/lib/x86_64-linux-gnu/qt5/mkspecs/features/exceptions.prf \
 		/usr/lib/x86_64-linux-gnu/qt5/mkspecs/features/yacc.prf \
 		/usr/lib/x86_64-linux-gnu/qt5/mkspecs/features/lex.prf \
-		../MyClient/MyClient.pro ../MyClient/MyClient.h \
+		../MyClient/MyClient.pro ../MyClient/DropZone.h \
+		../MyClient/MyClient.h \
 		../MyClient/MainHeader.h \
 		../MyClient/FileHeader.h \
 		../MyClient/LogInWindow.h \
-		../MyClient/Headers.h ../MyClient/main.cpp \
+		../MyClient/Headers.h ../MyClient/DropZone.cpp \
+		../MyClient/main.cpp \
 		../MyClient/MyClient.cpp \
 		../MyClient/MainHeader.cpp \
 		../MyClient/FileHeader.cpp \
@@ -336,8 +342,8 @@ distdir: FORCE
 	$(COPY_FILE) --parents $(DIST) $(DISTDIR)/
 	$(COPY_FILE) --parents ../MyClient/Resources.qrc $(DISTDIR)/
 	$(COPY_FILE) --parents /usr/lib/x86_64-linux-gnu/qt5/mkspecs/features/data/dummy.cpp $(DISTDIR)/
-	$(COPY_FILE) --parents ../MyClient/MyClient.h ../MyClient/MainHeader.h ../MyClient/FileHeader.h ../MyClient/LogInWindow.h ../MyClient/Headers.h $(DISTDIR)/
-	$(COPY_FILE) --parents ../MyClient/main.cpp ../MyClient/MyClient.cpp ../MyClient/MainHeader.cpp ../MyClient/FileHeader.cpp ../MyClient/LogInWindow.cpp ../MyClient/Headers.cpp $(DISTDIR)/
+	$(COPY_FILE) --parents ../MyClient/DropZone.h ../MyClient/MyClient.h ../MyClient/MainHeader.h ../MyClient/FileHeader.h ../MyClient/LogInWindow.h ../MyClient/Headers.h $(DISTDIR)/
+	$(COPY_FILE) --parents ../MyClient/DropZone.cpp ../MyClient/main.cpp ../MyClient/MyClient.cpp ../MyClient/MainHeader.cpp ../MyClient/FileHeader.cpp ../MyClient/LogInWindow.cpp ../MyClient/Headers.cpp $(DISTDIR)/
 	$(COPY_FILE) --parents ../MyClient/MyClient.ui ../MyClient/LogInWindow.ui $(DISTDIR)/
 
 
@@ -376,15 +382,21 @@ compiler_moc_predefs_clean:
 moc_predefs.h: /usr/lib/x86_64-linux-gnu/qt5/mkspecs/features/data/dummy.cpp
 	g++ -pipe -g -Wall -W -dM -E -o moc_predefs.h /usr/lib/x86_64-linux-gnu/qt5/mkspecs/features/data/dummy.cpp
 
-compiler_moc_header_make_all: moc_MyClient.cpp moc_LogInWindow.cpp
+compiler_moc_header_make_all: moc_DropZone.cpp moc_MyClient.cpp moc_LogInWindow.cpp
 compiler_moc_header_clean:
-	-$(DEL_FILE) moc_MyClient.cpp moc_LogInWindow.cpp
+	-$(DEL_FILE) moc_DropZone.cpp moc_MyClient.cpp moc_LogInWindow.cpp
+moc_DropZone.cpp: ../MyClient/DropZone.h \
+		moc_predefs.h \
+		/usr/lib/qt5/bin/moc
+	/usr/lib/qt5/bin/moc $(DEFINES) --include /home/nspace/OS/MyClient/build-MyClient-Desktop-Debug/moc_predefs.h -I/usr/lib/x86_64-linux-gnu/qt5/mkspecs/linux-g++ -I/home/nspace/OS/MyClient/MyClient -I/usr/include/postgresql -I/usr/include/x86_64-linux-gnu/qt5 -I/usr/include/x86_64-linux-gnu/qt5/QtWidgets -I/usr/include/x86_64-linux-gnu/qt5/QtGui -I/usr/include/x86_64-linux-gnu/qt5/QtNetwork -I/usr/include/x86_64-linux-gnu/qt5/QtSql -I/usr/include/x86_64-linux-gnu/qt5/QtCore -I. -I/usr/include/c++/7.4.0 -I/usr/include/x86_64-linux-gnu/c++/7.4.0 -I/usr/include/c++/7.4.0/backward -I/usr/include/clang/6.0.0/include -I/usr/local/include -I/usr/include/x86_64-linux-gnu -I/usr/include ../MyClient/DropZone.h -o moc_DropZone.cpp
+
 moc_MyClient.cpp: ../MyClient/MyClient.h \
 		../MyClient/MainHeader.h \
 		../MyClient/FileHeader.h \
 		../MyClient/LogInWindow.h \
 		../MyClient/MyClient.h \
 		../MyClient/Headers.h \
+		../MyClient/DropZone.h \
 		moc_predefs.h \
 		/usr/lib/qt5/bin/moc
 	/usr/lib/qt5/bin/moc $(DEFINES) --include /home/nspace/OS/MyClient/build-MyClient-Desktop-Debug/moc_predefs.h -I/usr/lib/x86_64-linux-gnu/qt5/mkspecs/linux-g++ -I/home/nspace/OS/MyClient/MyClient -I/usr/include/postgresql -I/usr/include/x86_64-linux-gnu/qt5 -I/usr/include/x86_64-linux-gnu/qt5/QtWidgets -I/usr/include/x86_64-linux-gnu/qt5/QtGui -I/usr/include/x86_64-linux-gnu/qt5/QtNetwork -I/usr/include/x86_64-linux-gnu/qt5/QtSql -I/usr/include/x86_64-linux-gnu/qt5/QtCore -I. -I/usr/include/c++/7.4.0 -I/usr/include/x86_64-linux-gnu/c++/7.4.0 -I/usr/include/c++/7.4.0/backward -I/usr/include/clang/6.0.0/include -I/usr/local/include -I/usr/include/x86_64-linux-gnu -I/usr/include ../MyClient/MyClient.h -o moc_MyClient.cpp
@@ -395,6 +407,7 @@ moc_LogInWindow.cpp: ../MyClient/LogInWindow.h \
 		../MyClient/FileHeader.h \
 		../MyClient/LogInWindow.h \
 		../MyClient/Headers.h \
+		../MyClient/DropZone.h \
 		moc_predefs.h \
 		/usr/lib/qt5/bin/moc
 	/usr/lib/qt5/bin/moc $(DEFINES) --include /home/nspace/OS/MyClient/build-MyClient-Desktop-Debug/moc_predefs.h -I/usr/lib/x86_64-linux-gnu/qt5/mkspecs/linux-g++ -I/home/nspace/OS/MyClient/MyClient -I/usr/include/postgresql -I/usr/include/x86_64-linux-gnu/qt5 -I/usr/include/x86_64-linux-gnu/qt5/QtWidgets -I/usr/include/x86_64-linux-gnu/qt5/QtGui -I/usr/include/x86_64-linux-gnu/qt5/QtNetwork -I/usr/include/x86_64-linux-gnu/qt5/QtSql -I/usr/include/x86_64-linux-gnu/qt5/QtCore -I. -I/usr/include/c++/7.4.0 -I/usr/include/x86_64-linux-gnu/c++/7.4.0 -I/usr/include/c++/7.4.0/backward -I/usr/include/clang/6.0.0/include -I/usr/local/include -I/usr/include/x86_64-linux-gnu -I/usr/include ../MyClient/LogInWindow.h -o moc_LogInWindow.cpp
@@ -407,7 +420,8 @@ compiler_uic_make_all: ui_MyClient.h ui_LogInWindow.h
 compiler_uic_clean:
 	-$(DEL_FILE) ui_MyClient.h ui_LogInWindow.h
 ui_MyClient.h: ../MyClient/MyClient.ui \
-		/usr/lib/qt5/bin/uic
+		/usr/lib/qt5/bin/uic \
+		../MyClient/DropZone.h
 	/usr/lib/qt5/bin/uic ../MyClient/MyClient.ui -o ui_MyClient.h
 
 ui_LogInWindow.h: ../MyClient/LogInWindow.ui \
@@ -424,11 +438,15 @@ compiler_clean: compiler_rcc_clean compiler_moc_predefs_clean compiler_moc_heade
 
 ####### Compile
 
+DropZone.o: ../MyClient/DropZone.cpp ../MyClient/DropZone.h
+	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o DropZone.o ../MyClient/DropZone.cpp
+
 main.o: ../MyClient/main.cpp ../MyClient/MyClient.h \
 		../MyClient/MainHeader.h \
 		../MyClient/FileHeader.h \
 		../MyClient/LogInWindow.h \
-		../MyClient/Headers.h
+		../MyClient/Headers.h \
+		../MyClient/DropZone.h
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o main.o ../MyClient/main.cpp
 
 MyClient.o: ../MyClient/MyClient.cpp ../MyClient/MyClient.h \
@@ -436,6 +454,7 @@ MyClient.o: ../MyClient/MyClient.cpp ../MyClient/MyClient.h \
 		../MyClient/FileHeader.h \
 		../MyClient/LogInWindow.h \
 		../MyClient/Headers.h \
+		../MyClient/DropZone.h \
 		ui_MyClient.h
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o MyClient.o ../MyClient/MyClient.cpp
 
@@ -450,6 +469,7 @@ LogInWindow.o: ../MyClient/LogInWindow.cpp ../MyClient/LogInWindow.h \
 		../MyClient/MainHeader.h \
 		../MyClient/FileHeader.h \
 		../MyClient/Headers.h \
+		../MyClient/DropZone.h \
 		ui_LogInWindow.h
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o LogInWindow.o ../MyClient/LogInWindow.cpp
 
@@ -458,6 +478,9 @@ Headers.o: ../MyClient/Headers.cpp ../MyClient/Headers.h
 
 qrc_Resources.o: qrc_Resources.cpp 
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o qrc_Resources.o qrc_Resources.cpp
+
+moc_DropZone.o: moc_DropZone.cpp 
+	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o moc_DropZone.o moc_DropZone.cpp
 
 moc_MyClient.o: moc_MyClient.cpp 
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o moc_MyClient.o moc_MyClient.cpp

@@ -33,6 +33,7 @@ private:
 signals:
     void logged();
 
+
 public slots:
     void slotCheckLogin();
     void slotIncorrectLogin();

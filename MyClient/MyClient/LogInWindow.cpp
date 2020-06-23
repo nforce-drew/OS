@@ -8,6 +8,7 @@ LogInWindow::LogInWindow(QWidget *parent) :
     ui(new Ui::LogInWindow)
 {
     ui->setupUi(this);
+    setWindowIcon(QIcon(":/Images/Images/user.png"));
 //    m_client = client;
     ui->password_lineEdit->setEchoMode(QLineEdit::Password);
     setWindowTitle("Авторизация");

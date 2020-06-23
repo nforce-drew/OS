@@ -5,6 +5,7 @@
 #include "FileHeader.h"
 #include "LogInWindow.h"
 #include "Headers.h"
+#include "DropZone.h"
 #include <QWidget>
 #include <QTcpSocket>
 #include <QTextEdit>
@@ -51,6 +52,7 @@ private slots:
     void slotSendFilesToServer();                            //Отправка файлов
     void slotConnected();                               //Клиент подключился к серверу
     void slotReconnect();
+    void slotDroppedFiles();
 public:
     void slotSendDataToServer(TYPE dataType, char* data, unsigned len); //Отправка данных или запроса
                                                                          // если дополнительные данные не передаются,

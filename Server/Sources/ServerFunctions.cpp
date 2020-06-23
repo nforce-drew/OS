@@ -420,3 +420,26 @@ int         sendOnlineUsers(int admin_fd)
     delete users;
     return (sentBytes);
 }
+
+int         sendTasksInfo(int sock_fd, string userName)
+{
+    list<TaskStateHeader>   tasks;
+    MainHeader              mainHdr;
+    int                     bytesSend;
+    unsigned                msgSize;
+    char*                   buf;
+
+    tasks = getTasksInfo("ivan", tasks);
+    msgSize = sizeof(MainHeader) + (unsigned)tasks.size() * sizeof(TaskStateHeader);
+    mainHdr.setData(msgSize, (unsigned)tasks.size(), TASKS_INFO);
+    buf = new char[msgSize - sizeof(MainHeader)];
+    int i = 0;
+    for (auto tsk : tasks)
+    {
+        memcpy(buf + i * sizeof(TaskStateHeader), (char*)&tsk, sizeof(TaskStateHeader));
+        i++;
+    }
+    bytesSend = sendData(sock_fd, mainHdr, buf, msgSize - sizeof(MainHeader));
+    
+    return (bytesSend);
+}

@@ -21,6 +21,7 @@ MyClient::MyClient(const QString& strHost, int nPort, QWidget *pwgt/*=0*/) :
     m_nNextBlockSize(0)
 {
 //    setWindowIcon(QIcon(":/Images/Images/user.png"));
+    ui->setupUi(this);
     m_lastStatus = true;
     m_pTcpSocket = new QTcpSocket(this);
 
@@ -35,6 +36,8 @@ MyClient::MyClient(const QString& strHost, int nPort, QWidget *pwgt/*=0*/) :
             this,         SLOT(slotError(QAbstractSocket::SocketError))
            );
 
+    connect(ui->dropArea, SIGNAL(dropped()), this, SLOT(slotDroppedFiles()));
+
 
 
     m_ptxtInfo  = new QTextEdit;
@@ -43,18 +46,20 @@ MyClient::MyClient(const QString& strHost, int nPort, QWidget *pwgt/*=0*/) :
 //    connect(m_ptxtInput, SIGNAL(returnPressed()),
 //            this,        SLOT(slotSendFilesToServer())
 //           );
-    m_ptxtInfo->setReadOnly(true);
 
     QPushButton* sendButton = new QPushButton("&Send");
-    connect(sendButton, SIGNAL(clicked()), SLOT(slotSendFilesToServer()));
+    connect(ui->solveBtn, SIGNAL(clicked()), SLOT(slotSendFilesToServer()));
 
     //Layout setup
     QVBoxLayout* pvbxLayout = new QVBoxLayout;
     pvbxLayout->addWidget(new QLabel("<H1>Client</H1>"));
     pvbxLayout->addWidget(m_ptxtInfo);
-    pvbxLayout->addWidget(m_ptxtInput);
+//    DropZone* pDropZone = new DropZone(this);
+//    pDropZone->setMinimumSize(600, 400);
+//    pvbxLayout->addWidget(pDropZone);
     pvbxLayout->addWidget(sendButton);
     m_loginWndw = new LogInWindow(this);
+
     if (((LogInWindow*)m_loginWndw)->exec() == QDialog::Accepted)
     {
         qDebug() << "User " + ((LogInWindow*)m_loginWndw)->getUserName() + " logged.";
@@ -63,11 +68,10 @@ MyClient::MyClient(const QString& strHost, int nPort, QWidget *pwgt/*=0*/) :
     }
     m_userName = ((LogInWindow*)m_loginWndw)->getUserName();
     qDebug() << "logged: " << m_userName;
-
-
+    setWindowIcon(QIcon(":/Images/Images/user.png"));
 //    m_loginWndw->show();
+    setLayout(ui->verticalLayout);
 
-    setLayout(pvbxLayout);
 }
 
 // ----------------------------------------------------------------------
@@ -153,7 +157,7 @@ void MyClient::slotError(QAbstractSocket::SocketError err)
                                          "The connection was refused." :
                                          QString(m_pTcpSocket->errorString())
                                          );
-        m_ptxtInfo->append(strError);
+        ui->statusBar->setText(strError);
         m_pTcpSocket->close();
         QTimer::singleShot(0, this, SLOT(slotReconnect()));
 //    }
@@ -168,6 +172,17 @@ void MyClient::slotReconnect()
 {
 //    qDebug() << "reconnect";
     m_pTcpSocket->connectToHost(m_strHost, m_nPort);
+}
+// ----------------------------------------------------------------------
+void MyClient::slotDroppedFiles()
+{
+    qDebug() << "SLOT DROPPED";
+    QListWidgetItem* pItem = 0;
+
+    for (QString file : ui->dropArea->getNewFiles())
+    {
+        pItem = new QListWidgetItem(file, ui->filesList);
+    }
 }
 // ----------------------------------------------------------------------
 void MyClient::slotSendFilesToServer()
@@ -188,10 +203,11 @@ void MyClient::slotSendFilesToServer()
     qDebug() << "Why send files";
     out.setVersion(QDataStream::Qt_5_9);
     out.setByteOrder(QDataStream::LittleEndian);
-    fPaths << "/home/nspace/Desktop/AllDesktop/Dzheremi.djvu"
-           << "/home/nspace/Desktop/AllDesktop/scrn29.png"
-           << "/home/nspace/Desktop/AllDesktop/Конспект_24.03.pdf"
-           << "/home/nspace/Desktop/AllDesktop/crock.jpg";// Удалить
+    fPaths = ui->dropArea->getFiles();
+//    fPaths << "/home/nspace/Desktop/AllDesktop/Dzheremi.djvu"
+//           << "/home/nspace/Desktop/AllDesktop/scrn29.png"
+//           << "/home/nspace/Desktop/AllDesktop/Конспект_24.03.pdf"
+//           << "/home/nspace/Desktop/AllDesktop/crock.jpg";// Удалить
     msgSize = sizeof(MainHeader);
     for (QString path : fPaths)
     {
@@ -288,7 +304,7 @@ void MyClient::slotConnected()
         slotSendDataToServer(RECONNECT, (char*)m_userName.toStdString().c_str(), m_userName.size() + 1);
     }
 
-    m_ptxtInfo->append("Received the connected() signal");
+    ui->statusBar->setText("Received the connected() signal");
 }
 
 MyClient::~MyClient()
