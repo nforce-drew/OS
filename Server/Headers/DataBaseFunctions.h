@@ -11,7 +11,7 @@
 #include <vector>
 #include <stdlib.h>
 
-#define DB_PATH     "/home/nforce/OS/tasks_solver.db"
+#define DB_PATH     "/home/nspace/OS/tasks_solver.db"
 
 sqlite3*        connectDB(char* db_path);
 static int      callback(void* notUsed, int argc, char** argv, char** azColName);

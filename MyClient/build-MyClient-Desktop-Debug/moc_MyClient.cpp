@@ -1,7 +1,7 @@
 /****************************************************************************
 ** Meta object code from reading C++ file 'MyClient.h'
 **
-** Created by: The Qt Meta Object Compiler version 67 (Qt 5.9.5)
+** Created by: The Qt Meta Object Compiler version 67 (Qt 5.12.8)
 **
 ** WARNING! All changes made in this file will be lost!
 *****************************************************************************/
@@ -12,7 +12,7 @@
 #if !defined(Q_MOC_OUTPUT_REVISION)
 #error "The header file 'MyClient.h' doesn't include <QObject>."
 #elif Q_MOC_OUTPUT_REVISION != 67
-#error "This file was generated using the moc from 5.9.5. It"
+#error "This file was generated using the moc from 5.12.8. It"
 #error "cannot be used with the include files from this version of Qt."
 #error "(The moc has changed too much.)"
 #endif
@@ -21,8 +21,8 @@ QT_BEGIN_MOC_NAMESPACE
 QT_WARNING_PUSH
 QT_WARNING_DISABLE_DEPRECATED
 struct qt_meta_stringdata_MyClient_t {
-    QByteArrayData data[8];
-    char stringdata0[103];
+    QByteArrayData data[9];
+    char stringdata0[117];
 };
 #define QT_MOC_LITERAL(idx, ofs, len) \
     Q_STATIC_BYTE_ARRAY_DATA_HEADER_INITIALIZER_WITH_OFFSET(len, \
@@ -38,22 +38,24 @@ QT_MOC_LITERAL(3, 24, 9), // "slotError"
 QT_MOC_LITERAL(4, 34, 28), // "QAbstractSocket::SocketError"
 QT_MOC_LITERAL(5, 63, 3), // "err"
 QT_MOC_LITERAL(6, 67, 21), // "slotSendFilesToServer"
-QT_MOC_LITERAL(7, 89, 13) // "slotConnected"
+QT_MOC_LITERAL(7, 89, 13), // "slotConnected"
+QT_MOC_LITERAL(8, 103, 13) // "slotReconnect"
 
     },
     "MyClient\0slotReadyRead\0\0slotError\0"
     "QAbstractSocket::SocketError\0err\0"
-    "slotSendFilesToServer\0slotConnected"
+    "slotSendFilesToServer\0slotConnected\0"
+    "slotReconnect"
 };
 #undef QT_MOC_LITERAL
 
 static const uint qt_meta_data_MyClient[] = {
 
  // content:
-       7,       // revision
+       8,       // revision
        0,       // classname
        0,    0, // classinfo
-       4,   14, // methods
+       5,   14, // methods
        0,    0, // properties
        0,    0, // enums/sets
        0,    0, // constructors
@@ -61,14 +63,16 @@ static const uint qt_meta_data_MyClient[] = {
        0,       // signalCount
 
  // slots: name, argc, parameters, tag, flags
-       1,    0,   34,    2, 0x08 /* Private */,
-       3,    1,   35,    2, 0x08 /* Private */,
-       6,    0,   38,    2, 0x08 /* Private */,
-       7,    0,   39,    2, 0x08 /* Private */,
+       1,    0,   39,    2, 0x08 /* Private */,
+       3,    1,   40,    2, 0x08 /* Private */,
+       6,    0,   43,    2, 0x08 /* Private */,
+       7,    0,   44,    2, 0x08 /* Private */,
+       8,    0,   45,    2, 0x08 /* Private */,
 
  // slots: parameters
     QMetaType::Void,
     QMetaType::Void, 0x80000000 | 4,    5,
+    QMetaType::Void,
     QMetaType::Void,
     QMetaType::Void,
 
@@ -78,13 +82,14 @@ static const uint qt_meta_data_MyClient[] = {
 void MyClient::qt_static_metacall(QObject *_o, QMetaObject::Call _c, int _id, void **_a)
 {
     if (_c == QMetaObject::InvokeMetaMethod) {
-        MyClient *_t = static_cast<MyClient *>(_o);
+        auto *_t = static_cast<MyClient *>(_o);
         Q_UNUSED(_t)
         switch (_id) {
         case 0: _t->slotReadyRead(); break;
         case 1: _t->slotError((*reinterpret_cast< QAbstractSocket::SocketError(*)>(_a[1]))); break;
         case 2: _t->slotSendFilesToServer(); break;
         case 3: _t->slotConnected(); break;
+        case 4: _t->slotReconnect(); break;
         default: ;
         }
     } else if (_c == QMetaObject::RegisterMethodArgumentMetaType) {
@@ -101,10 +106,14 @@ void MyClient::qt_static_metacall(QObject *_o, QMetaObject::Call _c, int _id, vo
     }
 }
 
-const QMetaObject MyClient::staticMetaObject = {
-    { &QWidget::staticMetaObject, qt_meta_stringdata_MyClient.data,
-      qt_meta_data_MyClient,  qt_static_metacall, nullptr, nullptr}
-};
+QT_INIT_METAOBJECT const QMetaObject MyClient::staticMetaObject = { {
+    &QWidget::staticMetaObject,
+    qt_meta_stringdata_MyClient.data,
+    qt_meta_data_MyClient,
+    qt_static_metacall,
+    nullptr,
+    nullptr
+} };
 
 
 const QMetaObject *MyClient::metaObject() const
@@ -126,13 +135,13 @@ int MyClient::qt_metacall(QMetaObject::Call _c, int _id, void **_a)
     if (_id < 0)
         return _id;
     if (_c == QMetaObject::InvokeMetaMethod) {
-        if (_id < 4)
+        if (_id < 5)
             qt_static_metacall(this, _c, _id, _a);
-        _id -= 4;
+        _id -= 5;
     } else if (_c == QMetaObject::RegisterMethodArgumentMetaType) {
-        if (_id < 4)
+        if (_id < 5)
             qt_static_metacall(this, _c, _id, _a);
-        _id -= 4;
+        _id -= 5;
     }
     return _id;
 }

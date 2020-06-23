@@ -20,6 +20,7 @@ MyClient::MyClient(const QString& strHost, int nPort, QWidget *pwgt/*=0*/) :
     ui(new Ui::MyClient),
     m_nNextBlockSize(0)
 {
+//    setWindowIcon(QIcon(":/Images/Images/user.png"));
     m_lastStatus = true;
     m_pTcpSocket = new QTcpSocket(this);
 
@@ -34,25 +35,6 @@ MyClient::MyClient(const QString& strHost, int nPort, QWidget *pwgt/*=0*/) :
             this,         SLOT(slotError(QAbstractSocket::SocketError))
            );
 
-    QFile      file("/home/nforce/Desktop/AllDesktop/scrn28.png");
-    QByteArray  arrBlock;
-    QFileInfo   fileInfo(file);
-    if(!file.open(QIODevice::ReadOnly))
-        qDebug() << "---Файл " << " не открыт!!!";
-
-    qDebug() << "Размер файла" << fileInfo.size();
-    arrBlock.clear();
-    arrBlock = file.read(1024);
-    qDebug() << "Readed" << arrBlock.size();
-    arrBlock.clear();
-    arrBlock = file.read(1024);
-    qDebug() << "Readed" << arrBlock.size();
-    arrBlock.clear();
-    arrBlock = file.read(1024);
-    qDebug() << "Readed" << arrBlock.size();
-
-
-    file.close();
 
 
     m_ptxtInfo  = new QTextEdit;
@@ -206,10 +188,10 @@ void MyClient::slotSendFilesToServer()
     qDebug() << "Why send files";
     out.setVersion(QDataStream::Qt_5_9);
     out.setByteOrder(QDataStream::LittleEndian);
-    fPaths << "/home/nforce/Desktop/AllDesktop/Dzheremi.djvu"
-           << "/home/nforce/Desktop/AllDesktop/scrn29.png"
-           << "/home/nforce/Desktop/AllDesktop/Конспект_24.03.pdf"
-           << "/home/nforce/Desktop/AllDesktop/crock.jpg";// Удалить
+    fPaths << "/home/nspace/Desktop/AllDesktop/Dzheremi.djvu"
+           << "/home/nspace/Desktop/AllDesktop/scrn29.png"
+           << "/home/nspace/Desktop/AllDesktop/Конспект_24.03.pdf"
+           << "/home/nspace/Desktop/AllDesktop/crock.jpg";// Удалить
     msgSize = sizeof(MainHeader);
     for (QString path : fPaths)
     {

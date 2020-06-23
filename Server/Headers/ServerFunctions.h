@@ -22,7 +22,7 @@
 
 using namespace std;
 
-#define     SAVE_PATH   "/home/nforce/OS/Server/Tasks/" // в конце должен быть слэш!!!
+#define     SAVE_PATH   "/home/nspace/OS/Server/Tasks/" // в конце должен быть слэш!!!
 #define     BUF_SIZE    1024
 
 string      fileName(string pathname); //(Вспомогательная) Вырезает имя файла из пути

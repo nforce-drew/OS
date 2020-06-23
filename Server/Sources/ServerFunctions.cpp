@@ -322,7 +322,7 @@ int sendData(int sock, const MainHeader &mainHdr, char* data, unsigned len)
     if (sendBytes <= 0)
         return (sendBytes);
     totalBytes += sendBytes;
-    
+    return (totalBytes);
 }
 
 int sendFiles(int sock, list<string> &paths)

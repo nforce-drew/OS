@@ -25,7 +25,7 @@ using namespace std;
 
 #define BUF_SIZE    1024
 #define PORT_NUMBER 5307
-#define SOLUTIONS_PATH "/home/nforce/OS/Server/Solutions/" // в конце должен быть слэш!!!
+#define SOLUTIONS_PATH "/home/nspace/OS/Server/Solutions/" // в конце должен быть слэш!!!
 
 int     admin_fd;
 bool    isSolverFree;
@@ -43,7 +43,7 @@ void solver()
         isSolverFree = true;
         return;
     }
-    this_thread::sleep_for(chrono::milliseconds(12000));
+    this_thread::sleep_for(chrono::milliseconds(20000));
     list<string> pathes = getTaskPathes(taskId);
 
     string userName = getUserNameByTaskId(taskId);

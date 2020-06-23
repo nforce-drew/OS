@@ -1,7 +1,7 @@
 /********************************************************************************
 ** Form generated from reading UI file 'Admin.ui'
 **
-** Created by: Qt User Interface Compiler version 5.9.5
+** Created by: Qt User Interface Compiler version 5.12.8
 **
 ** WARNING! All changes made in this file will be lost when recompiling UI file!
 ********************************************************************************/
@@ -10,9 +10,7 @@
 #define UI_ADMIN_H
 
 #include <QtCore/QVariant>
-#include <QtWidgets/QAction>
 #include <QtWidgets/QApplication>
-#include <QtWidgets/QButtonGroup>
 #include <QtWidgets/QHBoxLayout>
 #include <QtWidgets/QHeaderView>
 #include <QtWidgets/QLabel>
@@ -47,26 +45,26 @@ public:
     void setupUi(QMainWindow *Admin)
     {
         if (Admin->objectName().isEmpty())
-            Admin->setObjectName(QStringLiteral("Admin"));
+            Admin->setObjectName(QString::fromUtf8("Admin"));
         Admin->resize(800, 470);
         centralwidget = new QWidget(Admin);
-        centralwidget->setObjectName(QStringLiteral("centralwidget"));
+        centralwidget->setObjectName(QString::fromUtf8("centralwidget"));
         layoutWidget = new QWidget(centralwidget);
-        layoutWidget->setObjectName(QStringLiteral("layoutWidget"));
+        layoutWidget->setObjectName(QString::fromUtf8("layoutWidget"));
         layoutWidget->setGeometry(QRect(41, 11, 731, 441));
         main_Layout = new QVBoxLayout(layoutWidget);
         main_Layout->setSpacing(6);
         main_Layout->setContentsMargins(11, 11, 11, 11);
-        main_Layout->setObjectName(QStringLiteral("main_Layout"));
+        main_Layout->setObjectName(QString::fromUtf8("main_Layout"));
         main_Layout->setContentsMargins(20, 20, 20, 20);
         horizontalLayout = new QHBoxLayout();
         horizontalLayout->setSpacing(6);
-        horizontalLayout->setObjectName(QStringLiteral("horizontalLayout"));
+        horizontalLayout->setObjectName(QString::fromUtf8("horizontalLayout"));
         online_Layout = new QVBoxLayout();
         online_Layout->setSpacing(6);
-        online_Layout->setObjectName(QStringLiteral("online_Layout"));
+        online_Layout->setObjectName(QString::fromUtf8("online_Layout"));
         Users_Lbl = new QLabel(layoutWidget);
-        Users_Lbl->setObjectName(QStringLiteral("Users_Lbl"));
+        Users_Lbl->setObjectName(QString::fromUtf8("Users_Lbl"));
         QFont font;
         font.setPointSize(15);
         Users_Lbl->setFont(font);
@@ -74,7 +72,7 @@ public:
         online_Layout->addWidget(Users_Lbl);
 
         listUsers = new QListWidget(layoutWidget);
-        listUsers->setObjectName(QStringLiteral("listUsers"));
+        listUsers->setObjectName(QString::fromUtf8("listUsers"));
 
         online_Layout->addWidget(listUsers);
 
@@ -83,9 +81,9 @@ public:
 
         tasks_Layout = new QVBoxLayout();
         tasks_Layout->setSpacing(6);
-        tasks_Layout->setObjectName(QStringLiteral("tasks_Layout"));
+        tasks_Layout->setObjectName(QString::fromUtf8("tasks_Layout"));
         Tasks_lbl = new QLabel(layoutWidget);
-        Tasks_lbl->setObjectName(QStringLiteral("Tasks_lbl"));
+        Tasks_lbl->setObjectName(QString::fromUtf8("Tasks_lbl"));
         QFont font1;
         font1.setPointSize(16);
         Tasks_lbl->setFont(font1);
@@ -93,7 +91,7 @@ public:
         tasks_Layout->addWidget(Tasks_lbl);
 
         tableTasks = new QueueTable(layoutWidget);
-        tableTasks->setObjectName(QStringLiteral("tableTasks"));
+        tableTasks->setObjectName(QString::fromUtf8("tableTasks"));
 
         tasks_Layout->addWidget(tableTasks);
 
@@ -107,13 +105,13 @@ public:
 
         btn_Layout = new QHBoxLayout();
         btn_Layout->setSpacing(6);
-        btn_Layout->setObjectName(QStringLiteral("btn_Layout"));
+        btn_Layout->setObjectName(QString::fromUtf8("btn_Layout"));
         horizontalSpacer = new QSpacerItem(40, 20, QSizePolicy::Expanding, QSizePolicy::Minimum);
 
         btn_Layout->addItem(horizontalSpacer);
 
         deleteBtn = new QPushButton(layoutWidget);
-        deleteBtn->setObjectName(QStringLiteral("deleteBtn"));
+        deleteBtn->setObjectName(QString::fromUtf8("deleteBtn"));
         QFont font2;
         font2.setPointSize(10);
         deleteBtn->setFont(font2);
@@ -124,7 +122,7 @@ public:
         main_Layout->addLayout(btn_Layout);
 
         statusBar = new QLabel(layoutWidget);
-        statusBar->setObjectName(QStringLiteral("statusBar"));
+        statusBar->setObjectName(QString::fromUtf8("statusBar"));
 
         main_Layout->addWidget(statusBar);
 
@@ -137,11 +135,11 @@ public:
 
     void retranslateUi(QMainWindow *Admin)
     {
-        Admin->setWindowTitle(QApplication::translate("Admin", "Admin", Q_NULLPTR));
-        Users_Lbl->setText(QApplication::translate("Admin", "Online users", Q_NULLPTR));
-        Tasks_lbl->setText(QApplication::translate("Admin", "Tasks", Q_NULLPTR));
-        deleteBtn->setText(QApplication::translate("Admin", "Delete", Q_NULLPTR));
-        statusBar->setText(QApplication::translate("Admin", "TextLabel", Q_NULLPTR));
+        Admin->setWindowTitle(QApplication::translate("Admin", "Admin", nullptr));
+        Users_Lbl->setText(QApplication::translate("Admin", "Online users", nullptr));
+        Tasks_lbl->setText(QApplication::translate("Admin", "Tasks", nullptr));
+        deleteBtn->setText(QApplication::translate("Admin", "Delete", nullptr));
+        statusBar->setText(QApplication::translate("Admin", "TextLabel", nullptr));
     } // retranslateUi
 
 };

@@ -45,3 +45,6 @@ HEADERS += \
 FORMS += \
         MyClient.ui \
     LogInWindow.ui
+
+RESOURCES += \
+    Resources.qrc

@@ -25,6 +25,7 @@ TaskHeader &TaskHeader::setData(unsigned taskId, char* userName, unsigned queueN
     strcpy(m_userName, userName);
     m_queueNum = queueNum;
     strcpy(m_time, time);
+    return (*this);
 }
 
 TaskHeader TaskHeader::setByteArr(char* byteArr)

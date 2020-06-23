@@ -7,7 +7,7 @@ Admin::Admin(const QString& strHost, int nPort, QWidget *parent) :
     ui(new Ui::Admin)
 {
     ui->setupUi(this);
-
+    setWindowIcon(QIcon(":/Images/Images/gears.png"));
     // Настройка клиент-серверной части
     m_lastStatus = true;
     m_pTcpSocket = new QTcpSocket(this);

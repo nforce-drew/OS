@@ -65,17 +65,17 @@ void LogInWindow::slotIncorrectLogin()
 //-----------------------------------------------------------------------
 void LogInWindow::connectDatabase()
 {
-    if(!db.isOpen())
-    {
-        db = QSqlDatabase::addDatabase("QSQLITE");
-        db.setDatabaseName("/home/nforce/OS/tasks_solver.db");
-        db.open();
-    }
-    if(!db.isOpen())
-    {
-        QMessageBox::critical(this, "Ошибка", "База данных не открыта");
-        close();
-    }
+//    if(!db.isOpen())
+//    {
+//        db = QSqlDatabase::addDatabase("QSQLITE");
+//        db.setDatabaseName("/home/nforce/OS/tasks_solver.db");
+//        db.open();
+//    }
+//    if(!db.isOpen())
+//    {
+//        QMessageBox::critical(this, "Ошибка", "База данных не открыта");
+//        close();
+//    }
 }
 //-----------------------------------------------------------------------
 QString LogInWindow::getUserName()

@@ -39,3 +39,6 @@ HEADERS += \
 
 FORMS += \
         Admin.ui
+
+RESOURCES += \
+    Resources.qrc
