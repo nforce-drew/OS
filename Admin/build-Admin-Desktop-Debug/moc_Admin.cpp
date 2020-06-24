@@ -22,8 +22,8 @@ QT_BEGIN_MOC_NAMESPACE
 QT_WARNING_PUSH
 QT_WARNING_DISABLE_DEPRECATED
 struct qt_meta_stringdata_Admin_t {
-    QByteArrayData data[21];
-    char stringdata0[231];
+    QByteArrayData data[25];
+    char stringdata0[283];
 };
 #define QT_MOC_LITERAL(idx, ofs, len) \
     Q_STATIC_BYTE_ARRAY_DATA_HEADER_INITIALIZER_WITH_OFFSET(len, \
@@ -37,30 +37,35 @@ QT_MOC_LITERAL(1, 6, 9), // "reconnect"
 QT_MOC_LITERAL(2, 16, 0), // ""
 QT_MOC_LITERAL(3, 17, 10), // "deleteTask"
 QT_MOC_LITERAL(4, 28, 19), // "setEnabledDeleteBtn"
-QT_MOC_LITERAL(5, 48, 13), // "slotSendQueue"
-QT_MOC_LITERAL(6, 62, 18), // "QList<TaskHeader>*"
-QT_MOC_LITERAL(7, 81, 8), // "queueLst"
-QT_MOC_LITERAL(8, 90, 13), // "slotReconnect"
-QT_MOC_LITERAL(9, 104, 13), // "slotReadyRead"
-QT_MOC_LITERAL(10, 118, 9), // "slotError"
-QT_MOC_LITERAL(11, 128, 28), // "QAbstractSocket::SocketError"
-QT_MOC_LITERAL(12, 157, 3), // "err"
-QT_MOC_LITERAL(13, 161, 13), // "slotConnected"
-QT_MOC_LITERAL(14, 175, 20), // "slotSendDataToServer"
-QT_MOC_LITERAL(15, 196, 4), // "TYPE"
-QT_MOC_LITERAL(16, 201, 8), // "dataType"
-QT_MOC_LITERAL(17, 210, 5), // "count"
-QT_MOC_LITERAL(18, 216, 5), // "char*"
-QT_MOC_LITERAL(19, 222, 4), // "data"
-QT_MOC_LITERAL(20, 227, 3) // "len"
+QT_MOC_LITERAL(5, 48, 10), // "currentRow"
+QT_MOC_LITERAL(6, 59, 13), // "currentColumn"
+QT_MOC_LITERAL(7, 73, 11), // "previousRow"
+QT_MOC_LITERAL(8, 85, 14), // "previousColumn"
+QT_MOC_LITERAL(9, 100, 13), // "slotSendQueue"
+QT_MOC_LITERAL(10, 114, 18), // "QList<TaskHeader>*"
+QT_MOC_LITERAL(11, 133, 8), // "queueLst"
+QT_MOC_LITERAL(12, 142, 13), // "slotReconnect"
+QT_MOC_LITERAL(13, 156, 13), // "slotReadyRead"
+QT_MOC_LITERAL(14, 170, 9), // "slotError"
+QT_MOC_LITERAL(15, 180, 28), // "QAbstractSocket::SocketError"
+QT_MOC_LITERAL(16, 209, 3), // "err"
+QT_MOC_LITERAL(17, 213, 13), // "slotConnected"
+QT_MOC_LITERAL(18, 227, 20), // "slotSendDataToServer"
+QT_MOC_LITERAL(19, 248, 4), // "TYPE"
+QT_MOC_LITERAL(20, 253, 8), // "dataType"
+QT_MOC_LITERAL(21, 262, 5), // "count"
+QT_MOC_LITERAL(22, 268, 5), // "char*"
+QT_MOC_LITERAL(23, 274, 4), // "data"
+QT_MOC_LITERAL(24, 279, 3) // "len"
 
     },
     "Admin\0reconnect\0\0deleteTask\0"
-    "setEnabledDeleteBtn\0slotSendQueue\0"
-    "QList<TaskHeader>*\0queueLst\0slotReconnect\0"
-    "slotReadyRead\0slotError\0"
-    "QAbstractSocket::SocketError\0err\0"
-    "slotConnected\0slotSendDataToServer\0"
+    "setEnabledDeleteBtn\0currentRow\0"
+    "currentColumn\0previousRow\0previousColumn\0"
+    "slotSendQueue\0QList<TaskHeader>*\0"
+    "queueLst\0slotReconnect\0slotReadyRead\0"
+    "slotError\0QAbstractSocket::SocketError\0"
+    "err\0slotConnected\0slotSendDataToServer\0"
     "TYPE\0dataType\0count\0char*\0data\0len"
 };
 #undef QT_MOC_LITERAL
@@ -83,26 +88,26 @@ static const uint qt_meta_data_Admin[] = {
 
  // slots: name, argc, parameters, tag, flags
        3,    0,   60,    2, 0x08 /* Private */,
-       4,    0,   61,    2, 0x08 /* Private */,
-       5,    1,   62,    2, 0x08 /* Private */,
-       8,    0,   65,    2, 0x08 /* Private */,
-       9,    0,   66,    2, 0x08 /* Private */,
-      10,    1,   67,    2, 0x08 /* Private */,
-      13,    0,   70,    2, 0x08 /* Private */,
-      14,    4,   71,    2, 0x08 /* Private */,
+       4,    4,   61,    2, 0x08 /* Private */,
+       9,    1,   70,    2, 0x08 /* Private */,
+      12,    0,   73,    2, 0x08 /* Private */,
+      13,    0,   74,    2, 0x08 /* Private */,
+      14,    1,   75,    2, 0x08 /* Private */,
+      17,    0,   78,    2, 0x08 /* Private */,
+      18,    4,   79,    2, 0x08 /* Private */,
 
  // signals: parameters
     QMetaType::Void,
 
  // slots: parameters
     QMetaType::Void,
+    QMetaType::Void, QMetaType::Int, QMetaType::Int, QMetaType::Int, QMetaType::Int,    5,    6,    7,    8,
+    QMetaType::Void, 0x80000000 | 10,   11,
     QMetaType::Void,
-    QMetaType::Void, 0x80000000 | 6,    7,
     QMetaType::Void,
+    QMetaType::Void, 0x80000000 | 15,   16,
     QMetaType::Void,
-    QMetaType::Void, 0x80000000 | 11,   12,
-    QMetaType::Void,
-    QMetaType::Void, 0x80000000 | 15, QMetaType::UInt, 0x80000000 | 18, QMetaType::UInt,   16,   17,   19,   20,
+    QMetaType::Void, 0x80000000 | 19, QMetaType::UInt, 0x80000000 | 22, QMetaType::UInt,   20,   21,   23,   24,
 
        0        // eod
 };
@@ -115,7 +120,7 @@ void Admin::qt_static_metacall(QObject *_o, QMetaObject::Call _c, int _id, void 
         switch (_id) {
         case 0: _t->reconnect(); break;
         case 1: _t->deleteTask(); break;
-        case 2: _t->setEnabledDeleteBtn(); break;
+        case 2: _t->setEnabledDeleteBtn((*reinterpret_cast< int(*)>(_a[1])),(*reinterpret_cast< int(*)>(_a[2])),(*reinterpret_cast< int(*)>(_a[3])),(*reinterpret_cast< int(*)>(_a[4]))); break;
         case 3: _t->slotSendQueue((*reinterpret_cast< QList<TaskHeader>*(*)>(_a[1]))); break;
         case 4: _t->slotReconnect(); break;
         case 5: _t->slotReadyRead(); break;

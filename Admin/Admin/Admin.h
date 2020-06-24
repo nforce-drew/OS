@@ -36,7 +36,7 @@ private:
 private slots:
 //    void    slotQueueChanged();
     void deleteTask();
-    void setEnabledDeleteBtn();
+    void setEnabledDeleteBtn(int currentRow, int currentColumn, int previousRow, int previousColumn);
     void slotSendQueue(QList<TaskHeader>* queueLst);
     void slotReconnect();
 

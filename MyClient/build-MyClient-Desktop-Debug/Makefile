@@ -53,6 +53,7 @@ OBJECTS_DIR   = ./
 ####### Files
 
 SOURCES       = ../MyClient/DropZone.cpp \
+		../MyClient/TaskStateHeader.cpp \
 		../MyClient/main.cpp \
 		../MyClient/MyClient.cpp \
 		../MyClient/MainHeader.cpp \
@@ -63,6 +64,7 @@ SOURCES       = ../MyClient/DropZone.cpp \
 		moc_MyClient.cpp \
 		moc_LogInWindow.cpp
 OBJECTS       = DropZone.o \
+		TaskStateHeader.o \
 		main.o \
 		MyClient.o \
 		MainHeader.o \
@@ -153,7 +155,9 @@ DIST          = /usr/lib/x86_64-linux-gnu/qt5/mkspecs/features/spec_pre.prf \
 		../MyClient/MainHeader.h \
 		../MyClient/FileHeader.h \
 		../MyClient/LogInWindow.h \
-		../MyClient/Headers.h ../MyClient/DropZone.cpp \
+		../MyClient/Headers.h \
+		../MyClient/TaskStateHeader.h ../MyClient/DropZone.cpp \
+		../MyClient/TaskStateHeader.cpp \
 		../MyClient/main.cpp \
 		../MyClient/MyClient.cpp \
 		../MyClient/MainHeader.cpp \
@@ -342,8 +346,8 @@ distdir: FORCE
 	$(COPY_FILE) --parents $(DIST) $(DISTDIR)/
 	$(COPY_FILE) --parents ../MyClient/Resources.qrc $(DISTDIR)/
 	$(COPY_FILE) --parents /usr/lib/x86_64-linux-gnu/qt5/mkspecs/features/data/dummy.cpp $(DISTDIR)/
-	$(COPY_FILE) --parents ../MyClient/DropZone.h ../MyClient/MyClient.h ../MyClient/MainHeader.h ../MyClient/FileHeader.h ../MyClient/LogInWindow.h ../MyClient/Headers.h $(DISTDIR)/
-	$(COPY_FILE) --parents ../MyClient/DropZone.cpp ../MyClient/main.cpp ../MyClient/MyClient.cpp ../MyClient/MainHeader.cpp ../MyClient/FileHeader.cpp ../MyClient/LogInWindow.cpp ../MyClient/Headers.cpp $(DISTDIR)/
+	$(COPY_FILE) --parents ../MyClient/DropZone.h ../MyClient/MyClient.h ../MyClient/MainHeader.h ../MyClient/FileHeader.h ../MyClient/LogInWindow.h ../MyClient/Headers.h ../MyClient/TaskStateHeader.h $(DISTDIR)/
+	$(COPY_FILE) --parents ../MyClient/DropZone.cpp ../MyClient/TaskStateHeader.cpp ../MyClient/main.cpp ../MyClient/MyClient.cpp ../MyClient/MainHeader.cpp ../MyClient/FileHeader.cpp ../MyClient/LogInWindow.cpp ../MyClient/Headers.cpp $(DISTDIR)/
 	$(COPY_FILE) --parents ../MyClient/MyClient.ui ../MyClient/LogInWindow.ui $(DISTDIR)/
 
 
@@ -373,7 +377,11 @@ compiler_rcc_clean:
 	-$(DEL_FILE) qrc_Resources.cpp
 qrc_Resources.cpp: ../MyClient/Resources.qrc \
 		/usr/lib/qt5/bin/rcc \
-		../MyClient/Images/user.png
+		../MyClient/Images/solving.png \
+		../MyClient/Images/cancel.png \
+		../MyClient/Images/user.png \
+		../MyClient/Images/done.png \
+		../MyClient/Images/in_queue.png
 	/usr/lib/qt5/bin/rcc -name Resources ../MyClient/Resources.qrc -o qrc_Resources.cpp
 
 compiler_moc_predefs_make_all: moc_predefs.h
@@ -397,6 +405,7 @@ moc_MyClient.cpp: ../MyClient/MyClient.h \
 		../MyClient/MyClient.h \
 		../MyClient/Headers.h \
 		../MyClient/DropZone.h \
+		../MyClient/TaskStateHeader.h \
 		moc_predefs.h \
 		/usr/lib/qt5/bin/moc
 	/usr/lib/qt5/bin/moc $(DEFINES) --include /home/nspace/OS/MyClient/build-MyClient-Desktop-Debug/moc_predefs.h -I/usr/lib/x86_64-linux-gnu/qt5/mkspecs/linux-g++ -I/home/nspace/OS/MyClient/MyClient -I/usr/include/postgresql -I/usr/include/x86_64-linux-gnu/qt5 -I/usr/include/x86_64-linux-gnu/qt5/QtWidgets -I/usr/include/x86_64-linux-gnu/qt5/QtGui -I/usr/include/x86_64-linux-gnu/qt5/QtNetwork -I/usr/include/x86_64-linux-gnu/qt5/QtSql -I/usr/include/x86_64-linux-gnu/qt5/QtCore -I. -I/usr/include/c++/7.4.0 -I/usr/include/x86_64-linux-gnu/c++/7.4.0 -I/usr/include/c++/7.4.0/backward -I/usr/include/clang/6.0.0/include -I/usr/local/include -I/usr/include/x86_64-linux-gnu -I/usr/include ../MyClient/MyClient.h -o moc_MyClient.cpp
@@ -408,6 +417,7 @@ moc_LogInWindow.cpp: ../MyClient/LogInWindow.h \
 		../MyClient/LogInWindow.h \
 		../MyClient/Headers.h \
 		../MyClient/DropZone.h \
+		../MyClient/TaskStateHeader.h \
 		moc_predefs.h \
 		/usr/lib/qt5/bin/moc
 	/usr/lib/qt5/bin/moc $(DEFINES) --include /home/nspace/OS/MyClient/build-MyClient-Desktop-Debug/moc_predefs.h -I/usr/lib/x86_64-linux-gnu/qt5/mkspecs/linux-g++ -I/home/nspace/OS/MyClient/MyClient -I/usr/include/postgresql -I/usr/include/x86_64-linux-gnu/qt5 -I/usr/include/x86_64-linux-gnu/qt5/QtWidgets -I/usr/include/x86_64-linux-gnu/qt5/QtGui -I/usr/include/x86_64-linux-gnu/qt5/QtNetwork -I/usr/include/x86_64-linux-gnu/qt5/QtSql -I/usr/include/x86_64-linux-gnu/qt5/QtCore -I. -I/usr/include/c++/7.4.0 -I/usr/include/x86_64-linux-gnu/c++/7.4.0 -I/usr/include/c++/7.4.0/backward -I/usr/include/clang/6.0.0/include -I/usr/local/include -I/usr/include/x86_64-linux-gnu -I/usr/include ../MyClient/LogInWindow.h -o moc_LogInWindow.cpp
@@ -441,12 +451,16 @@ compiler_clean: compiler_rcc_clean compiler_moc_predefs_clean compiler_moc_heade
 DropZone.o: ../MyClient/DropZone.cpp ../MyClient/DropZone.h
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o DropZone.o ../MyClient/DropZone.cpp
 
+TaskStateHeader.o: ../MyClient/TaskStateHeader.cpp ../MyClient/TaskStateHeader.h
+	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o TaskStateHeader.o ../MyClient/TaskStateHeader.cpp
+
 main.o: ../MyClient/main.cpp ../MyClient/MyClient.h \
 		../MyClient/MainHeader.h \
 		../MyClient/FileHeader.h \
 		../MyClient/LogInWindow.h \
 		../MyClient/Headers.h \
-		../MyClient/DropZone.h
+		../MyClient/DropZone.h \
+		../MyClient/TaskStateHeader.h
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o main.o ../MyClient/main.cpp
 
 MyClient.o: ../MyClient/MyClient.cpp ../MyClient/MyClient.h \
@@ -455,6 +469,7 @@ MyClient.o: ../MyClient/MyClient.cpp ../MyClient/MyClient.h \
 		../MyClient/LogInWindow.h \
 		../MyClient/Headers.h \
 		../MyClient/DropZone.h \
+		../MyClient/TaskStateHeader.h \
 		ui_MyClient.h
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o MyClient.o ../MyClient/MyClient.cpp
 
@@ -470,6 +485,7 @@ LogInWindow.o: ../MyClient/LogInWindow.cpp ../MyClient/LogInWindow.h \
 		../MyClient/FileHeader.h \
 		../MyClient/Headers.h \
 		../MyClient/DropZone.h \
+		../MyClient/TaskStateHeader.h \
 		ui_LogInWindow.h
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o LogInWindow.o ../MyClient/LogInWindow.cpp
 

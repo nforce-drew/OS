@@ -74,6 +74,149 @@ MyClient::MyClient(const QString& strHost, int nPort, QWidget *pwgt/*=0*/) :
 
 }
 
+void MyClient::setTasksList(QList<TaskStateHeader> &tasksList)
+{
+    m_tasksList.clear();
+    ui->tasksList->clear();
+    QPixmap *pixOK = new QPixmap(":/Images/Images/done.png");
+    QPixmap *pixCancel = new QPixmap(":/Images/Images/cancel.png");
+    QPixmap *pixLoading = new QPixmap(":/Images/Images/solving.png");
+    QPixmap* pixInQueue = new QPixmap(":/Images/Images/in_queue.png");
+    bool solving = false;
+
+    for (int i = 0; i < tasksList.size(); ++i)
+    {
+        if (tasksList[i].getState() == DONE) //если состояние готово,ставим галочку
+        {
+            QLayout* layoutOK = new QHBoxLayout;
+            QLabel *pixLblOK = new QLabel();
+            pixLblOK->setPixmap(*pixOK);
+            QWidget* wgt = new QWidget;
+            layoutOK->addWidget(pixLblOK);
+            QLabel *text = new QLabel();
+            text->setText(tasksList[i].getTime());
+            layoutOK->addWidget(text);
+            QPushButton* btnDownLoad = new QPushButton("Download");
+            btnDownLoad->setObjectName(QString::number(ui->tasksList->count() - 1));
+            connect( btnDownLoad, SIGNAL( clicked() ), SLOT( slotDownloadClicked() ) );
+            layoutOK->addWidget(btnDownLoad);
+            wgt->setLayout(layoutOK);
+            QListWidgetItem* item = new QListWidgetItem(ui->tasksList);
+            wgt->setObjectName(QString::number(tasksList[i].getTaskId()));
+            item->setSizeHint(wgt->sizeHint());
+            ui->tasksList->setItemWidget(item, wgt);
+        }
+        if(tasksList[i].getState()==CANCEL)//если состояние "отменено",ставим крестик
+        {
+          QLayout* layoutCancel = new QHBoxLayout;
+          QLabel *pixLblCancel = new QLabel();
+          pixLblCancel->setPixmap(*pixCancel);
+          QWidget* wgt = new QWidget;
+          layoutCancel->addWidget(pixLblCancel);
+          QLabel *text = new QLabel();
+          text->setText(tasksList[i].getTime());
+          layoutCancel->addWidget(text);
+          QLabel *text2 = new QLabel();
+          text2->setText("Canceled");
+          layoutCancel->addWidget(text2);
+          wgt->setLayout( layoutCancel );
+          QListWidgetItem* item = new QListWidgetItem( ui->tasksList );
+          wgt->setObjectName(QString::number(tasksList[i].getTaskId()));
+          item->setSizeHint( wgt->sizeHint() );
+          ui->tasksList->setItemWidget( item, wgt );
+        }
+        if(tasksList[i].getState()==SOLVING)//если состояние "в очереди",ставим часы
+        {
+          QLayout* layoutLoading = new QHBoxLayout;
+          QLabel *pixLblLoading = new QLabel();
+          pixLblLoading->setPixmap(*pixLoading);
+          QWidget* wgt = new QWidget;
+          layoutLoading->addWidget(pixLblLoading);
+          QLabel *text = new QLabel();
+          text->setText(tasksList[i].getTime());
+          layoutLoading->addWidget(text);
+          wgt->setLayout( layoutLoading );
+          QListWidgetItem* item = new QListWidgetItem( ui->tasksList );
+          wgt->setObjectName(QString::number(tasksList[i].getTaskId()));
+          item->setSizeHint( wgt->sizeHint() );
+          ui->tasksList->setItemWidget( item, wgt );
+          solving = true;
+        }
+        if(tasksList[i].getState() == IN_QUEUE)//если состояние "в очереди",ставим часы
+        {
+          QLayout* layoutInQueue = new QHBoxLayout;
+          QLabel *pixLblInQueue = new QLabel();
+          pixLblInQueue->setPixmap(*pixInQueue);
+          QWidget* wgt = new QWidget;
+          layoutInQueue->addWidget(pixLblInQueue);
+          QLabel *text = new QLabel();
+          text->setText(tasksList[i].getTime());
+          layoutInQueue->addWidget(text);
+          wgt->setLayout( layoutInQueue );
+          QListWidgetItem* item = new QListWidgetItem( ui->tasksList );
+          QPushButton* btnCancel = new QPushButton("Отменить");
+          btnCancel->setObjectName(QString::number(ui->tasksList->count() - 1));
+          connect( btnCancel, SIGNAL( clicked() ), SLOT( slotCancelClicked() ) );
+          layoutInQueue->addWidget( btnCancel );
+          wgt->setObjectName(QString::number(tasksList[i].getTaskId()));
+          item->setSizeHint( wgt->sizeHint() );
+          ui->tasksList->setItemWidget( item, wgt );
+          solving = true;
+        }
+        m_tasksList.push_back(tasksList[i]);
+    }
+    if (!solving)
+        ui->solveBtn->setEnabled(true);
+}
+
+void MyClient::slotCancelClicked()
+{
+    QPushButton* pBtn = qobject_cast<QPushButton*>(sender());
+    pBtn->setText("Сменил");
+    int row = pBtn->objectName().toInt();
+    QListWidgetItem *itm = ui->tasksList->item(row);
+    QWidget* wgt = new QWidget;
+    QLayout* layoutCancel = new QHBoxLayout;
+    QPixmap *pixCancel = new QPixmap(":/Images/Images/cancel.png");
+    QLabel *pixLblCancel = new QLabel();
+    pixLblCancel->setPixmap(*pixCancel);
+    layoutCancel->addWidget(pixLblCancel);
+    QLabel *text = new QLabel();
+    text->setText(m_tasksList[row].getTime());
+    layoutCancel->addWidget(text);
+    QLabel *text2 = new QLabel();
+    text2->setText("Canceled");
+    layoutCancel->addWidget(text2);
+    wgt->setLayout( layoutCancel );
+    itm->setSizeHint( wgt->sizeHint() );
+    ui->tasksList->setItemWidget( itm, wgt );
+    slotSendMainHdrToServer(CANCEL_TASK, m_tasksList[row].getTaskId());
+    qDebug() << m_tasksList[row].getTaskId();
+}
+
+void MyClient::slotDownloadClicked()
+{
+    QPushButton* pBtn = qobject_cast<QPushButton*>(sender());
+    int row = pBtn->objectName().toInt();
+    unsigned taskId = m_tasksList[row + 1].getTaskId();
+    qDebug() << taskId;
+    slotSendMainHdrToServer(GET_SOLUTION, taskId);
+}
+
+void MyClient::slotSendMainHdrToServer(TYPE dataType, unsigned num)
+{
+    MainHeader mainHdr;
+    QByteArray  arrBlock;
+    QDataStream out(&arrBlock, QIODevice::ReadWrite);
+
+    out.setVersion(QDataStream::Qt_5_9);
+    out.setByteOrder(QDataStream::LittleEndian);
+    mainHdr.setData(sizeof(MainHeader), num, dataType);
+    out.writeRawData((char*)&mainHdr, sizeof(MainHeader));
+    m_pTcpSocket->write(arrBlock);
+    qDebug() << bytes(arrBlock.data(), 15);
+}
+
 // ----------------------------------------------------------------------
 void MyClient::slotReadyRead()
 {
@@ -109,11 +252,11 @@ void MyClient::slotReadyRead()
             in.readRawData(data.data(), data.size());
 
             //путь для сохранения
-            QFile file("/home/nforce/Desktop/ClientReceive/" + QString(fileHeader.getFileName()));
+            QFile file("/home/nspace/Desktop/ClientReceive/" + QString(fileHeader.getFileName()));
             if(!file.open(QIODevice::WriteOnly | QIODevice::Append | QIODevice::Truncate))
             {
                 qDebug() << "Error: opening the file for writing "
-                            << "/home/nforce/Desktop/ClientReceive/" << fileHeader.getFileName();
+                            << "/home/nspace/Desktop/ClientReceive/" << fileHeader.getFileName();
                 QMessageBox::critical(this, "Ошибка", "Не удалось открыть файл для записи!");
             }
             file.write(data);
@@ -138,6 +281,23 @@ void MyClient::slotReadyRead()
         data.reserve(mainHeader.getMsgSize() - sizeof(MainHeader));
         qDebug() << mainHeader.getMsgSize() << " " << mainHeader.getCount() << " " << mainHeader.getType();
         qDebug() << in.readRawData(data.data(), mainHeader.getMsgSize() - sizeof(MainHeader));
+    }
+    if (mainHeader.getType() == TASKS_INFO)
+    {
+        qDebug() << "TASKS_INFO";
+        data.clear();
+        data.reserve(mainHeader.getMsgSize() - sizeof(MainHeader));
+        qDebug() << mainHeader.getMsgSize() << " " << mainHeader.getCount() << " " << mainHeader.getType();
+//        qDebug() << in.readRawData(data.data(), mainHeader.getMsgSize() - sizeof(MainHeader));
+        QList<TaskStateHeader> tasksList;
+        TaskStateHeader taskStateHdr;
+        for (int i = 0; i < mainHeader.getCount(); i++)
+        {
+            in.readRawData((char*)&taskStateHdr, sizeof(TaskStateHeader));
+            tasksList << taskStateHdr;
+            qDebug() << taskStateHdr.getState() << " " << taskStateHdr.getTime() << " " << taskStateHdr.getTaskId();
+        }
+        setTasksList(tasksList);
     }
     qDebug() << "End of data reading.";
 }
@@ -200,7 +360,7 @@ void MyClient::slotSendFilesToServer()
     qint64                      totalSent(0);
     int                         readBytes;
 
-    qDebug() << "Why send files";
+    ui->solveBtn->setEnabled(false);
     out.setVersion(QDataStream::Qt_5_9);
     out.setByteOrder(QDataStream::LittleEndian);
     fPaths = ui->dropArea->getFiles();

@@ -6,6 +6,7 @@
 #include "LogInWindow.h"
 #include "Headers.h"
 #include "DropZone.h"
+#include "TaskStateHeader.h"
 #include <QWidget>
 #include <QTcpSocket>
 #include <QTextEdit>
@@ -41,6 +42,7 @@ private:
     int             m_nPort;
     bool            m_lastStatus;
     QString         m_userName;
+    QList<TaskStateHeader> m_tasksList;
 
 public:
     MyClient(const QString& strHost, int nPort, QWidget *pwgt = 0);
@@ -53,10 +55,15 @@ private slots:
     void slotConnected();                               //Клиент подключился к серверу
     void slotReconnect();
     void slotDroppedFiles();
+    void slotCancelClicked();
+    void slotDownloadClicked();
 public:
+    void slotSendMainHdrToServer(TYPE dataType, unsigned num);
     void slotSendDataToServer(TYPE dataType, char* data, unsigned len); //Отправка данных или запроса
                                                                          // если дополнительные данные не передаются,
                                                                           //то присвоить data = NULL и len = 0
+private:
+    void setTasksList(QList<TaskStateHeader> &tasksList);
 
 private:
     Ui::MyClient *ui;

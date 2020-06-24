@@ -43,10 +43,14 @@ void solver()
         isSolverFree = true;
         return;
     }
-    this_thread::sleep_for(chrono::milliseconds(20000));
+    string userName = getUserNameByTaskId(taskId);
+    setTaskState(taskId, "Решается");
+    int sock_fd = getSockFd(userName);
+    sendTasksInfo(sock_fd, userName);
+    this_thread::sleep_for(chrono::milliseconds(10000));
     list<string> pathes = getTaskPathes(taskId);
 
-    string userName = getUserNameByTaskId(taskId);
+    
     string curTime = currentTimeInfo();
     string folderName;
     string savePath;
@@ -66,13 +70,19 @@ void solver()
     }
     savePath = (char*)SOLUTIONS_PATH + folderName;
     mkdir(savePath.c_str(), S_IRWXU);
-
+    list<string> solutionPathes;
     for (auto el : pathes)
     {
         shellCommand = "cp " + el + " " + savePath;
         system(shellCommand.c_str());
+        solutionPathes.push_back(savePath + '/' + fileName(el));
     }
+    setSolutionPathes(taskId, solutionPathes);
     setTaskState(taskId, "Готово");
+    
+    std::cout << "sock_fd = " << sock_fd << std::endl;
+    if (sock_fd != -1)
+        sendTasksInfo(sock_fd, userName);
     sendQueue(admin_fd);
     std::cout << "===SOLVER END===" << std::endl;
     if (getFirstTask() != -1)
@@ -81,17 +91,6 @@ void solver()
     return;
 }
 
-string bytes(const char *buf, int size)
-{
-    string message;
-    for (int i = 0; i < size; i++)
-    {
-        message += to_string((int)buf[i]) + " ";
-        if ((i + 1) % 4 == 0)
-            message += "| ";
-    }
-    return (message);
-}
 //=================================================================================
 int main(const int argc, const char** argv)
 {
@@ -249,6 +248,7 @@ int main(const int argc, const char** argv)
                         checkLoginPermission(db, *it, loginHdr.getUserName(), loginHdr.getUserPassword());
                         sqlite3_close(db);
                         sendOnlineUsers(admin_fd);
+                        sendTasksInfo(*it, loginHdr.getUserName());
                         break;
                     }
                     case SEND_FILES:
@@ -261,6 +261,7 @@ int main(const int argc, const char** argv)
                         taskId = *((int*)buf);
                         std::cout << "\t\t tsk id: " << taskId << std::endl;
                         addTaskPathes(taskId, *lst);
+                        sendTasksInfo(*it, getUserName(*it));
                         if (isSolverFree)
                         {
                             
@@ -299,14 +300,36 @@ int main(const int argc, const char** argv)
                     {
                         std::cout << "\t-> RECONNECT - user name: \"" 
                                     << buf << "\"" << std::endl;
-                        std::cout << bytes(buf, 20) << std::endl;
+                        // std::cout << bytes(buf, 20) << std::endl;
                         addOnlineUser(*it, std::string(buf));
                         if (admin_fd != -1)
                         {
                             sendQueue(admin_fd);                      
                             sendOnlineUsers(admin_fd);
                         }
+                        sendTasksInfo(*it, getUserName(*it));
                         break;
+                    }
+                    case GET_SOLUTION:
+                    {
+                        MainHeader      mainHdr;
+                        list<string>    files;
+
+                        mainHdr.setByteArr(buf);
+                        std::cout << "send taskId = " << mainHdr.getCount() << std::endl;
+                        files = getSolutionPathes(mainHdr.getCount(), files);
+                        sendFiles(*it, files);
+                    }
+                    case CANCEL_TASK:
+                    {
+                        MainHeader      mainHdr;
+
+                        std::cout << "canceled = " << mainHdr.getCount() << std::endl;
+                        mainHdr.setByteArr(buf);
+                        cancelQueueTask(mainHdr.getCount());
+                        sendTasksInfo(*it, getUserName(*it));
+                        if (admin_fd != -1)
+                            sendQueue(admin_fd);
                     }
                 }
                 //ОТПРАВЛЯЕМ ФАЙЛЫ

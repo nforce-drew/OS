@@ -29,6 +29,7 @@ DEFINES += QT_DEPRECATED_WARNINGS
 
 SOURCES += \
     DropZone.cpp \
+    TaskStateHeader.cpp \
         main.cpp \
         MyClient.cpp \
     MainHeader.cpp \
@@ -42,7 +43,8 @@ HEADERS += \
     MainHeader.h \
     FileHeader.h \
     LogInWindow.h \
-    Headers.h
+    Headers.h \
+    TaskStateHeader.h
 
 FORMS += \
         MyClient.ui \

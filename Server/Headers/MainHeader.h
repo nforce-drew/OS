@@ -13,6 +13,8 @@ enum TYPE
     ONLINE_USERS,
     RECONNECT,
     TASKS_INFO,
+    GET_SOLUTION,
+    CANCEL_TASK,
     OTHER
 };
 //=================================================================================

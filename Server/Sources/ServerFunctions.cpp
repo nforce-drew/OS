@@ -41,17 +41,17 @@ unsigned appFileData(string folderAndFileName, const char *data, unsigned len)
     return (len);
 }
 
-// string bytes(const char *buf, int size)
-// {
-//     string message;
-//     for (int i = 0; i < size; i++)
-//     {
-//         message += to_string((int)buf[i]) + " ";
-//         if ((i + 1) % 4 == 0)
-//             message += "| ";
-//     }
-//     return (message);
-// }
+string bytes(const char *buf, int size)
+{
+    string message;
+    for (int i = 0; i < size; i++)
+    {
+        message += to_string((int)buf[i]) + " ";
+        if ((i + 1) % 4 == 0)
+            message += "| ";
+    }
+    return (message);
+}
 
 int recvAll(int sock, char *strData, TYPE &dataType, void* data)
 {
@@ -80,7 +80,6 @@ int recvAll(int sock, char *strData, TYPE &dataType, void* data)
         }
         totalBytes += (int)readBytes;
     }
-    // std::cout << bytes(buf, 20) << std::endl;
     mainHeader.setByteArr(buf);
 
     curByte = sizeof(MainHeader);
@@ -253,7 +252,8 @@ int recvAll(int sock, char *strData, TYPE &dataType, void* data)
         memcpy(strData, buf, 20);
         // userName->copy(buf, mainHeader.getMsgSize() - sizeof(MainHeader) - 1);
     }
-
+    if (dataType == GET_SOLUTION || dataType == CANCEL_TASK)
+        memcpy(strData, buf, BUF_SIZE);
     return (totalBytes);
 }
 
@@ -429,7 +429,7 @@ int         sendTasksInfo(int sock_fd, string userName)
     unsigned                msgSize;
     char*                   buf;
 
-    tasks = getTasksInfo("ivan", tasks);
+    tasks = getTasksInfo(userName, tasks);
     msgSize = sizeof(MainHeader) + (unsigned)tasks.size() * sizeof(TaskStateHeader);
     mainHdr.setData(msgSize, (unsigned)tasks.size(), TASKS_INFO);
     buf = new char[msgSize - sizeof(MainHeader)];

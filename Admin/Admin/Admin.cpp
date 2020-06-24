@@ -47,7 +47,7 @@ Admin::Admin(const QString& strHost, int nPort, QWidget *parent) :
 
     ui->deleteBtn->setEnabled(false);
     connect(ui->tableTasks, SIGNAL(currentCellChanged(int, int, int, int)),
-            this, SLOT(setEnabledDeleteBtn()));
+            this, SLOT(setEnabledDeleteBtn(int, int, int, int)));
     connect(ui->deleteBtn, SIGNAL(clicked()), this, SLOT(deleteTask()));
     connect(ui->tableTasks, SIGNAL(queueChanged(QList<TaskHeader>*)),
             this, SLOT(slotSendQueue(QList<TaskHeader>*)));
@@ -91,9 +91,10 @@ void Admin::deleteTask()
     slotSendQueue(ui->tableTasks->m_queueList);
 }
 
-void Admin::setEnabledDeleteBtn()
+void Admin::setEnabledDeleteBtn(int currentRow, int currentColumn, int previousRow, int previousColumn)
 {
-    ui->deleteBtn->setEnabled(true);
+    if (currentRow != 0)
+        ui->deleteBtn->setEnabled(true);
 }
 
 QString bytes(const char *buf, int size)

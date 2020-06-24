@@ -1,5 +1,9 @@
 <RCC>
     <qresource prefix="/Images">
         <file>Images/user.png</file>
+        <file>Images/cancel.png</file>
+        <file>Images/done.png</file>
+        <file>Images/solving.png</file>
+        <file>Images/in_queue.png</file>
     </qresource>
 </RCC>

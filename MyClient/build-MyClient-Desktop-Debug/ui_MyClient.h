@@ -25,9 +25,10 @@ QT_BEGIN_NAMESPACE
 class Ui_MyClient
 {
 public:
-    QWidget *widget;
+    QWidget *layoutWidget;
     QVBoxLayout *verticalLayout;
     QHBoxLayout *horizontalLayout;
+    QListWidget *tasksList;
     DropZone *dropArea;
     QListWidget *filesList;
     QHBoxLayout *horizontalLayout_2;
@@ -39,11 +40,11 @@ public:
     {
         if (MyClient->objectName().isEmpty())
             MyClient->setObjectName(QString::fromUtf8("MyClient"));
-        MyClient->resize(645, 473);
-        widget = new QWidget(MyClient);
-        widget->setObjectName(QString::fromUtf8("widget"));
-        widget->setGeometry(QRect(10, 20, 621, 321));
-        verticalLayout = new QVBoxLayout(widget);
+        MyClient->resize(753, 414);
+        layoutWidget = new QWidget(MyClient);
+        layoutWidget->setObjectName(QString::fromUtf8("layoutWidget"));
+        layoutWidget->setGeometry(QRect(10, 20, 671, 321));
+        verticalLayout = new QVBoxLayout(layoutWidget);
         verticalLayout->setSpacing(6);
         verticalLayout->setContentsMargins(11, 11, 11, 11);
         verticalLayout->setObjectName(QString::fromUtf8("verticalLayout"));
@@ -51,19 +52,26 @@ public:
         horizontalLayout = new QHBoxLayout();
         horizontalLayout->setSpacing(6);
         horizontalLayout->setObjectName(QString::fromUtf8("horizontalLayout"));
-        dropArea = new DropZone(widget);
+        tasksList = new QListWidget(layoutWidget);
+        tasksList->setObjectName(QString::fromUtf8("tasksList"));
+        tasksList->setMinimumSize(QSize(350, 0));
+
+        horizontalLayout->addWidget(tasksList);
+
+        dropArea = new DropZone(layoutWidget);
         dropArea->setObjectName(QString::fromUtf8("dropArea"));
         dropArea->setFrameShape(QFrame::Box);
 
         horizontalLayout->addWidget(dropArea);
 
-        filesList = new QListWidget(widget);
+        filesList = new QListWidget(layoutWidget);
         filesList->setObjectName(QString::fromUtf8("filesList"));
 
         horizontalLayout->addWidget(filesList);
 
-        horizontalLayout->setStretch(0, 2);
+        horizontalLayout->setStretch(0, 1);
         horizontalLayout->setStretch(1, 1);
+        horizontalLayout->setStretch(2, 1);
 
         verticalLayout->addLayout(horizontalLayout);
 
@@ -74,7 +82,7 @@ public:
 
         horizontalLayout_2->addItem(horizontalSpacer);
 
-        solveBtn = new QPushButton(widget);
+        solveBtn = new QPushButton(layoutWidget);
         solveBtn->setObjectName(QString::fromUtf8("solveBtn"));
 
         horizontalLayout_2->addWidget(solveBtn);
@@ -82,7 +90,7 @@ public:
 
         verticalLayout->addLayout(horizontalLayout_2);
 
-        statusBar = new QLabel(widget);
+        statusBar = new QLabel(layoutWidget);
         statusBar->setObjectName(QString::fromUtf8("statusBar"));
 
         verticalLayout->addWidget(statusBar);

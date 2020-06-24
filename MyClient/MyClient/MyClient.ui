@@ -6,19 +6,19 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>645</width>
-    <height>473</height>
+    <width>753</width>
+    <height>414</height>
    </rect>
   </property>
   <property name="windowTitle">
    <string>MyClient</string>
   </property>
-  <widget class="QWidget" name="">
+  <widget class="QWidget" name="layoutWidget">
    <property name="geometry">
     <rect>
      <x>10</x>
      <y>20</y>
-     <width>621</width>
+     <width>671</width>
      <height>321</height>
     </rect>
    </property>
@@ -36,7 +36,17 @@
      <number>5</number>
     </property>
     <item>
-     <layout class="QHBoxLayout" name="horizontalLayout" stretch="2,1">
+     <layout class="QHBoxLayout" name="horizontalLayout" stretch="1,1,1">
+      <item>
+       <widget class="QListWidget" name="tasksList">
+        <property name="minimumSize">
+         <size>
+          <width>350</width>
+          <height>0</height>
+         </size>
+        </property>
+       </widget>
+      </item>
       <item>
        <widget class="DropZone" name="dropArea">
         <property name="frameShape">

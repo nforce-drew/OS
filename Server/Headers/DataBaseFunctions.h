@@ -33,6 +33,10 @@ void            addTaskPathes(int taskId, list<string> pathes);
 int             getFirstTask();
 list<string>    getTaskPathes(int taskId);
 void            setTaskState(int taskId, string state);
+list<string>    getSolutionPathes(int taskId, list<string>& files);
+void            setSolutionPathes(int taskId, list<string>& files);
+int             getSockFd(string userName);
+void            cancelQueueTask(int taskId);
 
 list<TaskStateHeader> &getTasksInfo(string userName, list<TaskStateHeader>& tasksList);
 // bool            isSolverFree();
