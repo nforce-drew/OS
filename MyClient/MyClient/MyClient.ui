@@ -41,19 +41,19 @@
        <widget class="QListWidget" name="tasksList">
         <property name="minimumSize">
          <size>
-          <width>350</width>
+          <width>280</width>
           <height>0</height>
          </size>
         </property>
        </widget>
       </item>
       <item>
-       <widget class="DropZone" name="dropArea">
+       <widget class="DropArea" name="dropArea">
         <property name="frameShape">
          <enum>QFrame::Box</enum>
         </property>
         <property name="text">
-         <string>TextLabel</string>
+         <string>DROP AREA</string>
         </property>
        </widget>
       </item>
@@ -99,9 +99,9 @@
  <layoutdefault spacing="6" margin="11"/>
  <customwidgets>
   <customwidget>
-   <class>DropZone</class>
+   <class>DropArea</class>
    <extends>QLabel</extends>
-   <header>DropZone.h</header>
+   <header>DropArea.h</header>
   </customwidget>
  </customwidgets>
  <resources/>

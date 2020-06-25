@@ -5,7 +5,7 @@
 #include "FileHeader.h"
 #include "LogInWindow.h"
 #include "Headers.h"
-#include "DropZone.h"
+#include "DropArea.h"
 #include "TaskStateHeader.h"
 #include <QWidget>
 #include <QTcpSocket>
@@ -37,7 +37,6 @@ private:
     QTextEdit*      m_ptxtInfo;
     QLineEdit*      m_ptxtInput;
     void*           m_loginWndw;
-    quint16         m_nNextBlockSize;
     QString         m_strHost;
     int             m_nPort;
     bool            m_lastStatus;
@@ -54,9 +53,10 @@ private slots:
     void slotSendFilesToServer();                            //Отправка файлов
     void slotConnected();                               //Клиент подключился к серверу
     void slotReconnect();
-    void slotDroppedFiles();
+    void slotDroppedFiles(QStringList newFiles);
     void slotCancelClicked();
     void slotDownloadClicked();
+    void slotSolveClicked();
 public:
     void slotSendMainHdrToServer(TYPE dataType, unsigned num);
     void slotSendDataToServer(TYPE dataType, char* data, unsigned len); //Отправка данных или запроса
@@ -64,6 +64,7 @@ public:
                                                                           //то присвоить data = NULL и len = 0
 private:
     void setTasksList(QList<TaskStateHeader> &tasksList);
+    void successRecieve();
 
 private:
     Ui::MyClient *ui;

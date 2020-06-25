@@ -178,6 +178,8 @@ int recvAll(int sock, char *strData, TYPE &dataType, void* data)
         }
         data = (void*)paths;
         memcpy(strData, (char*)&taskId, sizeof(int));
+        if (mainHeader.getMsgSize() == totalBytes)
+            sendData(sock, MainHeader(sizeof(MainHeader), 0, SUCCESS_RECIEVE), NULL, 0);
         return (totalBytes);
     }
     else if (mainHeader.getType() == CHECK_LOGIN)

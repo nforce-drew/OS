@@ -15,6 +15,7 @@ enum TYPE
     TASKS_INFO,
     GET_SOLUTION,
     CANCEL_TASK,
+    SUCCESS_RECIEVE,
     OTHER
 };
 //=================================================================================

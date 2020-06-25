@@ -86,9 +86,24 @@ void Admin::setTable(QList<TaskHeader> queueList)
 
 void Admin::deleteTask()
 {
-    ui->tableTasks->removeRow(ui->tableTasks->currentRow());
+    int curRow = ui->tableTasks->currentRow();
+    ui->tableTasks->removeRow(curRow);
     ui->tableTasks->queueChanged();
+    slotSendMainHdrToServer(CANCEL_TASK, (unsigned)curRow);
     slotSendQueue(ui->tableTasks->m_queueList);
+}
+
+void Admin::slotSendMainHdrToServer(TYPE dataType, unsigned num)
+{
+    MainHeader mainHdr;
+    QByteArray  arrBlock;
+    QDataStream out(&arrBlock, QIODevice::ReadWrite);
+
+    out.setVersion(QDataStream::Qt_5_9);
+    out.setByteOrder(QDataStream::LittleEndian);
+    mainHdr.setData(sizeof(MainHeader), num, dataType);
+    out.writeRawData((char*)&mainHdr, sizeof(MainHeader));
+    m_pTcpSocket->write(arrBlock);
 }
 
 void Admin::setEnabledDeleteBtn(int currentRow, int currentColumn, int previousRow, int previousColumn)

@@ -215,6 +215,7 @@ int main(const int argc, const char** argv)
                 // Поступили данные от клиента, читаем их
                 list<string>* lst = new list<string>;
                 data = (void*)lst;
+                std::cout << "ДАННЫЕ" << std::endl;
                 bytes_read = recvAll(*it, buf, dataType, data);
                 // cout << "main" << data << endl;
                 cout << "Bytes read: " << bytes_read << endl;
@@ -315,21 +316,25 @@ int main(const int argc, const char** argv)
                         MainHeader      mainHdr;
                         list<string>    files;
 
+                        std::cout << "GET_SOLUTION" << std::endl;
                         mainHdr.setByteArr(buf);
                         std::cout << "send taskId = " << mainHdr.getCount() << std::endl;
                         files = getSolutionPathes(mainHdr.getCount(), files);
                         sendFiles(*it, files);
+                        break;
                     }
                     case CANCEL_TASK:
                     {
                         MainHeader      mainHdr;
 
+                        std::cout << "CANCEL_TASK" << std::endl;
                         std::cout << "canceled = " << mainHdr.getCount() << std::endl;
                         mainHdr.setByteArr(buf);
                         cancelQueueTask(mainHdr.getCount());
                         sendTasksInfo(*it, getUserName(*it));
                         if (admin_fd != -1)
                             sendQueue(admin_fd);
+                        break;
                     }
                 }
                 //ОТПРАВЛЯЕМ ФАЙЛЫ

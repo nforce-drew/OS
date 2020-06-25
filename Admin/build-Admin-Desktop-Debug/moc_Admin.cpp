@@ -22,8 +22,8 @@ QT_BEGIN_MOC_NAMESPACE
 QT_WARNING_PUSH
 QT_WARNING_DISABLE_DEPRECATED
 struct qt_meta_stringdata_Admin_t {
-    QByteArrayData data[25];
-    char stringdata0[283];
+    QByteArrayData data[27];
+    char stringdata0[311];
 };
 #define QT_MOC_LITERAL(idx, ofs, len) \
     Q_STATIC_BYTE_ARRAY_DATA_HEADER_INITIALIZER_WITH_OFFSET(len, \
@@ -50,13 +50,15 @@ QT_MOC_LITERAL(14, 170, 9), // "slotError"
 QT_MOC_LITERAL(15, 180, 28), // "QAbstractSocket::SocketError"
 QT_MOC_LITERAL(16, 209, 3), // "err"
 QT_MOC_LITERAL(17, 213, 13), // "slotConnected"
-QT_MOC_LITERAL(18, 227, 20), // "slotSendDataToServer"
-QT_MOC_LITERAL(19, 248, 4), // "TYPE"
-QT_MOC_LITERAL(20, 253, 8), // "dataType"
-QT_MOC_LITERAL(21, 262, 5), // "count"
-QT_MOC_LITERAL(22, 268, 5), // "char*"
-QT_MOC_LITERAL(23, 274, 4), // "data"
-QT_MOC_LITERAL(24, 279, 3) // "len"
+QT_MOC_LITERAL(18, 227, 23), // "slotSendMainHdrToServer"
+QT_MOC_LITERAL(19, 251, 4), // "TYPE"
+QT_MOC_LITERAL(20, 256, 8), // "dataType"
+QT_MOC_LITERAL(21, 265, 3), // "num"
+QT_MOC_LITERAL(22, 269, 20), // "slotSendDataToServer"
+QT_MOC_LITERAL(23, 290, 5), // "count"
+QT_MOC_LITERAL(24, 296, 5), // "char*"
+QT_MOC_LITERAL(25, 302, 4), // "data"
+QT_MOC_LITERAL(26, 307, 3) // "len"
 
     },
     "Admin\0reconnect\0\0deleteTask\0"
@@ -65,8 +67,9 @@ QT_MOC_LITERAL(24, 279, 3) // "len"
     "slotSendQueue\0QList<TaskHeader>*\0"
     "queueLst\0slotReconnect\0slotReadyRead\0"
     "slotError\0QAbstractSocket::SocketError\0"
-    "err\0slotConnected\0slotSendDataToServer\0"
-    "TYPE\0dataType\0count\0char*\0data\0len"
+    "err\0slotConnected\0slotSendMainHdrToServer\0"
+    "TYPE\0dataType\0num\0slotSendDataToServer\0"
+    "count\0char*\0data\0len"
 };
 #undef QT_MOC_LITERAL
 
@@ -76,7 +79,7 @@ static const uint qt_meta_data_Admin[] = {
        8,       // revision
        0,       // classname
        0,    0, // classinfo
-       9,   14, // methods
+      10,   14, // methods
        0,    0, // properties
        0,    0, // enums/sets
        0,    0, // constructors
@@ -84,17 +87,18 @@ static const uint qt_meta_data_Admin[] = {
        1,       // signalCount
 
  // signals: name, argc, parameters, tag, flags
-       1,    0,   59,    2, 0x06 /* Public */,
+       1,    0,   64,    2, 0x06 /* Public */,
 
  // slots: name, argc, parameters, tag, flags
-       3,    0,   60,    2, 0x08 /* Private */,
-       4,    4,   61,    2, 0x08 /* Private */,
-       9,    1,   70,    2, 0x08 /* Private */,
-      12,    0,   73,    2, 0x08 /* Private */,
-      13,    0,   74,    2, 0x08 /* Private */,
-      14,    1,   75,    2, 0x08 /* Private */,
-      17,    0,   78,    2, 0x08 /* Private */,
-      18,    4,   79,    2, 0x08 /* Private */,
+       3,    0,   65,    2, 0x08 /* Private */,
+       4,    4,   66,    2, 0x08 /* Private */,
+       9,    1,   75,    2, 0x08 /* Private */,
+      12,    0,   78,    2, 0x08 /* Private */,
+      13,    0,   79,    2, 0x08 /* Private */,
+      14,    1,   80,    2, 0x08 /* Private */,
+      17,    0,   83,    2, 0x08 /* Private */,
+      18,    2,   84,    2, 0x08 /* Private */,
+      22,    4,   89,    2, 0x08 /* Private */,
 
  // signals: parameters
     QMetaType::Void,
@@ -107,7 +111,8 @@ static const uint qt_meta_data_Admin[] = {
     QMetaType::Void,
     QMetaType::Void, 0x80000000 | 15,   16,
     QMetaType::Void,
-    QMetaType::Void, 0x80000000 | 19, QMetaType::UInt, 0x80000000 | 22, QMetaType::UInt,   20,   21,   23,   24,
+    QMetaType::Void, 0x80000000 | 19, QMetaType::UInt,   20,   21,
+    QMetaType::Void, 0x80000000 | 19, QMetaType::UInt, 0x80000000 | 24, QMetaType::UInt,   20,   23,   25,   26,
 
        0        // eod
 };
@@ -126,7 +131,8 @@ void Admin::qt_static_metacall(QObject *_o, QMetaObject::Call _c, int _id, void 
         case 5: _t->slotReadyRead(); break;
         case 6: _t->slotError((*reinterpret_cast< QAbstractSocket::SocketError(*)>(_a[1]))); break;
         case 7: _t->slotConnected(); break;
-        case 8: _t->slotSendDataToServer((*reinterpret_cast< TYPE(*)>(_a[1])),(*reinterpret_cast< uint(*)>(_a[2])),(*reinterpret_cast< char*(*)>(_a[3])),(*reinterpret_cast< uint(*)>(_a[4]))); break;
+        case 8: _t->slotSendMainHdrToServer((*reinterpret_cast< TYPE(*)>(_a[1])),(*reinterpret_cast< uint(*)>(_a[2]))); break;
+        case 9: _t->slotSendDataToServer((*reinterpret_cast< TYPE(*)>(_a[1])),(*reinterpret_cast< uint(*)>(_a[2])),(*reinterpret_cast< char*(*)>(_a[3])),(*reinterpret_cast< uint(*)>(_a[4]))); break;
         default: ;
         }
     } else if (_c == QMetaObject::RegisterMethodArgumentMetaType) {
@@ -181,13 +187,13 @@ int Admin::qt_metacall(QMetaObject::Call _c, int _id, void **_a)
     if (_id < 0)
         return _id;
     if (_c == QMetaObject::InvokeMetaMethod) {
-        if (_id < 9)
+        if (_id < 10)
             qt_static_metacall(this, _c, _id, _a);
-        _id -= 9;
+        _id -= 10;
     } else if (_c == QMetaObject::RegisterMethodArgumentMetaType) {
-        if (_id < 9)
+        if (_id < 10)
             qt_static_metacall(this, _c, _id, _a);
-        _id -= 9;
+        _id -= 10;
     }
     return _id;
 }

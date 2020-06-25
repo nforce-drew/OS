@@ -18,7 +18,7 @@
 #include <QtWidgets/QSpacerItem>
 #include <QtWidgets/QVBoxLayout>
 #include <QtWidgets/QWidget>
-#include "DropZone.h"
+#include "DropArea.h"
 
 QT_BEGIN_NAMESPACE
 
@@ -29,7 +29,7 @@ public:
     QVBoxLayout *verticalLayout;
     QHBoxLayout *horizontalLayout;
     QListWidget *tasksList;
-    DropZone *dropArea;
+    DropArea *dropArea;
     QListWidget *filesList;
     QHBoxLayout *horizontalLayout_2;
     QSpacerItem *horizontalSpacer;
@@ -54,11 +54,11 @@ public:
         horizontalLayout->setObjectName(QString::fromUtf8("horizontalLayout"));
         tasksList = new QListWidget(layoutWidget);
         tasksList->setObjectName(QString::fromUtf8("tasksList"));
-        tasksList->setMinimumSize(QSize(350, 0));
+        tasksList->setMinimumSize(QSize(280, 0));
 
         horizontalLayout->addWidget(tasksList);
 
-        dropArea = new DropZone(layoutWidget);
+        dropArea = new DropArea(layoutWidget);
         dropArea->setObjectName(QString::fromUtf8("dropArea"));
         dropArea->setFrameShape(QFrame::Box);
 
@@ -104,7 +104,7 @@ public:
     void retranslateUi(QWidget *MyClient)
     {
         MyClient->setWindowTitle(QApplication::translate("MyClient", "MyClient", nullptr));
-        dropArea->setText(QApplication::translate("MyClient", "TextLabel", nullptr));
+        dropArea->setText(QApplication::translate("MyClient", "DROP AREA", nullptr));
         solveBtn->setText(QApplication::translate("MyClient", "\320\240\320\265\321\210\320\270\321\202\321\214", nullptr));
         statusBar->setText(QApplication::translate("MyClient", "TextLabel", nullptr));
     } // retranslateUi

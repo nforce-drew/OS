@@ -43,6 +43,7 @@ private slots:
     void slotReadyRead();                               //Принятие данных
     void slotError(QAbstractSocket::SocketError err);   //Ошибка подключения с сервером
     void slotConnected();
+    void slotSendMainHdrToServer(TYPE dataType, unsigned num);
     void slotSendDataToServer(TYPE dataType, unsigned count, char* data, unsigned len); //Отправка данных или запроса
                                                                          // если дополнительные данные не передаются,
                                                                           //то присвоить data = NULL и len = 0

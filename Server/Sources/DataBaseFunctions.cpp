@@ -432,7 +432,7 @@ list<TaskStateHeader> &getTasksInfo(string userName, list<TaskStateHeader>& task
         unsigned taskId = (unsigned)(std::stoi((*res)[i][2]));
         task.setData(state, time, taskId);
         tasksList.push_back(task);
-        std::cout << task.getState() << " " << task.getTime() << " " << task.getTaskId() << std::endl;
+        // std::cout << task.getState() << " " << task.getTime() << " " << task.getTaskId() << std::endl;
     }
     delete (res);
 
