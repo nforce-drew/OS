@@ -236,7 +236,7 @@ int recvAll(int sock, char *strData, TYPE &dataType, void* data)
         cout << "2 queue->size(): " << queue->size() << endl;;
         data = (void*)queue;
     }
-    if (dataType == RECONNECT)
+    if (dataType == RECONNECT || dataType == DELETE_USER)
     {
         curByte = sizeof(MainHeader);
         memcpy(buf, buf + curByte, totalBytes - sizeof(MainHeader));
@@ -443,5 +443,35 @@ int         sendTasksInfo(int sock_fd, string userName)
     }
     bytesSend = sendData(sock_fd, mainHdr, buf, msgSize - sizeof(MainHeader));
     
+    return (bytesSend);
+}
+
+int         sendUsersInfo(int admin_fd)
+{
+    list<LoginHeader> usersInfoList;
+    MainHeader  mainHdr;
+    char*       data;
+    int         dataSize;
+    int         bytesSend;
+
+    usersInfoList = getUsersInfo(usersInfoList);
+    for (auto info : usersInfoList)
+        cout << info.getUserName() << " " << info.getUserPassword() << endl;
+    dataSize = usersInfoList.size() * sizeof(LoginHeader);
+    data = new char[dataSize];
+    auto it = usersInfoList.begin();
+    int i = 0;
+    for (auto info : usersInfoList)
+    {
+        memcpy(data + i * sizeof(LoginHeader), (char*)&(info), sizeof(LoginHeader));
+        i++;
+    }
+    mainHdr.setData(dataSize + sizeof(MainHeader), usersInfoList.size(), USERS_INFO);
+    for (i = 0; i < (int)mainHdr.getCount(); i++)
+    {
+        cout << bytes(data  + i * sizeof(LoginHeader), sizeof(LoginHeader)) << endl;
+    }
+    bytesSend = sendData(admin_fd, mainHdr, data, dataSize);
+    delete data;
     return (bytesSend);
 }

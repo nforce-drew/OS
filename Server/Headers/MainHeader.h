@@ -16,6 +16,11 @@ enum TYPE
     GET_SOLUTION,
     CANCEL_TASK,
     SUCCESS_RECIEVE,
+    SIGN_UP,
+    SUCCESS_SIGN_UP,
+    LOGIN_ALREADY_EXISTS,
+    USERS_INFO,
+    DELETE_USER,
     OTHER
 };
 //=================================================================================

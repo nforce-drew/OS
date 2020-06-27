@@ -4,10 +4,12 @@
 #include "TaskHeader.h"
 #include "QueueTable.h"
 #include "MainHeader.h"
+#include "LoginHeader.h"
 #include <QMainWindow>
 #include <QList>
 #include <QDebug>
 #include <QTcpSocket>
+#include <QTableWidgetItem>
 
 namespace Ui {
 class Admin;
@@ -27,11 +29,14 @@ private:
     QString         m_strHost;
     int             m_nPort;
     bool            m_lastStatus;
+    QList<QVector<QString>> m_usersInfo;
 signals:
     void reconnect();
 private:
     void    setTable(QList<TaskHeader> queueList);
     void    setOnlineUsers(QStringList users);
+    void    fillUserInfoTable(QList<QVector<QString>> list);
+    void    fillUserNamesCmbBox(QList<QVector<QString>> list);
 
 private slots:
 //    void    slotQueueChanged();
@@ -47,6 +52,8 @@ private slots:
     void slotSendDataToServer(TYPE dataType, unsigned count, char* data, unsigned len); //Отправка данных или запроса
                                                                          // если дополнительные данные не передаются,
                                                                           //то присвоить data = NULL и len = 0
+    void deleteUserBtnEnabled();
+    void deleteUserBtnClicked();
 };
 
 #endif // ADMIN_H

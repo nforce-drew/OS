@@ -9,6 +9,7 @@
 #ifndef UI_LOGINWINDOW_H
 #define UI_LOGINWINDOW_H
 
+#include <QtCore/QLocale>
 #include <QtCore/QVariant>
 #include <QtWidgets/QApplication>
 #include <QtWidgets/QDialog>
@@ -34,7 +35,9 @@ public:
     QVBoxLayout *password_verticalLayout;
     QLabel *password_label;
     QLineEdit *password_lineEdit;
+    QHBoxLayout *horizontalLayout;
     QLabel *error_lbl;
+    QPushButton *signUp_btn;
     QSpacerItem *verticalSpacer;
     QHBoxLayout *buttons_horizontalLayout;
     QSpacerItem *horizontalSpacer;
@@ -95,11 +98,22 @@ public:
 
         main_VerticalLayout->addLayout(verticalLayout);
 
+        horizontalLayout = new QHBoxLayout();
+        horizontalLayout->setObjectName(QString::fromUtf8("horizontalLayout"));
         error_lbl = new QLabel(layoutWidget);
         error_lbl->setObjectName(QString::fromUtf8("error_lbl"));
         error_lbl->setStyleSheet(QString::fromUtf8("color: red;"));
 
-        main_VerticalLayout->addWidget(error_lbl);
+        horizontalLayout->addWidget(error_lbl);
+
+        signUp_btn = new QPushButton(layoutWidget);
+        signUp_btn->setObjectName(QString::fromUtf8("signUp_btn"));
+        signUp_btn->setLocale(QLocale(QLocale::Prussian, QLocale::World));
+
+        horizontalLayout->addWidget(signUp_btn);
+
+
+        main_VerticalLayout->addLayout(horizontalLayout);
 
         verticalSpacer = new QSpacerItem(20, 40, QSizePolicy::Minimum, QSizePolicy::Expanding);
 
@@ -143,6 +157,7 @@ public:
         login_label->setText(QApplication::translate("LogInWindow", "\320\233\320\276\320\263\320\270\320\275:", nullptr));
         password_label->setText(QApplication::translate("LogInWindow", "\320\237\320\260\321\200\320\276\320\273\321\214:", nullptr));
         error_lbl->setText(QString());
+        signUp_btn->setText(QApplication::translate("LogInWindow", "\320\240\320\265\320\263\320\270\321\201\321\202\321\200\320\260\321\206\320\270\321\217", nullptr));
         login_btn->setText(QApplication::translate("LogInWindow", "\320\222\320\276\320\271\321\202\320\270", nullptr));
         cancel_btn->setText(QApplication::translate("LogInWindow", "\320\236\321\202\320\274\320\265\320\275\320\260", nullptr));
     } // retranslateUi

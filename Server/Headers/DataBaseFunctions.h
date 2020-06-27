@@ -37,7 +37,9 @@ list<string>    getSolutionPathes(int taskId, list<string>& files);
 void            setSolutionPathes(int taskId, list<string>& files);
 int             getSockFd(string userName);
 void            cancelQueueTask(int taskId);
+void            deleteUser(string userName);
 
-list<TaskStateHeader> &getTasksInfo(string userName, list<TaskStateHeader>& tasksList);
+list<LoginHeader>       getUsersInfo(list<LoginHeader> &usersInfoList);
+list<TaskStateHeader>   &getTasksInfo(string userName, list<TaskStateHeader>& tasksList);
 // bool            isSolverFree();
 #endif // DATABASEFUNCTIONS_H

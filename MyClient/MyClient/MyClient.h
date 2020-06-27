@@ -22,6 +22,7 @@
 #include <QStringList>
 #include <QDebug>
 #include <QTimer>
+#include <QFileDialog>
 
 //=================================================================================
 namespace Ui {
@@ -42,6 +43,7 @@ private:
     bool            m_lastStatus;
     QString         m_userName;
     QList<TaskStateHeader> m_tasksList;
+    QString         m_dirToSave;
 
 public:
     MyClient(const QString& strHost, int nPort, QWidget *pwgt = 0);

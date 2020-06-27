@@ -51,25 +51,46 @@ Admin::Admin(const QString& strHost, int nPort, QWidget *parent) :
     connect(ui->deleteBtn, SIGNAL(clicked()), this, SLOT(deleteTask()));
     connect(ui->tableTasks, SIGNAL(queueChanged(QList<TaskHeader>*)),
             this, SLOT(slotSendQueue(QList<TaskHeader>*)));
-//    ui->tableTasks->curr
 
     QList<TaskHeader> queueList;
     setTable(queueList);
-//    ui->tableTasks->queueChanged();
 
-    centralWidget()->setLayout(ui->main_Layout);
+    //User Info: делаем кнопки неактивными
+    ui->deleteUserBtn->setEnabled(false);
+    ui->addBtn->setEnabled(false);
+    ui->changeBtn->setEnabled(false);
+
+    //Users info Настройка таблицы
+    ui->usersInfoTable->setColumnCount(2);
+    ui->usersInfoTable->setShowGrid(true);
+    QStringList userInfoHeaderLst;
+    userInfoHeaderLst << "Имя пользователя" << " Пароль" ;
+    ui->usersInfoTable->setHorizontalHeaderLabels(userInfoHeaderLst);
+    ui->usersInfoTable->setEditTriggers(QAbstractItemView::NoEditTriggers); //запрещено редактирование
+    ui->usersInfoTable->horizontalHeader()->setSectionResizeMode(0,QHeaderView::Stretch);// растягиваем 1 столбец по содержимому
+    ui->usersInfoTable->horizontalHeader()->setSectionResizeMode(1,QHeaderView::Stretch);//  растягиваем 2 столбец по содержимому
+    ui->usersInfoTable->setSelectionMode(QAbstractItemView::SingleSelection);
+    ui->usersInfoTable->setSelectionBehavior(QAbstractItemView::SelectRows);
+
+    //Users info
+    QObject::connect(ui->usersInfoTable, SIGNAL(itemPressed(QTableWidgetItem*)),
+                     this, SLOT(deleteUserBtnEnabled()));//активировать кнопку удалить
+    QObject::connect(ui->deleteUserBtn, SIGNAL(clicked()),
+                     this, SLOT(deleteUserBtnClicked()));
+    QObject::connect(ui->deleteUserBtn,SIGNAL(clicked()),this,SLOT(deleteUser()));// удаление пользователя
+    QObject::connect(ui->editPassword,SIGNAL( textChanged(const QString&)),this,SLOT(activAddBtn(const QString &)));// активировать кнопку добавить
+    QObject::connect(ui->addBtn,SIGNAL(clicked()),this,SLOT(addUser()));// добавление пользователя
+    QObject::connect(ui->editNewPassword,SIGNAL( textChanged(const QString&)),this,SLOT(activChangeBtn(const QString &)));//активировать кнопку изменить
+    QObject::connect(ui->changeBtn,SIGNAL(clicked()),this,SLOT(changePassword()));// изменить пароль пользователя
+
+    ui->tab_queue->setLayout(ui->layout_queue);
+    ui->tab_userInfo->setLayout(ui->layout_userInfo);
+    centralWidget()->setLayout(ui->layout_main);
 }
 
 void Admin::setTable(QList<TaskHeader> queueList)
 {
     ui->tableTasks->setRowCount(0);
-
-//    TaskHeader taskHdr;
-//    for (int i = 0; i < 10; i++)
-//    {
-//        taskHdr.setData(i, (char*)QString("User " + QString::number(i)).toStdString().c_str() , i + 1, "11:22:11");
-//        queueList << taskHdr;
-//    }
     for (int i = 0; i < queueList.size(); i++)
     {
         qDebug() << queueList[i].getUserName();
@@ -86,11 +107,14 @@ void Admin::setTable(QList<TaskHeader> queueList)
 
 void Admin::deleteTask()
 {
-    int curRow = ui->tableTasks->currentRow();
+    unsigned taskId;
+    int curRow;
+
+    curRow = ui->tableTasks->currentRow();
+    taskId = (unsigned)ui->tableTasks->item(curRow, 0)->text().toInt();
     ui->tableTasks->removeRow(curRow);
     ui->tableTasks->queueChanged();
-    slotSendMainHdrToServer(CANCEL_TASK, (unsigned)curRow);
-    slotSendQueue(ui->tableTasks->m_queueList);
+    slotSendMainHdrToServer(CANCEL_TASK, taskId);
 }
 
 void Admin::slotSendMainHdrToServer(TYPE dataType, unsigned num)
@@ -158,7 +182,7 @@ void Admin::slotReadyRead()
     MainHeader  mainHeader;
 
     qDebug() << "Receiving data..." << m_pTcpSocket->bytesAvailable();
-    if (m_pTcpSocket->bytesAvailable() < sizeof(MainHeader))
+    if (m_pTcpSocket->bytesAvailable() < (qint64)sizeof(MainHeader))
     {
         qDebug() << "Error reading data.";
 //        QMessageBox::critical(this, "Ошибка", "Ошибка чтения данных!");
@@ -181,7 +205,7 @@ void Admin::slotReadyRead()
 //        qDebug() << in.readRawData(data.data(), mainHeader.getMsgSize() - sizeof(MainHeader));
         QList<TaskHeader> queueList;
         TaskHeader taskHdr;
-        for (int i = 0; i < mainHeader.getCount(); i++)
+        for (int i = 0; i < (int)mainHeader.getCount(); i++)
         {
             in.readRawData((char*)&taskHdr, sizeof(taskHdr));
             queueList << taskHdr;
@@ -196,12 +220,36 @@ void Admin::slotReadyRead()
         data.clear();
         data.reserve(mainHeader.getMsgSize() - sizeof(MainHeader));
         qDebug() << mainHeader.getMsgSize() << " " << mainHeader.getCount() << " " << mainHeader.getType();
-        for (int i = 0; i < mainHeader.getCount(); i++)
+        for (int i = 0; i < (int)mainHeader.getCount(); i++)
         {
             in.readRawData(user, 20);
             onlineLst.push_back(user);
         }
         setOnlineUsers(onlineLst);
+    }
+    if (mainHeader.getType() == USERS_INFO)
+    {
+        QList<QVector<QString>> usersInfoList;
+        QVector<QString>        userInfo;
+        LoginHeader             loginHdr;
+        char                    data[sizeof(LoginHeader)];
+        qDebug() << "MAIN HEADER msgSize: " << mainHeader.getMsgSize() <<
+                    " count: " << mainHeader.getCount() <<
+                    " type: " << mainHeader.getType();
+        qDebug() << m_pTcpSocket->bytesAvailable();
+        for (int i = 0; i < (int)mainHeader.getCount(); i++)
+        {
+            in.readRawData(data, sizeof(LoginHeader));
+            loginHdr.setByteArr(data);
+            qDebug() << "LOGIN HEADER user name: " << loginHdr.getUserName() <<
+                        " password " << loginHdr.getUserPassword();
+            userInfo.clear();
+            userInfo.push_back(QString(loginHdr.getUserName()));
+            userInfo.push_back(QString(loginHdr.getUserPassword()));
+            usersInfoList.push_back(userInfo);
+        }
+        fillUserInfoTable(usersInfoList);
+        fillUserNamesCmbBox(usersInfoList);
     }
     qDebug() << "End of data reading.";
 }
@@ -257,14 +305,61 @@ void Admin::slotSendDataToServer(TYPE dataType, unsigned count, char* data, unsi
     m_pTcpSocket->write(arrBlock);
     qDebug() << "SENDED: " << bytes(arrBlock.data(), 30);
 }
+// ------------------------------------------------------------------
+void Admin::deleteUserBtnClicked()
+{
+    int row;
+    char userName[20];
 
+    row = ui->usersInfoTable->currentRow();
+    strcpy(userName, ui->usersInfoTable->item(row, 0)->text().toStdString().c_str());
+    slotSendDataToServer(DELETE_USER, 0, userName, 20);
+    ui->comboBox->removeItem(row + 1);
+    QMessageBox::information(this,"Информация","Пользователь " + QString(userName) + " успешно удален!");
+    ui->usersInfoTable->removeRow(row);
+    ui->deleteBtn->setEnabled(false);
+}
+// ------------------------------------------------------------------
+void Admin::deleteUserBtnEnabled()
+{
+    ui->deleteUserBtn->setEnabled(true);
+}
+// ------------------------------------------------------------------
 void Admin::setOnlineUsers(QStringList users)
 {
     ui->listUsers->clear();
     ui->listUsers->addItems(users);
 }
-
+// ------------------------------------------------------------------
+void Admin::fillUserInfoTable(QList<QVector<QString>> list)
+{
+    int rowCount = ui->usersInfoTable->rowCount();
+    //заполнение таблицы
+    for (int i = 0; i < rowCount; i++)
+    {
+        ui->usersInfoTable->removeRow(i);
+    qDebug() << i;
+    }
+    for (int i = 0; i < list.size(); ++i)
+    {
+        ui->usersInfoTable->insertRow(i);
+        QTableWidgetItem *username = new QTableWidgetItem;
+        QTableWidgetItem *pass = new QTableWidgetItem;
+        username->setText(list[i][0]);
+        pass->setText(list[i][1]);
+        ui->usersInfoTable->setItem(i,0,username);
+        ui->usersInfoTable->setItem(i,1,pass);
+    }
+}
+// ------------------------------------------------------------------
+void Admin::fillUserNamesCmbBox(QList<QVector<QString>> list)
+{
+    for(int i = 0; i < list.size(); ++i)
+        ui->comboBox->addItem(list[i].at(0));
+}
+// ------------------------------------------------------------------
 Admin::~Admin()
 {
     delete ui;
 }
+// ------------------------------------------------------------------

@@ -204,11 +204,17 @@ void MyClient::slotDownloadClicked()
     int row = pBtn->objectName().toInt();
     unsigned taskId = m_tasksList[row + 1].getTaskId();
     qDebug() << taskId;
-    slotSendMainHdrToServer(GET_SOLUTION, taskId);
+    m_dirToSave = QFileDialog::getExistingDirectory(this,
+                                                   "Директория для сохранения",
+                                                   "/home/nspace/Desktop"
+                                                   );
+    if (!m_dirToSave.isEmpty())
+        slotSendMainHdrToServer(GET_SOLUTION, taskId);
 }
 
 void MyClient::slotSolveClicked()
 {
+    qDebug() << "slotSolveClicked()";
     ui->solveBtn->setEnabled(false);
     ui->filesList->clear();
     slotSendFilesToServer();
@@ -264,7 +270,7 @@ void MyClient::slotReadyRead()
             in.readRawData(data.data(), data.size());
 
             //путь для сохранения
-            QFile file("/home/nspace/Desktop/ClientReceive/" + QString(fileHeader.getFileName()));
+            QFile file(m_dirToSave + '/' + QString(fileHeader.getFileName()));
             if(!file.open(QIODevice::WriteOnly | QIODevice::Append | QIODevice::Truncate))
             {
                 qDebug() << "Error: opening the file for writing "
@@ -286,6 +292,12 @@ void MyClient::slotReadyRead()
     {
         qDebug() << "BAN_LOGIN";
         ((LogInWindow*)m_loginWndw)->slotIncorrectLogin();
+    }
+    if (mainHeader.getType() == SUCCESS_SIGN_UP)
+    {
+        qDebug() << "SUCCESS_SIGN_UP";
+        ((LogInWindow*)m_loginWndw)->hide();
+        show();
     }
     if (mainHeader.getType() == QUEUE_LIST)
     {

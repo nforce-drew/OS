@@ -21,14 +21,13 @@ class LogInWindow : public QDialog
 public:
     LogInWindow();
     LogInWindow(QWidget *parent = nullptr);
-    void        connectDatabase();
     QString     getUserName();
     ~LogInWindow();
 
 private:
     Ui::LogInWindow*    ui;
-    QSqlDatabase        db;
     QString             m_userName;
+    bool                m_isSignIn;
 
 signals:
     void logged();
@@ -37,6 +36,10 @@ signals:
 public slots:
     void slotCheckLogin();
     void slotIncorrectLogin();
+    void changeToSignUp();
+    void changeToSignIn();
+private slots:
+    void slotCancelClicked();
 };
 
 #endif // LOGINWINDOW_H

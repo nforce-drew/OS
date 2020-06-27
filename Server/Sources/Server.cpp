@@ -34,7 +34,7 @@ void solver()
 {
     isSolverFree = false;
     std::cout << "===SOLVER STARTED===" << std::endl;
-
+    
     int taskId = getFirstTask();
     if (taskId == -1)
     {
@@ -295,6 +295,7 @@ int main(const int argc, const char** argv)
                         cout << "\t-> ADMIN_LOGGED. Socket: " << *it << endl;
                         sendQueue(admin_fd);                      
                         sendOnlineUsers(admin_fd);
+                        sendUsersInfo(admin_fd);
                         break;
                     }
                     case RECONNECT:
@@ -334,6 +335,13 @@ int main(const int argc, const char** argv)
                         sendTasksInfo(*it, getUserName(*it));
                         if (admin_fd != -1)
                             sendQueue(admin_fd);
+                        break;
+                    }
+                    case DELETE_USER:
+                    {
+                        std::cout << "\t-> RECONNECT - user name: \"" 
+                                    << buf << "\"" << std::endl;
+                        deleteUser(string(buf));
                         break;
                     }
                 }

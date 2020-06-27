@@ -483,8 +483,8 @@ void            setSolutionPathes(int taskId, list<string> &files)
 int             getSockFd(string userName)
 {
     vector<vector<string>>* res;
-    string      query;
-    sqlite3*    db;
+    string                  query;
+    sqlite3*                db;
     void*                   data;
     int                     sock_fd;
 
@@ -520,6 +520,45 @@ void            cancelQueueTask(int taskId)
     sqlite3_close(db);
 }
 
+list<LoginHeader>       getUsersInfo(list<LoginHeader> &usersInfoList)
+{
+    vector<vector<string>>* res;
+    LoginHeader             loginHdr;
+    string                  query;
+    sqlite3*                db;
+    void*                   data;
+    int                     sock_fd;
+
+    usersInfoList.clear();
+    res = new vector<vector<string>>;
+    data = (void*)res;
+    query = "SELECT user_name, user_password FROM users_info " \
+            "ORDER BY user_name;";
+    std::cout << query << std::endl;
+    db = connectDB((char*)DB_PATH);
+    sqlite3_exec(db, query.c_str(), callback_result, data, NULL);
+    sqlite3_close(db);
+    for (auto userInfo : *res)
+    {
+        loginHdr.setData((char*)userInfo[0].c_str(), (char*)userInfo[1].c_str());
+        usersInfoList.push_back(loginHdr);
+    }
+    delete (res);
+    return (usersInfoList);
+}
+
+void            deleteUser(string userName)
+{
+    string                  query;
+    sqlite3*                db;
+
+    query = "DELETE FROM users_info " \
+            "WHERE user_name == '" + userName + "';";
+    std::cout << query << std::endl;
+    db = connectDB((char*)DB_PATH);
+    sqlite3_exec(db, query.c_str(), NULL, NULL, NULL);
+    sqlite3_close(db);
+}
 // bool            isSolverFree()
 // {
 //     vector<vector<string>>* res;

@@ -41,3 +41,4 @@ int         sendFiles(int sock, list<string> &paths); //ОТПРАВЛЯЕТ Ф�
 char*       onlineUsersToChar(list<string>* lst);
 int         sendOnlineUsers(int admin_fd);
 int         sendTasksInfo(int sock_fd, string userName);
+int         sendUsersInfo(int admin_fd);
