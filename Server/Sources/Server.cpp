@@ -32,6 +32,14 @@ bool    isSolverFree;
 
 void solver()
 {
+    ofstream fout_task;
+    ofstream fout_solution;
+    ifstream fin_binInfo;
+    ifstream fin_solInfo;
+    string taskInfoPath = "/home/nspace/OS/Server/TaskInfo.txt";
+    string solutionInfoPath = "/home/nspace/OS/Server/SolutionInfo.txt";
+    string binInfoPath = "/home/nspace/OS/Server/BinInfo.txt";
+
     isSolverFree = false;
     std::cout << "===SOLVER STARTED===" << std::endl;
     
@@ -71,11 +79,59 @@ void solver()
     savePath = (char*)SOLUTIONS_PATH + folderName;
     mkdir(savePath.c_str(), S_IRWXU);
     list<string> solutionPathes;
-    for (auto el : pathes)
+    fout_task.open(taskInfoPath, std::ios_base::trunc);
+    if (!fout_task.is_open())
+        cerr << "File TaskInfo.txt opening error." << endl;
+    else
     {
-        shellCommand = "cp " + el + " " + savePath;
-        system(shellCommand.c_str());
-        solutionPathes.push_back(savePath + '/' + fileName(el));
+        for (auto el : pathes)
+        {
+            if (el != *(pathes.begin()))
+                fout_task.write("\n", 1);
+            fout_task.write(el.c_str(), el.size());
+            // fout.write("\n", 1);
+            // shellCommand = "cp " + el + " " + savePath;
+            // system(shellCommand.c_str());
+            // solutionPathes.push_back(savePath + '/' + fileName(el));
+        }
+        fout_task.close();
+        fout_solution.open(solutionInfoPath, std::ios_base::trunc);
+        if (!fout_solution.is_open())
+            cerr << "File SolutionInfo.txt opening error." << endl;
+        else
+        {
+            fout_solution.write(savePath.c_str(), savePath.size());
+            fout_solution.close();
+        }
+        string binPath = "/home/nspace/OS/Server";
+        string binName = "filesToZip.out";
+        string command = "cd " + binPath + "; ./" + binName + " " 
+                            + taskInfoPath + " " + solutionInfoPath;
+        system(command.c_str());
+        std::cout << "????????" << std::endl;
+        fin_binInfo.open(binInfoPath);
+        if (!fin_binInfo.is_open())
+            cout << "File BinInfo.txt opening error. Errno: " << errno << endl;
+        else
+        {
+            command = "ps | grep \" " + binName + "$\" > " + "BinInfoPath.txt";
+            system(command.c_str());
+            fin_binInfo.close();
+        }
+    }
+    fin_solInfo.open(solutionInfoPath);
+    if (!fin_solInfo.is_open())
+        cerr << "File SolutionInfo.txt opening error." << endl;
+    else
+    {
+        string solutionPath;
+        while(!fin_solInfo.eof())
+        {
+            solutionPath.clear();
+            std::getline(fin_solInfo, solutionPath);
+            solutionPathes.push_back(solutionPath);
+        }
+        fin_solInfo.close();
     }
     setSolutionPathes(taskId, solutionPathes);
     setTaskState(taskId, "Готово");

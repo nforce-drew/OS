@@ -3,6 +3,9 @@
 #include <list>
 #include <thread>
 #include <chrono>
+#include <unistd.h>
+
+
 
 using namespace std;
 
@@ -15,22 +18,25 @@ void threadFunction(list<string>* lst)
  
 int main()
 {
-    string str = "hello world and people";
+    // string str = "hello world and people";
 
-    int i;
-    string change = "_";
-    for (int j = 0; j < str.length() - 1; j++)
-    {
-        i = str.find(" ");
-        if(i == j)
-        str.replace(i, change.length(), change);
-    }
-    // while (it != str.end())
+    // int i;
+    // string change = "_";
+    // for (int j = 0; j < str.length() - 1; j++)
     // {
-    //     auto it = str.find(" ");
+    //     i = str.find(" ");
+    //     if(i == j)
+    //     str.replace(i, change.length(), change);
     // }
-    cout << str;
-    
+    // // while (it != str.end())
+    // // {
+    // //     auto it = str.find(" ");
+    // // }
+    // cout << str;
+    char* args[] = {"./b.out", "", "", NULL};
+    std::cout << "Вызывает" << std::endl;
+    execvp("./b.out", args);
+    std::cout << "Продолжил" << std::endl;
     // str.replace()
     return 0;
 }
