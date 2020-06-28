@@ -102,6 +102,7 @@ public:
         horizontalLayout->setObjectName(QString::fromUtf8("horizontalLayout"));
         error_lbl = new QLabel(layoutWidget);
         error_lbl->setObjectName(QString::fromUtf8("error_lbl"));
+        error_lbl->setContextMenuPolicy(Qt::CustomContextMenu);
         error_lbl->setStyleSheet(QString::fromUtf8("color: red;"));
 
         horizontalLayout->addWidget(error_lbl);

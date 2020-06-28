@@ -81,6 +81,9 @@
      <layout class="QHBoxLayout" name="horizontalLayout">
       <item>
        <widget class="QLabel" name="error_lbl">
+        <property name="contextMenuPolicy">
+         <enum>Qt::CustomContextMenu</enum>
+        </property>
         <property name="styleSheet">
          <string notr="true">color: red;</string>
         </property>

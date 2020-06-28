@@ -327,23 +327,53 @@ int main(const int argc, const char** argv)
                     case CANCEL_TASK:
                     {
                         MainHeader      mainHdr;
+                        string          userName;
+                        int             userSock_fd;
 
+                        mainHdr.setByteArr(buf);
                         std::cout << "CANCEL_TASK" << std::endl;
                         std::cout << "canceled = " << mainHdr.getCount() << std::endl;
                         mainHdr.setByteArr(buf);
                         cancelQueueTask(mainHdr.getCount());
-                        sendTasksInfo(*it, getUserName(*it));
-                        if (admin_fd != -1)
+                        this_thread::sleep_for(std::chrono::milliseconds(500));
+                        if (*it != admin_fd)
+                        {
+                            sendTasksInfo(*it, getUserName(*it));
                             sendQueue(admin_fd);
+                        }
+                        else
+                        {
+                            userName = getUserNameByTaskId(mainHdr.getCount());
+                            userSock_fd = getSockFd(userName);
+                            sendTasksInfo(userSock_fd, userName);
+                        }
+                        
                         break;
                     }
                     case DELETE_USER:
                     {
-                        std::cout << "\t-> RECONNECT - user name: \"" 
-                                    << buf << "\"" << std::endl;
+                        std::cout << "\t-> DELETE_USER - user name: \"" 
+                                    << string(buf) << "\"" << std::endl;
                         deleteUser(string(buf));
                         break;
                     }
+                    case ADD_NEW_USER:
+                    {
+                        std::cout << "\t-> ADD_NEW_USER - user name: \"" 
+                                    << LoginHeader(buf).getUserName() << "\"" << std::endl;
+                        addNewUser(LoginHeader(buf));
+                        sendUsersInfo(admin_fd);
+                        break;
+                    }
+                    case CHANGE_PASSWORD:
+                    {
+                        std::cout << "\t-> CHANGE_PASSWORD - user name: \"" 
+                                    << LoginHeader(buf).getUserName() << "\"" << std::endl;
+                        changePassword(LoginHeader(buf));
+                        sendUsersInfo(admin_fd);
+                        break;
+                    }
+                    
                 }
                 //ОТПРАВЛЯЕМ ФАЙЛЫ
                 // cout << "Отправляемые файлы(" << paths.size() << ")" << endl;

@@ -14,7 +14,7 @@
    <string>Admin</string>
   </property>
   <widget class="QWidget" name="centralwidget">
-   <widget class="QWidget" name="">
+   <widget class="QWidget" name="layoutWidget">
     <property name="geometry">
      <rect>
       <x>10</x>
@@ -133,7 +133,7 @@
         <attribute name="title">
          <string>Пользователи</string>
         </attribute>
-        <widget class="QWidget" name="">
+        <widget class="QWidget" name="layoutWidget">
          <property name="geometry">
           <rect>
            <x>10</x>
@@ -265,17 +265,11 @@
             <item>
              <layout class="QHBoxLayout" name="horizontalLayout_2">
               <item>
-               <spacer name="horizontalSpacer_2">
-                <property name="orientation">
-                 <enum>Qt::Horizontal</enum>
+               <widget class="QLabel" name="errorAddUser_label">
+                <property name="text">
+                 <string/>
                 </property>
-                <property name="sizeHint" stdset="0">
-                 <size>
-                  <width>40</width>
-                  <height>20</height>
-                 </size>
-                </property>
-               </spacer>
+               </widget>
               </item>
               <item>
                <widget class="QPushButton" name="addBtn">
@@ -373,20 +367,14 @@
             <item>
              <layout class="QHBoxLayout" name="horizontalLayout_4">
               <item>
-               <spacer name="horizontalSpacer_4">
-                <property name="orientation">
-                 <enum>Qt::Horizontal</enum>
+               <widget class="QLabel" name="errorNewPass_label">
+                <property name="text">
+                 <string/>
                 </property>
-                <property name="sizeHint" stdset="0">
-                 <size>
-                  <width>40</width>
-                  <height>20</height>
-                 </size>
-                </property>
-               </spacer>
+               </widget>
               </item>
               <item>
-               <widget class="QPushButton" name="changeBtn">
+               <widget class="QPushButton" name="newPassBtn">
                 <property name="font">
                  <font>
                   <pointsize>13</pointsize>

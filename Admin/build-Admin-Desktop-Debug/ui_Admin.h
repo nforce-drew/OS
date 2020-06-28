@@ -32,11 +32,11 @@ class Ui_Admin
 {
 public:
     QWidget *centralwidget;
-    QWidget *widget;
+    QWidget *layoutWidget;
     QVBoxLayout *layout_main;
     QTabWidget *tabWidget;
     QWidget *tab_queue;
-    QWidget *layoutWidget;
+    QWidget *layoutWidget1;
     QVBoxLayout *layout_queue;
     QHBoxLayout *horizontalLayout;
     QVBoxLayout *online_Layout;
@@ -49,7 +49,7 @@ public:
     QSpacerItem *horizontalSpacer;
     QPushButton *deleteBtn;
     QWidget *tab_userInfo;
-    QWidget *widget1;
+    QWidget *layoutWidget2;
     QHBoxLayout *layout_userInfo;
     QVBoxLayout *verticalLayout_4;
     QTableWidget *usersInfoTable;
@@ -63,7 +63,7 @@ public:
     QLabel *label_3;
     QLineEdit *editPassword;
     QHBoxLayout *horizontalLayout_2;
-    QSpacerItem *horizontalSpacer_2;
+    QLabel *errorAddUser_label;
     QPushButton *addBtn;
     QSpacerItem *verticalSpacer;
     QVBoxLayout *verticalLayout;
@@ -72,8 +72,8 @@ public:
     QLabel *label_4;
     QLineEdit *editNewPassword;
     QHBoxLayout *horizontalLayout_4;
-    QSpacerItem *horizontalSpacer_4;
-    QPushButton *changeBtn;
+    QLabel *errorNewPass_label;
+    QPushButton *newPassBtn;
     QSpacerItem *verticalSpacer_2;
     QLabel *statusBar;
 
@@ -84,22 +84,22 @@ public:
         Admin->resize(984, 662);
         centralwidget = new QWidget(Admin);
         centralwidget->setObjectName(QString::fromUtf8("centralwidget"));
-        widget = new QWidget(centralwidget);
-        widget->setObjectName(QString::fromUtf8("widget"));
-        widget->setGeometry(QRect(10, 10, 761, 531));
-        layout_main = new QVBoxLayout(widget);
+        layoutWidget = new QWidget(centralwidget);
+        layoutWidget->setObjectName(QString::fromUtf8("layoutWidget"));
+        layoutWidget->setGeometry(QRect(10, 10, 761, 531));
+        layout_main = new QVBoxLayout(layoutWidget);
         layout_main->setSpacing(6);
         layout_main->setContentsMargins(11, 11, 11, 11);
         layout_main->setObjectName(QString::fromUtf8("layout_main"));
         layout_main->setContentsMargins(0, 0, 0, 0);
-        tabWidget = new QTabWidget(widget);
+        tabWidget = new QTabWidget(layoutWidget);
         tabWidget->setObjectName(QString::fromUtf8("tabWidget"));
         tab_queue = new QWidget();
         tab_queue->setObjectName(QString::fromUtf8("tab_queue"));
-        layoutWidget = new QWidget(tab_queue);
-        layoutWidget->setObjectName(QString::fromUtf8("layoutWidget"));
-        layoutWidget->setGeometry(QRect(10, 10, 731, 441));
-        layout_queue = new QVBoxLayout(layoutWidget);
+        layoutWidget1 = new QWidget(tab_queue);
+        layoutWidget1->setObjectName(QString::fromUtf8("layoutWidget1"));
+        layoutWidget1->setGeometry(QRect(10, 10, 731, 441));
+        layout_queue = new QVBoxLayout(layoutWidget1);
         layout_queue->setSpacing(6);
         layout_queue->setContentsMargins(11, 11, 11, 11);
         layout_queue->setObjectName(QString::fromUtf8("layout_queue"));
@@ -110,7 +110,7 @@ public:
         online_Layout = new QVBoxLayout();
         online_Layout->setSpacing(6);
         online_Layout->setObjectName(QString::fromUtf8("online_Layout"));
-        Users_Lbl = new QLabel(layoutWidget);
+        Users_Lbl = new QLabel(layoutWidget1);
         Users_Lbl->setObjectName(QString::fromUtf8("Users_Lbl"));
         QFont font;
         font.setPointSize(15);
@@ -118,7 +118,7 @@ public:
 
         online_Layout->addWidget(Users_Lbl);
 
-        listUsers = new QListWidget(layoutWidget);
+        listUsers = new QListWidget(layoutWidget1);
         listUsers->setObjectName(QString::fromUtf8("listUsers"));
 
         online_Layout->addWidget(listUsers);
@@ -129,7 +129,7 @@ public:
         tasks_Layout = new QVBoxLayout();
         tasks_Layout->setSpacing(6);
         tasks_Layout->setObjectName(QString::fromUtf8("tasks_Layout"));
-        Tasks_lbl = new QLabel(layoutWidget);
+        Tasks_lbl = new QLabel(layoutWidget1);
         Tasks_lbl->setObjectName(QString::fromUtf8("Tasks_lbl"));
         QFont font1;
         font1.setPointSize(16);
@@ -137,7 +137,7 @@ public:
 
         tasks_Layout->addWidget(Tasks_lbl);
 
-        tableTasks = new QueueTable(layoutWidget);
+        tableTasks = new QueueTable(layoutWidget1);
         tableTasks->setObjectName(QString::fromUtf8("tableTasks"));
 
         tasks_Layout->addWidget(tableTasks);
@@ -157,7 +157,7 @@ public:
 
         btn_Layout->addItem(horizontalSpacer);
 
-        deleteBtn = new QPushButton(layoutWidget);
+        deleteBtn = new QPushButton(layoutWidget1);
         deleteBtn->setObjectName(QString::fromUtf8("deleteBtn"));
         QFont font2;
         font2.setPointSize(10);
@@ -171,10 +171,10 @@ public:
         tabWidget->addTab(tab_queue, QString());
         tab_userInfo = new QWidget();
         tab_userInfo->setObjectName(QString::fromUtf8("tab_userInfo"));
-        widget1 = new QWidget(tab_userInfo);
-        widget1->setObjectName(QString::fromUtf8("widget1"));
-        widget1->setGeometry(QRect(10, 10, 711, 441));
-        layout_userInfo = new QHBoxLayout(widget1);
+        layoutWidget2 = new QWidget(tab_userInfo);
+        layoutWidget2->setObjectName(QString::fromUtf8("layoutWidget2"));
+        layoutWidget2->setGeometry(QRect(10, 10, 711, 441));
+        layout_userInfo = new QHBoxLayout(layoutWidget2);
         layout_userInfo->setSpacing(6);
         layout_userInfo->setContentsMargins(11, 11, 11, 11);
         layout_userInfo->setObjectName(QString::fromUtf8("layout_userInfo"));
@@ -183,7 +183,7 @@ public:
         verticalLayout_4->setSpacing(6);
         verticalLayout_4->setObjectName(QString::fromUtf8("verticalLayout_4"));
         verticalLayout_4->setContentsMargins(5, -1, -1, -1);
-        usersInfoTable = new QTableWidget(widget1);
+        usersInfoTable = new QTableWidget(layoutWidget2);
         usersInfoTable->setObjectName(QString::fromUtf8("usersInfoTable"));
         QFont font3;
         font3.setPointSize(12);
@@ -198,7 +198,7 @@ public:
 
         horizontalLayout_3->addItem(horizontalSpacer_3);
 
-        deleteUserBtn = new QPushButton(widget1);
+        deleteUserBtn = new QPushButton(layoutWidget2);
         deleteUserBtn->setObjectName(QString::fromUtf8("deleteUserBtn"));
         QFont font4;
         font4.setPointSize(13);
@@ -216,7 +216,7 @@ public:
         verticalLayout_2->setSpacing(6);
         verticalLayout_2->setObjectName(QString::fromUtf8("verticalLayout_2"));
         verticalLayout_2->setContentsMargins(10, -1, 5, -1);
-        addLabel = new QLabel(widget1);
+        addLabel = new QLabel(layoutWidget2);
         addLabel->setObjectName(QString::fromUtf8("addLabel"));
         QFont font5;
         font5.setPointSize(14);
@@ -224,25 +224,25 @@ public:
 
         verticalLayout_2->addWidget(addLabel);
 
-        label = new QLabel(widget1);
+        label = new QLabel(layoutWidget2);
         label->setObjectName(QString::fromUtf8("label"));
         label->setFont(font2);
 
         verticalLayout_2->addWidget(label);
 
-        editUsername = new QLineEdit(widget1);
+        editUsername = new QLineEdit(layoutWidget2);
         editUsername->setObjectName(QString::fromUtf8("editUsername"));
         editUsername->setFont(font4);
 
         verticalLayout_2->addWidget(editUsername);
 
-        label_3 = new QLabel(widget1);
+        label_3 = new QLabel(layoutWidget2);
         label_3->setObjectName(QString::fromUtf8("label_3"));
         label_3->setFont(font2);
 
         verticalLayout_2->addWidget(label_3);
 
-        editPassword = new QLineEdit(widget1);
+        editPassword = new QLineEdit(layoutWidget2);
         editPassword->setObjectName(QString::fromUtf8("editPassword"));
         editPassword->setFont(font4);
 
@@ -251,11 +251,12 @@ public:
         horizontalLayout_2 = new QHBoxLayout();
         horizontalLayout_2->setSpacing(6);
         horizontalLayout_2->setObjectName(QString::fromUtf8("horizontalLayout_2"));
-        horizontalSpacer_2 = new QSpacerItem(40, 20, QSizePolicy::Expanding, QSizePolicy::Minimum);
+        errorAddUser_label = new QLabel(layoutWidget2);
+        errorAddUser_label->setObjectName(QString::fromUtf8("errorAddUser_label"));
 
-        horizontalLayout_2->addItem(horizontalSpacer_2);
+        horizontalLayout_2->addWidget(errorAddUser_label);
 
-        addBtn = new QPushButton(widget1);
+        addBtn = new QPushButton(layoutWidget2);
         addBtn->setObjectName(QString::fromUtf8("addBtn"));
         addBtn->setFont(font4);
 
@@ -275,7 +276,7 @@ public:
         verticalLayout->setSpacing(6);
         verticalLayout->setObjectName(QString::fromUtf8("verticalLayout"));
         verticalLayout->setContentsMargins(5, -1, 10, -1);
-        label_2 = new QLabel(widget1);
+        label_2 = new QLabel(layoutWidget2);
         label_2->setObjectName(QString::fromUtf8("label_2"));
         label_2->setMinimumSize(QSize(0, 44));
         label_2->setFont(font5);
@@ -283,20 +284,20 @@ public:
 
         verticalLayout->addWidget(label_2);
 
-        comboBox = new QComboBox(widget1);
+        comboBox = new QComboBox(layoutWidget2);
         comboBox->addItem(QString());
         comboBox->setObjectName(QString::fromUtf8("comboBox"));
         comboBox->setFont(font3);
 
         verticalLayout->addWidget(comboBox);
 
-        label_4 = new QLabel(widget1);
+        label_4 = new QLabel(layoutWidget2);
         label_4->setObjectName(QString::fromUtf8("label_4"));
         label_4->setFont(font2);
 
         verticalLayout->addWidget(label_4);
 
-        editNewPassword = new QLineEdit(widget1);
+        editNewPassword = new QLineEdit(layoutWidget2);
         editNewPassword->setObjectName(QString::fromUtf8("editNewPassword"));
         editNewPassword->setFont(font4);
 
@@ -305,15 +306,16 @@ public:
         horizontalLayout_4 = new QHBoxLayout();
         horizontalLayout_4->setSpacing(6);
         horizontalLayout_4->setObjectName(QString::fromUtf8("horizontalLayout_4"));
-        horizontalSpacer_4 = new QSpacerItem(40, 20, QSizePolicy::Expanding, QSizePolicy::Minimum);
+        errorNewPass_label = new QLabel(layoutWidget2);
+        errorNewPass_label->setObjectName(QString::fromUtf8("errorNewPass_label"));
 
-        horizontalLayout_4->addItem(horizontalSpacer_4);
+        horizontalLayout_4->addWidget(errorNewPass_label);
 
-        changeBtn = new QPushButton(widget1);
-        changeBtn->setObjectName(QString::fromUtf8("changeBtn"));
-        changeBtn->setFont(font4);
+        newPassBtn = new QPushButton(layoutWidget2);
+        newPassBtn->setObjectName(QString::fromUtf8("newPassBtn"));
+        newPassBtn->setFont(font4);
 
-        horizontalLayout_4->addWidget(changeBtn);
+        horizontalLayout_4->addWidget(newPassBtn);
 
 
         verticalLayout->addLayout(horizontalLayout_4);
@@ -329,7 +331,7 @@ public:
 
         layout_main->addWidget(tabWidget);
 
-        statusBar = new QLabel(widget);
+        statusBar = new QLabel(layoutWidget);
         statusBar->setObjectName(QString::fromUtf8("statusBar"));
 
         layout_main->addWidget(statusBar);
@@ -355,12 +357,14 @@ public:
         addLabel->setText(QApplication::translate("Admin", "\320\224\320\276\320\261\320\260\320\262\320\270\321\202\321\214 \320\277\320\276\320\273\321\214\320\267\320\276\320\262\320\260\321\202\320\265\320\273\321\217", nullptr));
         label->setText(QApplication::translate("Admin", "\320\230\320\274\321\217 \320\277\320\276\320\273\321\214\320\267\320\276\320\262\320\260\321\202\320\265\320\273\321\217", nullptr));
         label_3->setText(QApplication::translate("Admin", "\320\237\320\260\321\200\320\276\320\273\321\214", nullptr));
+        errorAddUser_label->setText(QString());
         addBtn->setText(QApplication::translate("Admin", "\320\224\320\276\320\261\320\260\320\262\320\270\321\202\321\214", nullptr));
         label_2->setText(QApplication::translate("Admin", "\320\230\320\267\320\274\320\265\320\275\320\270\321\202\321\214 \320\277\320\260\321\200\320\276\320\273\321\214", nullptr));
         comboBox->setItemText(0, QApplication::translate("Admin", "-\320\222\321\213\320\261\320\265\321\200\320\270\321\202\320\265 \320\277\320\276\320\273\321\214\320\267\320\276\320\262\320\260\321\202\320\265\320\273\321\217-", nullptr));
 
         label_4->setText(QApplication::translate("Admin", "\320\235\320\276\320\262\321\213\320\271 \320\277\320\260\321\200\320\276\320\273\321\214", nullptr));
-        changeBtn->setText(QApplication::translate("Admin", "\320\230\320\267\320\274\320\265\320\275\320\270\321\202\321\214", nullptr));
+        errorNewPass_label->setText(QString());
+        newPassBtn->setText(QApplication::translate("Admin", "\320\230\320\267\320\274\320\265\320\275\320\270\321\202\321\214", nullptr));
         tabWidget->setTabText(tabWidget->indexOf(tab_userInfo), QApplication::translate("Admin", "\320\237\320\276\320\273\321\214\320\267\320\276\320\262\320\260\321\202\320\265\320\273\320\270", nullptr));
         statusBar->setText(QApplication::translate("Admin", "Status Bar", nullptr));
     } // retranslateUi

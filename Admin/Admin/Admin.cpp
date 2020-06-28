@@ -58,7 +58,8 @@ Admin::Admin(const QString& strHost, int nPort, QWidget *parent) :
     //User Info: делаем кнопки неактивными
     ui->deleteUserBtn->setEnabled(false);
     ui->addBtn->setEnabled(false);
-    ui->changeBtn->setEnabled(false);
+    ui->newPassBtn->setEnabled(false);
+    ui->editNewPassword->setEnabled(false);
 
     //Users info Настройка таблицы
     ui->usersInfoTable->setColumnCount(2);
@@ -72,16 +73,21 @@ Admin::Admin(const QString& strHost, int nPort, QWidget *parent) :
     ui->usersInfoTable->setSelectionMode(QAbstractItemView::SingleSelection);
     ui->usersInfoTable->setSelectionBehavior(QAbstractItemView::SelectRows);
 
+    ui->errorAddUser_label->setStyleSheet("color: red");
+
+
     //Users info
     QObject::connect(ui->usersInfoTable, SIGNAL(itemPressed(QTableWidgetItem*)),
                      this, SLOT(deleteUserBtnEnabled()));//активировать кнопку удалить
     QObject::connect(ui->deleteUserBtn, SIGNAL(clicked()),
-                     this, SLOT(deleteUserBtnClicked()));
-    QObject::connect(ui->deleteUserBtn,SIGNAL(clicked()),this,SLOT(deleteUser()));// удаление пользователя
-    QObject::connect(ui->editPassword,SIGNAL( textChanged(const QString&)),this,SLOT(activAddBtn(const QString &)));// активировать кнопку добавить
-    QObject::connect(ui->addBtn,SIGNAL(clicked()),this,SLOT(addUser()));// добавление пользователя
-    QObject::connect(ui->editNewPassword,SIGNAL( textChanged(const QString&)),this,SLOT(activChangeBtn(const QString &)));//активировать кнопку изменить
-    QObject::connect(ui->changeBtn,SIGNAL(clicked()),this,SLOT(changePassword()));// изменить пароль пользователя
+                     this, SLOT(deleteUserBtnClicked()));// удаление пользователя
+    QObject::connect(ui->editPassword, SIGNAL(textChanged(const QString&)), this, SLOT(editPasswordChanged(const QString&)));// активировать кнопку добавить
+    QObject::connect(ui->editUsername, SIGNAL(textChanged(const QString&)), this, SLOT(editLoginChanged(const QString&)));// активировать кнопку добавить
+    QObject::connect(ui->addBtn, SIGNAL(clicked()), this, SLOT(addBtnClicked()));// добавление пользователя
+    QObject::connect(ui->editNewPassword, SIGNAL(textChanged(const QString&)), this, SLOT(editNewPasswordChanged(const QString &)));//активировать кнопку изменить
+    QObject::connect(ui->newPassBtn, SIGNAL(clicked()), this, SLOT(newPassBtnClicked()));// изменить пароль пользователя
+    QObject::connect(ui->comboBox, SIGNAL(currentTextChanged(const QString&)),
+                     this, SLOT(comboBoxChanged(const QString&)));
 
     ui->tab_queue->setLayout(ui->layout_queue);
     ui->tab_userInfo->setLayout(ui->layout_userInfo);
@@ -110,6 +116,7 @@ void Admin::deleteTask()
     unsigned taskId;
     int curRow;
 
+    ui->deleteBtn->setEnabled(false);
     curRow = ui->tableTasks->currentRow();
     taskId = (unsigned)ui->tableTasks->item(curRow, 0)->text().toInt();
     ui->tableTasks->removeRow(curRow);
@@ -320,6 +327,124 @@ void Admin::deleteUserBtnClicked()
     ui->deleteBtn->setEnabled(false);
 }
 // ------------------------------------------------------------------
+void Admin::editPasswordChanged(const QString &text)
+{
+    if (text.size() > 19)
+    {
+        ui->addBtn->setEnabled(false);
+        ui->errorAddUser_label->setText("Длина пароля превышает\n19 символов!");
+        return;
+    }
+    else if (ui->editUsername->text().size() > 19)
+    {
+        ui->addBtn->setEnabled(false);
+        ui->errorAddUser_label->setText("Длина имени превышает\n19 символов!");
+        return;
+    }
+    else
+        ui->errorAddUser_label->setText("");
+    for (auto userInfo : m_usersInfo)
+        if (userInfo[0] == ui->editUsername->text())
+        {
+            ui->addBtn->setEnabled(false);
+            ui->errorAddUser_label->setText("Имя " + ui->editUsername->text()
+                                            + " уже существует!");
+            return;
+        }
+    if (!text.isEmpty() && !ui->editUsername->text().isEmpty())
+        ui->addBtn->setEnabled(true);
+    if (text.isEmpty())
+        ui->addBtn->setEnabled(false);
+}
+// ------------------------------------------------------------------
+void Admin::editLoginChanged(const QString &text)
+{
+    if (text.size() > 19)
+    {
+        ui->addBtn->setEnabled(false);
+        ui->errorAddUser_label->setText("Длина имени превышает\n19 символов!");
+        return;
+    }
+    else if (ui->editPassword->text().size() > 19)
+    {
+        ui->addBtn->setEnabled(false);
+        ui->errorAddUser_label->setText("Длина пароля превышает\n19 символов!");
+        return;
+    }
+    else
+        ui->errorAddUser_label->setText("");
+    for (auto userInfo : m_usersInfo)
+        if (userInfo[0] == text)
+        {
+            ui->addBtn->setEnabled(false);
+            ui->errorAddUser_label->setText("Имя " + text + " уже существует!");
+            return;
+        }
+    if (!text.isEmpty() && !ui->editPassword->text().isEmpty())
+        ui->addBtn->setEnabled(true);
+    if (text.isEmpty())
+        ui->addBtn->setEnabled(false);
+}
+
+void Admin::addBtnClicked()
+{
+    LoginHeader loginHdr;
+    char        userName[20];
+    char        password[20];
+
+    strcpy(userName, ui->editUsername->text().toStdString().c_str());
+    strcpy(password, ui->editPassword->text().toStdString().c_str());
+    ui->editUsername->setText("");
+    ui->editPassword->setText("");
+    ui->addBtn->setEnabled(false);
+    loginHdr.setData(userName, password);
+    slotSendDataToServer(ADD_NEW_USER, 1, (char*)&loginHdr, sizeof(LoginHeader));
+}
+
+void Admin::editNewPasswordChanged(const QString &text)
+{
+    if (text.size() > 19)
+    {
+        ui->newPassBtn->setEnabled(false);
+        ui->errorNewPass_label->setText("Длина пароля превышает\n19 символов!");
+        return;
+    }
+    else
+        ui->errorNewPass_label->setText("");
+    if (text.isEmpty())
+    {
+        ui->newPassBtn->setEnabled(false);
+        return;
+    }
+    ui->newPassBtn->setEnabled(true);
+}
+
+void Admin::comboBoxChanged(const QString &text)
+{
+    if (text == "-Выберите пользователя-")
+    {
+        ui->editNewPassword->setEnabled(false);
+        ui->editNewPassword->clear();
+    }
+    else
+        ui->editNewPassword->setEnabled(true);
+}
+// ------------------------------------------------------------------
+void Admin::newPassBtnClicked()
+{
+    LoginHeader loginHdr;
+    char        userName[20];
+    char        password[20];
+
+    strcpy(userName, ui->comboBox->currentText().toStdString().c_str());
+    strcpy(password, ui->editNewPassword->text().toStdString().c_str());
+    ui->comboBox->setCurrentIndex(0);
+    ui->editNewPassword->setText("");
+    ui->newPassBtn->setEnabled(false);
+    loginHdr.setData(userName, password);
+    slotSendDataToServer(CHANGE_PASSWORD, 1, (char*)&loginHdr, sizeof(LoginHeader));
+}
+// ------------------------------------------------------------------
 void Admin::deleteUserBtnEnabled()
 {
     ui->deleteUserBtn->setEnabled(true);
@@ -333,13 +458,12 @@ void Admin::setOnlineUsers(QStringList users)
 // ------------------------------------------------------------------
 void Admin::fillUserInfoTable(QList<QVector<QString>> list)
 {
+    m_usersInfo = list;
+    ui->deleteUserBtn->setEnabled(false);
     int rowCount = ui->usersInfoTable->rowCount();
-    //заполнение таблицы
     for (int i = 0; i < rowCount; i++)
-    {
-        ui->usersInfoTable->removeRow(i);
-    qDebug() << i;
-    }
+        ui->usersInfoTable->removeRow(0);
+    //заполнение таблицы
     for (int i = 0; i < list.size(); ++i)
     {
         ui->usersInfoTable->insertRow(i);
@@ -354,8 +478,10 @@ void Admin::fillUserInfoTable(QList<QVector<QString>> list)
 // ------------------------------------------------------------------
 void Admin::fillUserNamesCmbBox(QList<QVector<QString>> list)
 {
+    ui->comboBox->clear();
+    ui->comboBox->addItem("-Выберите пользователя-");
     for(int i = 0; i < list.size(); ++i)
-        ui->comboBox->addItem(list[i].at(0));
+        ui->comboBox->addItem(list[i][0]);
 }
 // ------------------------------------------------------------------
 Admin::~Admin()

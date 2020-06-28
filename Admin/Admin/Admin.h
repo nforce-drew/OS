@@ -54,6 +54,12 @@ private slots:
                                                                           //то присвоить data = NULL и len = 0
     void deleteUserBtnEnabled();
     void deleteUserBtnClicked();
+    void editPasswordChanged(const QString &text);
+    void editLoginChanged(const QString &text);
+    void addBtnClicked();
+    void editNewPasswordChanged(const QString &text);
+    void comboBoxChanged(const QString &text);
+    void newPassBtnClicked();
 };
 
 #endif // ADMIN_H

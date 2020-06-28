@@ -21,6 +21,8 @@ enum TYPE
     LOGIN_ALREADY_EXISTS,
     USERS_INFO,
     DELETE_USER,
+    ADD_NEW_USER,
+    CHANGE_PASSWORD,
     OTHER
 };
 //=================================================================================

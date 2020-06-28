@@ -549,11 +549,39 @@ list<LoginHeader>       getUsersInfo(list<LoginHeader> &usersInfoList)
 
 void            deleteUser(string userName)
 {
-    string                  query;
-    sqlite3*                db;
+    string      query;
+    sqlite3*    db;
 
     query = "DELETE FROM users_info " \
             "WHERE user_name == '" + userName + "';";
+    std::cout << query << std::endl;
+    db = connectDB((char*)DB_PATH);
+    sqlite3_exec(db, query.c_str(), NULL, NULL, NULL);
+    sqlite3_close(db);
+}
+
+void            addNewUser(LoginHeader userInfo)
+{
+    string      query;
+    sqlite3*    db;
+
+    query = "INSERT INTO users_info(user_name, user_password) " \
+            "VALUES('" + std::string(userInfo.getUserName()) + "', '"
+                + std::string(userInfo.getUserPassword()) + "');";
+    std::cout << query << std::endl;
+    db = connectDB((char*)DB_PATH);
+    sqlite3_exec(db, query.c_str(), NULL, NULL, NULL);
+    sqlite3_close(db);
+}
+
+void            changePassword(LoginHeader userInfo)
+{
+    string      query;
+    sqlite3*    db;
+
+    query = "UPDATE users_info " \
+            "SET user_password = '" + std::string(userInfo.getUserName()) + "' " \
+            "WHERE user_name == '" + std::string(userInfo.getUserPassword()) + "';";
     std::cout << query << std::endl;
     db = connectDB((char*)DB_PATH);
     sqlite3_exec(db, query.c_str(), NULL, NULL, NULL);

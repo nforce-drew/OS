@@ -236,7 +236,8 @@ int recvAll(int sock, char *strData, TYPE &dataType, void* data)
         cout << "2 queue->size(): " << queue->size() << endl;;
         data = (void*)queue;
     }
-    if (dataType == RECONNECT || dataType == DELETE_USER)
+    if (dataType == RECONNECT || dataType == DELETE_USER
+        || dataType == ADD_NEW_USER || dataType == CHANGE_PASSWORD)
     {
         curByte = sizeof(MainHeader);
         memcpy(buf, buf + curByte, totalBytes - sizeof(MainHeader));
@@ -251,7 +252,7 @@ int recvAll(int sock, char *strData, TYPE &dataType, void* data)
             }
             totalBytes += (int)readBytes;
         }
-        memcpy(strData, buf, 20);
+        memcpy(strData, buf, BUF_SIZE);
         // userName->copy(buf, mainHeader.getMsgSize() - sizeof(MainHeader) - 1);
     }
     if (dataType == GET_SOLUTION || dataType == CANCEL_TASK)
