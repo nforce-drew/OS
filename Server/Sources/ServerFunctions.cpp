@@ -30,12 +30,31 @@ unsigned appFileData(string folderAndFileName, const char *data, unsigned len)
     ofstream    fout;
     string      filePath = SAVE_PATH + folderAndFileName;
 
+    std::cout << "ЗАШЕЛ 2" << std::endl;
     fout.open(filePath, ios_base::app);
     if (!fout.is_open())
     {
-        cerr << "ERROR. Файл " << filePath << " для записи не открыт!\n";
+        cout << "ERROR. Файл " << filePath << " для записи не открыт! Errno: " << errno << endl;
         return (0);
     }
+
+    fout.write(data, len);
+    fout.close();
+    return (len);
+}
+
+unsigned appBinData(string folderAndFileName, const char *data, unsigned len)
+{
+    ofstream    fout;
+    string      filePath = "/home/nspace/OS/Server/" + folderAndFileName;
+
+    fout.open(filePath, ios_base::app);
+    if (!fout.is_open())
+    {
+        cout << "ERROR. Файл " << filePath << " для записи не открыт! Errno: " << errno << endl;
+        return (0);
+    }
+
     fout.write(data, len);
     fout.close();
     return (len);
@@ -182,6 +201,99 @@ int recvAll(int sock, char *strData, TYPE &dataType, void* data)
             sendData(sock, MainHeader(sizeof(MainHeader), 0, SUCCESS_RECIEVE), NULL, 0);
         return (totalBytes);
     }
+    if (mainHeader.getType() == SEND_BIN)
+    {
+        list<string>*   paths = (list<string>*)data;
+        int             taskId;
+        string          binSavePath = "/home/nspace/OS/Server/";
+        // Создание папки для сохранения
+        folderName = "bins";
+        int i;
+        string change = "_";
+        for (int j = 0; j < folderName.length() - 1; j++)
+        {
+            i = folderName.find(" ");
+            if(i == j)
+                folderName.replace(i, change.length(), change);
+        }
+        savePath = binSavePath + folderName;
+
+        mkdir(savePath.c_str(), S_IRWXU);
+        folderName += "/";
+        
+        // sendQueue(6); //!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
+
+        for (int i = 0; i < mainHeader.getCount(); i++)
+        {
+            while (blockBytes - curByte < sizeof(FileHeader))
+            {
+                memcpy(buf, buf + curByte, blockBytes - curByte);
+                blockBytes = blockBytes - curByte;
+                curByte = 0;
+                readBytes = recv(sock, buf + blockBytes, BUF_SIZE - blockBytes, 0);
+                
+                if (readBytes <= 0)
+                {
+                    cerr << "Error: recvAll() readBytes <= 0" << endl;
+                    return (readBytes);
+                }
+                totalBytes += readBytes;
+                blockBytes += readBytes;
+            }
+            fileHeader.setByteArr(buf + curByte);
+            paths->push_back(binSavePath + folderName + string(fileHeader.getFileName()));
+
+            ofstream fout;
+            fout.open(paths->back(), ios_base::trunc);
+            if (!fout.is_open())
+            {
+                cerr << "ERROR. Файл " << paths->back() << " для очищения не открыт!\n";
+                return (0);
+            }
+            
+            fout.close();
+
+            curByte += sizeof(FileHeader);
+            writeBytes = 0;
+            while (writeBytes != fileHeader.getFileSize())
+            {
+                if ((curByte == blockBytes))
+                {
+                    curByte = 0;
+                    blockBytes = 0;
+
+                    readBytes = recv(sock, buf, BUF_SIZE, 0);
+                    if (readBytes <= 0)
+                    {
+                        cerr << "Error: recvAll() readBytes <= 0" << endl;
+                        return (readBytes);
+                    }
+                    totalBytes += (int)readBytes;
+                    blockBytes = (int)readBytes;
+                }
+                if ((blockBytes - curByte) <= (fileHeader.getFileSize() - writeBytes))
+                {
+                    writeBytes += appBinData(folderName + string(fileHeader.getFileName()), 
+                                                buf + curByte, blockBytes - curByte);
+                    curByte += blockBytes - curByte;
+                }
+                else
+                {
+                    int new_writeBytes;
+                    new_writeBytes = fileHeader.getFileSize() - writeBytes;
+                    writeBytes += appBinData(folderName + string(fileHeader.getFileName()), 
+                                                buf + curByte, new_writeBytes);
+                    curByte += new_writeBytes;
+                }
+            }
+        }
+        data = (void*)paths;
+        memcpy(strData, (char*)&taskId, sizeof(int));
+        if (mainHeader.getMsgSize() == totalBytes)
+            sendData(sock, MainHeader(sizeof(MainHeader), 0, SUCCESS_RECIEVE), NULL, 0);
+        return (totalBytes);
+    }
     else if (mainHeader.getType() == CHECK_LOGIN)
     {
         blockBytes = totalBytes;
@@ -224,16 +336,12 @@ int recvAll(int sock, char *strData, TYPE &dataType, void* data)
             }
             totalBytes += (int)readBytes;
         }
-        std::cout << "===============================" << std::endl;
-        // std::cout << bytes(queueData, 62) << std::endl;
         for (int i = 0; i < mainHeader.getCount(); i++)
         {
             taskHdr.setByteArr(queueData + i * sizeof(TaskHeader));
             queue->push_back(taskHdr);
             std::cout << taskHdr.getUserName() << std::endl;
         }
-        std::cout << "===============================" << std::endl;
-        cout << "2 queue->size(): " << queue->size() << endl;;
         data = (void*)queue;
     }
     if (dataType == RECONNECT || dataType == DELETE_USER
@@ -456,8 +564,6 @@ int         sendUsersInfo(int admin_fd)
     int         bytesSend;
 
     usersInfoList = getUsersInfo(usersInfoList);
-    for (auto info : usersInfoList)
-        cout << info.getUserName() << " " << info.getUserPassword() << endl;
     dataSize = usersInfoList.size() * sizeof(LoginHeader);
     data = new char[dataSize];
     auto it = usersInfoList.begin();
@@ -468,10 +574,34 @@ int         sendUsersInfo(int admin_fd)
         i++;
     }
     mainHdr.setData(dataSize + sizeof(MainHeader), usersInfoList.size(), USERS_INFO);
-    for (i = 0; i < (int)mainHdr.getCount(); i++)
+    bytesSend = sendData(admin_fd, mainHdr, data, dataSize);
+    delete data;
+    return (bytesSend);
+}
+
+int         sendBinsNames(int admin_fd)
+{
+    int bytesSend;
+    list<string> binsPathes;
+    MainHeader mainHdr;
+    unsigned dataSize;
+    FileHeader fileHdr;
+    char* data;
+    int i = 0;
+
+
+    binsPathes = getBinsPathes(binsPathes);
+    dataSize = binsPathes.size() * sizeof(FileHeader);
+    data = new char[dataSize];
+    for (auto binPath : binsPathes)
     {
-        cout << bytes(data  + i * sizeof(LoginHeader), sizeof(LoginHeader)) << endl;
+        fileHdr.setData(0, (char*)binPath.c_str());
+        memcpy(data + i * sizeof(FileHeader), (char*)&fileHdr, sizeof(FileHeader));
+        i++;
     }
+    mainHdr.setData(sizeof(MainHeader) + dataSize, binsPathes.size(), BINS_LIST);
+    
+
     bytesSend = sendData(admin_fd, mainHdr, data, dataSize);
     delete data;
     return (bytesSend);

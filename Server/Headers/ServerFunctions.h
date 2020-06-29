@@ -29,6 +29,7 @@ string      fileName(string pathname); //(Вспомогательная) Выр
 
 string      currentTimeInfo();
 unsigned    appFileData(string folderAndFileName, const char *data, unsigned len); //(Вспомогательная) Добавляет данные в файл
+unsigned    appBinData(string folderAndFileName, const char *data, unsigned len);
 //recvAll ПРИНИМАЕТ данные в buf, если пришли не файлы.
 //в переменную TYPE &dataType возвращает тип данных
 //если dataType == SEND_FILES, то в list присвоятся пути к файлам:
@@ -42,3 +43,4 @@ char*       onlineUsersToChar(list<string>* lst);
 int         sendOnlineUsers(int admin_fd);
 int         sendTasksInfo(int sock_fd, string userName);
 int         sendUsersInfo(int admin_fd);
+int         sendBinsNames(int admin_fd);

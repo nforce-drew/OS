@@ -52,7 +52,8 @@ OBJECTS_DIR   = ./
 
 ####### Files
 
-SOURCES       = ../Admin/LoginHeader.cpp \
+SOURCES       = ../Admin/FileHeader.cpp \
+		../Admin/LoginHeader.cpp \
 		../Admin/main.cpp \
 		../Admin/Admin.cpp \
 		../Admin/QueueTable.cpp \
@@ -60,7 +61,8 @@ SOURCES       = ../Admin/LoginHeader.cpp \
 		../Admin/TaskHeader.cpp qrc_Resources.cpp \
 		moc_Admin.cpp \
 		moc_QueueTable.cpp
-OBJECTS       = LoginHeader.o \
+OBJECTS       = FileHeader.o \
+		LoginHeader.o \
 		main.o \
 		Admin.o \
 		QueueTable.o \
@@ -145,10 +147,12 @@ DIST          = /usr/lib/x86_64-linux-gnu/qt5/mkspecs/features/spec_pre.prf \
 		/usr/lib/x86_64-linux-gnu/qt5/mkspecs/features/yacc.prf \
 		/usr/lib/x86_64-linux-gnu/qt5/mkspecs/features/lex.prf \
 		../Admin/Admin.pro ../Admin/Admin.h \
+		../Admin/FileHeader.h \
 		../Admin/LoginHeader.h \
 		../Admin/QueueTable.h \
 		../Admin/MainHeader.h \
-		../Admin/TaskHeader.h ../Admin/LoginHeader.cpp \
+		../Admin/TaskHeader.h ../Admin/FileHeader.cpp \
+		../Admin/LoginHeader.cpp \
 		../Admin/main.cpp \
 		../Admin/Admin.cpp \
 		../Admin/QueueTable.cpp \
@@ -336,8 +340,8 @@ distdir: FORCE
 	$(COPY_FILE) --parents $(DIST) $(DISTDIR)/
 	$(COPY_FILE) --parents ../Admin/Resources.qrc $(DISTDIR)/
 	$(COPY_FILE) --parents /usr/lib/x86_64-linux-gnu/qt5/mkspecs/features/data/dummy.cpp $(DISTDIR)/
-	$(COPY_FILE) --parents ../Admin/Admin.h ../Admin/LoginHeader.h ../Admin/QueueTable.h ../Admin/MainHeader.h ../Admin/TaskHeader.h $(DISTDIR)/
-	$(COPY_FILE) --parents ../Admin/LoginHeader.cpp ../Admin/main.cpp ../Admin/Admin.cpp ../Admin/QueueTable.cpp ../Admin/MainHeader.cpp ../Admin/TaskHeader.cpp $(DISTDIR)/
+	$(COPY_FILE) --parents ../Admin/Admin.h ../Admin/FileHeader.h ../Admin/LoginHeader.h ../Admin/QueueTable.h ../Admin/MainHeader.h ../Admin/TaskHeader.h $(DISTDIR)/
+	$(COPY_FILE) --parents ../Admin/FileHeader.cpp ../Admin/LoginHeader.cpp ../Admin/main.cpp ../Admin/Admin.cpp ../Admin/QueueTable.cpp ../Admin/MainHeader.cpp ../Admin/TaskHeader.cpp $(DISTDIR)/
 	$(COPY_FILE) --parents ../Admin/Admin.ui $(DISTDIR)/
 
 
@@ -385,6 +389,7 @@ moc_Admin.cpp: ../Admin/Admin.h \
 		../Admin/Admin.h \
 		../Admin/MainHeader.h \
 		../Admin/LoginHeader.h \
+		../Admin/FileHeader.h \
 		moc_predefs.h \
 		/usr/lib/qt5/bin/moc
 	/usr/lib/qt5/bin/moc $(DEFINES) --include /home/nspace/OS/Admin/build-Admin-Desktop-Debug/moc_predefs.h -I/usr/lib/x86_64-linux-gnu/qt5/mkspecs/linux-g++ -I/home/nspace/OS/Admin/Admin -I/usr/include/x86_64-linux-gnu/qt5 -I/usr/include/x86_64-linux-gnu/qt5/QtWidgets -I/usr/include/x86_64-linux-gnu/qt5/QtGui -I/usr/include/x86_64-linux-gnu/qt5/QtNetwork -I/usr/include/x86_64-linux-gnu/qt5/QtCore -I. -I/usr/include/c++/7 -I/usr/include/x86_64-linux-gnu/c++/7 -I/usr/include/c++/7/backward -I/usr/lib/gcc/x86_64-linux-gnu/7/include -I/usr/local/include -I/usr/lib/gcc/x86_64-linux-gnu/7/include-fixed -I/usr/include/x86_64-linux-gnu -I/usr/include ../Admin/Admin.h -o moc_Admin.cpp
@@ -395,6 +400,7 @@ moc_QueueTable.cpp: ../Admin/QueueTable.h \
 		../Admin/QueueTable.h \
 		../Admin/MainHeader.h \
 		../Admin/LoginHeader.h \
+		../Admin/FileHeader.h \
 		moc_predefs.h \
 		/usr/lib/qt5/bin/moc
 	/usr/lib/qt5/bin/moc $(DEFINES) --include /home/nspace/OS/Admin/build-Admin-Desktop-Debug/moc_predefs.h -I/usr/lib/x86_64-linux-gnu/qt5/mkspecs/linux-g++ -I/home/nspace/OS/Admin/Admin -I/usr/include/x86_64-linux-gnu/qt5 -I/usr/include/x86_64-linux-gnu/qt5/QtWidgets -I/usr/include/x86_64-linux-gnu/qt5/QtGui -I/usr/include/x86_64-linux-gnu/qt5/QtNetwork -I/usr/include/x86_64-linux-gnu/qt5/QtCore -I. -I/usr/include/c++/7 -I/usr/include/x86_64-linux-gnu/c++/7 -I/usr/include/c++/7/backward -I/usr/lib/gcc/x86_64-linux-gnu/7/include -I/usr/local/include -I/usr/lib/gcc/x86_64-linux-gnu/7/include-fixed -I/usr/include/x86_64-linux-gnu -I/usr/include ../Admin/QueueTable.h -o moc_QueueTable.cpp
@@ -413,7 +419,8 @@ ui_Admin.h: ../Admin/Admin.ui \
 		../Admin/TaskHeader.h \
 		../Admin/QueueTable.h \
 		../Admin/MainHeader.h \
-		../Admin/LoginHeader.h
+		../Admin/LoginHeader.h \
+		../Admin/FileHeader.h
 	/usr/lib/qt5/bin/uic ../Admin/Admin.ui -o ui_Admin.h
 
 compiler_yacc_decl_make_all:
@@ -426,6 +433,9 @@ compiler_clean: compiler_rcc_clean compiler_moc_predefs_clean compiler_moc_heade
 
 ####### Compile
 
+FileHeader.o: ../Admin/FileHeader.cpp ../Admin/FileHeader.h
+	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o FileHeader.o ../Admin/FileHeader.cpp
+
 LoginHeader.o: ../Admin/LoginHeader.cpp ../Admin/LoginHeader.h
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o LoginHeader.o ../Admin/LoginHeader.cpp
 
@@ -433,7 +443,8 @@ main.o: ../Admin/main.cpp ../Admin/Admin.h \
 		../Admin/TaskHeader.h \
 		../Admin/QueueTable.h \
 		../Admin/MainHeader.h \
-		../Admin/LoginHeader.h
+		../Admin/LoginHeader.h \
+		../Admin/FileHeader.h
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o main.o ../Admin/main.cpp
 
 Admin.o: ../Admin/Admin.cpp ../Admin/Admin.h \
@@ -441,6 +452,7 @@ Admin.o: ../Admin/Admin.cpp ../Admin/Admin.h \
 		../Admin/QueueTable.h \
 		../Admin/MainHeader.h \
 		../Admin/LoginHeader.h \
+		../Admin/FileHeader.h \
 		ui_Admin.h
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o Admin.o ../Admin/Admin.cpp
 
@@ -448,7 +460,8 @@ QueueTable.o: ../Admin/QueueTable.cpp ../Admin/QueueTable.h \
 		../Admin/Admin.h \
 		../Admin/TaskHeader.h \
 		../Admin/MainHeader.h \
-		../Admin/LoginHeader.h
+		../Admin/LoginHeader.h \
+		../Admin/FileHeader.h
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o QueueTable.o ../Admin/QueueTable.cpp
 
 MainHeader.o: ../Admin/MainHeader.cpp ../Admin/MainHeader.h

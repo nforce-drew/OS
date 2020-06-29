@@ -5,11 +5,13 @@
 #include "QueueTable.h"
 #include "MainHeader.h"
 #include "LoginHeader.h"
+#include "FileHeader.h"
 #include <QMainWindow>
 #include <QList>
 #include <QDebug>
 #include <QTcpSocket>
 #include <QTableWidgetItem>
+#include <QFileDialog>
 
 namespace Ui {
 class Admin;
@@ -30,6 +32,7 @@ private:
     int             m_nPort;
     bool            m_lastStatus;
     QList<QVector<QString>> m_usersInfo;
+    QString         m_newBin;
 signals:
     void reconnect();
 private:
@@ -37,6 +40,7 @@ private:
     void    setOnlineUsers(QStringList users);
     void    fillUserInfoTable(QList<QVector<QString>> list);
     void    fillUserNamesCmbBox(QList<QVector<QString>> list);
+    void    fillBinsList(QStringList binsNames);
 
 private slots:
 //    void    slotQueueChanged();
@@ -49,6 +53,7 @@ private slots:
     void slotError(QAbstractSocket::SocketError err);   //Ошибка подключения с сервером
     void slotConnected();
     void slotSendMainHdrToServer(TYPE dataType, unsigned num);
+    void slotSendBinToServer();
     void slotSendDataToServer(TYPE dataType, unsigned count, char* data, unsigned len); //Отправка данных или запроса
                                                                          // если дополнительные данные не передаются,
                                                                           //то присвоить data = NULL и len = 0
@@ -60,6 +65,8 @@ private slots:
     void editNewPasswordChanged(const QString &text);
     void comboBoxChanged(const QString &text);
     void newPassBtnClicked();
+
+    void addBinBtnClicked();
 };
 
 #endif // ADMIN_H

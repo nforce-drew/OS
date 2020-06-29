@@ -587,6 +587,39 @@ void            changePassword(LoginHeader userInfo)
     sqlite3_exec(db, query.c_str(), NULL, NULL, NULL);
     sqlite3_close(db);
 }
+
+list<string>    getBinsPathes(list<string> &binsPathes)
+{
+    vector<vector<string>>* res;
+    string                  query;
+    sqlite3*                db;
+    void*                   data;
+
+    binsPathes.clear();
+    res = new vector<vector<string>>;
+    data = (void*)res;
+    query = "SELECT bin_path FROM bins ORDER BY bin_path;";
+    db = connectDB((char*)DB_PATH);
+    sqlite3_exec(db, query.c_str(), callback_result, data, NULL);
+    sqlite3_close(db);
+    for (auto binPath : *res)
+        binsPathes.push_back(binPath[0]);
+    delete (res);
+
+    return (binsPathes);
+}
+
+void            addNewBin(string binPath)
+{
+    string      query;
+    sqlite3*    db;
+
+    query = "INSERT INTO bins(bin_path) VALUES('" + binPath + "');";
+    std::cout << query << std::endl;
+    db = connectDB((char*)DB_PATH);
+    sqlite3_exec(db, query.c_str(), NULL, NULL, NULL);
+    sqlite3_close(db);
+}
 // bool            isSolverFree()
 // {
 //     vector<vector<string>>* res;

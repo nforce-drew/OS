@@ -40,6 +40,8 @@ void            cancelQueueTask(int taskId);
 void            deleteUser(string userName);
 void            addNewUser(LoginHeader userInfo);
 void            changePassword(LoginHeader userInfo);
+list<string>    getBinsPathes(list<string> &binsPathes);
+void            addNewBin(string binPath);
 
 list<LoginHeader>       getUsersInfo(list<LoginHeader> &usersInfoList);
 list<TaskStateHeader>   &getTasksInfo(string userName, list<TaskStateHeader>& tasksList);

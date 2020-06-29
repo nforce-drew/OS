@@ -29,6 +29,7 @@ using namespace std;
 
 int     admin_fd;
 bool    isSolverFree;
+string  binPath;
 
 void solver()
 {
@@ -103,8 +104,7 @@ void solver()
             fout_solution.write(savePath.c_str(), savePath.size());
             fout_solution.close();
         }
-        string binPath = "/home/nspace/OS/Server";
-        string binName = "filesToZip.out";
+        string binName = fileName(binPath);
         string command = "cd " + binPath + "; ./" + binName + " " 
                             + taskInfoPath + " " + solutionInfoPath;
         system(command.c_str());
@@ -114,8 +114,15 @@ void solver()
             cout << "File BinInfo.txt opening error. Errno: " << errno << endl;
         else
         {
-            command = "ps | grep \" " + binName + "$\" > " + "BinInfoPath.txt";
-            system(command.c_str());
+            string res = "1";
+            while (res != "")
+            {
+                command = "ps | grep \" " + binName + "$\" > " + "BinInfoPath.txt";
+                system(command.c_str());
+                std::getline(fin_binInfo, res);
+                fin_binInfo.seekg(0);
+            }
+
             fin_binInfo.close();
         }
     }
@@ -319,15 +326,22 @@ int main(const int argc, const char** argv)
                         std::cout << "\t\t tsk id: " << taskId << std::endl;
                         addTaskPathes(taskId, *lst);
                         sendTasksInfo(*it, getUserName(*it));
+                        binPath = "/home/nspace/OS/Server/filesToZip.out";
                         if (isSolverFree)
                         {
-                            
                             this_thread::sleep_for(chrono::milliseconds(100));
                             solverTh = thread(solver);
                             solverTh.detach();
                         }
-                        // for (auto el : *lst)
-                        //     cout << "\t\t" << el << endl;
+                        delete lst;
+                        break;        
+                    }
+                    case SEND_BIN:
+                    {
+                        cout << "\t-> SEND_BIN - count files: " << lst->size() << endl;
+                        binPath = "/home/nspace/OS/Server/filesToZip.out";
+                        addNewBin(*(lst->begin()));
+                        sendBinsNames(admin_fd);
                         delete lst;
                         break;        
                     }
@@ -352,6 +366,7 @@ int main(const int argc, const char** argv)
                         sendQueue(admin_fd);                      
                         sendOnlineUsers(admin_fd);
                         sendUsersInfo(admin_fd);
+                        sendBinsNames(admin_fd);
                         break;
                     }
                     case RECONNECT:

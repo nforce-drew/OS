@@ -23,6 +23,8 @@ enum TYPE
     DELETE_USER,
     ADD_NEW_USER,
     CHANGE_PASSWORD,
+    SEND_BIN,
+    BINS_LIST,
     OTHER
 };
 //=================================================================================

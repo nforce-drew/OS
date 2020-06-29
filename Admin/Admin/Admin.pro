@@ -25,6 +25,7 @@ DEFINES += QT_DEPRECATED_WARNINGS
 
 
 SOURCES += \
+    FileHeader.cpp \
     LoginHeader.cpp \
         main.cpp \
         Admin.cpp \
@@ -34,6 +35,7 @@ SOURCES += \
 
 HEADERS += \
         Admin.h \
+    FileHeader.h \
     LoginHeader.h \
     QueueTable.h \
     MainHeader.h \

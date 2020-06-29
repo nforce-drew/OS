@@ -65,7 +65,6 @@ public:
     QHBoxLayout *horizontalLayout_2;
     QLabel *errorAddUser_label;
     QPushButton *addBtn;
-    QSpacerItem *verticalSpacer;
     QVBoxLayout *verticalLayout;
     QLabel *label_2;
     QComboBox *comboBox;
@@ -75,6 +74,12 @@ public:
     QLabel *errorNewPass_label;
     QPushButton *newPassBtn;
     QSpacerItem *verticalSpacer_2;
+    QVBoxLayout *verticalLayout_3;
+    QLabel *label_5;
+    QListWidget *binList;
+    QHBoxLayout *horizontalLayout_5;
+    QSpacerItem *horizontalSpacer_2;
+    QPushButton *addBinBtn;
     QLabel *statusBar;
 
     void setupUi(QMainWindow *Admin)
@@ -265,20 +270,13 @@ public:
 
         verticalLayout_2->addLayout(horizontalLayout_2);
 
-        verticalSpacer = new QSpacerItem(20, 40, QSizePolicy::Minimum, QSizePolicy::Expanding);
-
-        verticalLayout_2->addItem(verticalSpacer);
-
-
-        layout_userInfo->addLayout(verticalLayout_2);
-
         verticalLayout = new QVBoxLayout();
         verticalLayout->setSpacing(6);
         verticalLayout->setObjectName(QString::fromUtf8("verticalLayout"));
-        verticalLayout->setContentsMargins(5, -1, 10, -1);
+        verticalLayout->setContentsMargins(0, -1, 0, -1);
         label_2 = new QLabel(layoutWidget2);
         label_2->setObjectName(QString::fromUtf8("label_2"));
-        label_2->setMinimumSize(QSize(0, 44));
+        label_2->setMinimumSize(QSize(0, 0));
         label_2->setFont(font5);
         label_2->setAlignment(Qt::AlignLeading|Qt::AlignLeft|Qt::AlignTop);
 
@@ -325,7 +323,42 @@ public:
         verticalLayout->addItem(verticalSpacer_2);
 
 
-        layout_userInfo->addLayout(verticalLayout);
+        verticalLayout_2->addLayout(verticalLayout);
+
+
+        layout_userInfo->addLayout(verticalLayout_2);
+
+        verticalLayout_3 = new QVBoxLayout();
+        verticalLayout_3->setSpacing(6);
+        verticalLayout_3->setObjectName(QString::fromUtf8("verticalLayout_3"));
+        label_5 = new QLabel(layoutWidget2);
+        label_5->setObjectName(QString::fromUtf8("label_5"));
+        label_5->setFont(font5);
+
+        verticalLayout_3->addWidget(label_5);
+
+        binList = new QListWidget(layoutWidget2);
+        binList->setObjectName(QString::fromUtf8("binList"));
+
+        verticalLayout_3->addWidget(binList);
+
+        horizontalLayout_5 = new QHBoxLayout();
+        horizontalLayout_5->setSpacing(6);
+        horizontalLayout_5->setObjectName(QString::fromUtf8("horizontalLayout_5"));
+        horizontalSpacer_2 = new QSpacerItem(40, 20, QSizePolicy::Expanding, QSizePolicy::Minimum);
+
+        horizontalLayout_5->addItem(horizontalSpacer_2);
+
+        addBinBtn = new QPushButton(layoutWidget2);
+        addBinBtn->setObjectName(QString::fromUtf8("addBinBtn"));
+
+        horizontalLayout_5->addWidget(addBinBtn);
+
+
+        verticalLayout_3->addLayout(horizontalLayout_5);
+
+
+        layout_userInfo->addLayout(verticalLayout_3);
 
         tabWidget->addTab(tab_userInfo, QString());
 
@@ -365,6 +398,8 @@ public:
         label_4->setText(QApplication::translate("Admin", "\320\235\320\276\320\262\321\213\320\271 \320\277\320\260\321\200\320\276\320\273\321\214", nullptr));
         errorNewPass_label->setText(QString());
         newPassBtn->setText(QApplication::translate("Admin", "\320\230\320\267\320\274\320\265\320\275\320\270\321\202\321\214", nullptr));
+        label_5->setText(QApplication::translate("Admin", "\320\241\320\277\320\270\321\201\320\276\320\272 \320\261\320\270\320\275\320\260\321\200\320\275\320\270\320\272\320\276\320\262", nullptr));
+        addBinBtn->setText(QApplication::translate("Admin", "\320\224\320\276\320\261\320\260\320\262\320\270\321\202\321\214", nullptr));
         tabWidget->setTabText(tabWidget->indexOf(tab_userInfo), QApplication::translate("Admin", "\320\237\320\276\320\273\321\214\320\267\320\276\320\262\320\260\321\202\320\265\320\273\320\270", nullptr));
         statusBar->setText(QApplication::translate("Admin", "Status Bar", nullptr));
     } // retranslateUi
