@@ -38,7 +38,6 @@ MyClient::MyClient(const QString& strHost, int nPort, QWidget *pwgt/*=0*/) :
     connect(ui->dropArea, SIGNAL(dropped(QStringList)), this, SLOT(slotDroppedFiles(QStringList)));
 
 
-
     m_ptxtInfo  = new QTextEdit;
     m_ptxtInput = new QLineEdit;
 
@@ -62,8 +61,14 @@ MyClient::MyClient(const QString& strHost, int nPort, QWidget *pwgt/*=0*/) :
         QMessageBox::information(this, "Logged", "User " + ((LogInWindow*)m_loginWndw)->getUserName() + " logged.");
     }
     m_userName = ((LogInWindow*)m_loginWndw)->getUserName();
+    ui->userName->setText("Имя пользователя: " + m_userName);
     qDebug() << "logged: " << m_userName;
     setWindowIcon(QIcon(":/Images/Images/user.png"));
+    ui->filesList->setIconSize(QSize(48, 48));
+
+    connect(ui->filesList, SIGNAL(itemSelectionChanged()), this, SLOT(setDeleteBtnFileEnable()));
+    connect(ui->deleteFileBtn, SIGNAL(clicked()), this, SLOT(deleteFileClicked()));
+    ui->deleteFileBtn->setEnabled(false);
 //    m_loginWndw->show();
     setLayout(ui->verticalLayout);
 
@@ -91,7 +96,7 @@ void MyClient::setTasksList(QList<TaskStateHeader> &tasksList)
             QLabel *text = new QLabel();
             text->setText(tasksList[i].getTime());
             layoutOK->addWidget(text);
-            QPushButton* btnDownLoad = new QPushButton("Download");
+            QPushButton* btnDownLoad = new QPushButton("Скачать");
             btnDownLoad->setObjectName(QString::number(ui->tasksList->count() - 1));
             connect( btnDownLoad, SIGNAL( clicked() ), SLOT( slotDownloadClicked() ) );
             layoutOK->addWidget(btnDownLoad);
@@ -112,7 +117,7 @@ void MyClient::setTasksList(QList<TaskStateHeader> &tasksList)
             text->setText(tasksList[i].getTime());
             layoutCancel->addWidget(text);
             QLabel *text2 = new QLabel();
-            text2->setText("Canceled");
+            text2->setText("Отменено");
             layoutCancel->addWidget(text2);
             wgt->setLayout( layoutCancel );
             QListWidgetItem* item = new QListWidgetItem( ui->tasksList );
@@ -172,6 +177,11 @@ void MyClient::successRecieve()
     ui->dropArea->clearFiles();
 }
 
+unsigned MyClient::getBinId(int index)
+{
+    return (m_binsInfo[index].getFileSize());
+}
+
 void MyClient::slotCancelClicked()
 {
     qDebug() << "slotCancelClicked()";
@@ -189,7 +199,7 @@ void MyClient::slotCancelClicked()
     text->setText(m_tasksList[row].getTime());
     layoutCancel->addWidget(text);
     QLabel *text2 = new QLabel();
-    text2->setText("Canceled");
+    text2->setText("Отменено");
     layoutCancel->addWidget(text2);
     wgt->setLayout( layoutCancel );
     itm->setSizeHint( wgt->sizeHint() );
@@ -220,6 +230,26 @@ void MyClient::slotSolveClicked()
     slotSendFilesToServer();
 }
 
+void MyClient::setDeleteBtnFileEnable()
+{
+    if (ui->filesList->selectedItems().size())
+        ui->deleteFileBtn->setEnabled(true);
+    else
+        ui->deleteFileBtn->setEnabled(false);
+}
+
+void MyClient::deleteFileClicked()
+{
+    auto item = ui->filesList->selectedItems()[0];
+    QString deleteFile;
+
+    deleteFile = item->text();
+    qDebug() << deleteFile;
+    int row = ui->dropArea->deleteFile(deleteFile);
+    ui->filesList->takeItem(row);
+    ui->deleteFileBtn->setEnabled(false);
+}
+
 void MyClient::slotSendMainHdrToServer(TYPE dataType, unsigned num)
 {
     MainHeader mainHdr;
@@ -229,7 +259,7 @@ void MyClient::slotSendMainHdrToServer(TYPE dataType, unsigned num)
     qDebug() << "slotSendMainHdrToServer() " << dataType;
     out.setVersion(QDataStream::Qt_5_9);
     out.setByteOrder(QDataStream::LittleEndian);
-    mainHdr.setData(sizeof(MainHeader), num, dataType);
+    mainHdr.setData(sizeof(MainHeader), num, dataType, 0);
     out.writeRawData((char*)&mainHdr, sizeof(MainHeader));
     m_pTcpSocket->write(arrBlock);
     qDebug() << bytes(arrBlock.data(), 15);
@@ -328,6 +358,22 @@ void MyClient::slotReadyRead()
         qDebug() << "SUCCESS_RECIEVE";
         successRecieve();
     }
+    if (mainHeader.getType() == BINS_LIST)
+    {
+        FileHeader  fileHdr;
+        QStringList binsNames;
+
+        qDebug() << "BINS_LIST " << mainHeader.getMsgSize();
+        m_binsInfo.clear();
+        for (int i = 0; i < (int)mainHeader.getCount(); i++)
+        {
+            in.readRawData((char*)&fileHdr, sizeof(FileHeader));
+            m_binsInfo.push_back(fileHdr);
+            binsNames.push_back(QString(fileHdr.getFileName()).section('/', -1));
+        }
+        ui->comboBox->clear();
+        ui->comboBox->addItems(binsNames);
+    }
     qDebug() << "End of data reading.";
 }
 
@@ -339,11 +385,11 @@ void MyClient::slotError(QAbstractSocket::SocketError err)
 //    {
         QString strError =
                 "Error: " + (err == QAbstractSocket::HostNotFoundError ?
-                                 "The host was not found." :
+                                 "Сервер не найден" :
                                  err == QAbstractSocket::RemoteHostClosedError ?
-                                     "The remote host is closed." :
+                                     "Сервер не работает" :
                                      err == QAbstractSocket::ConnectionRefusedError ?
-                                         "The connection was refused." :
+                                         "В соединении было отказано" :
                                          QString(m_pTcpSocket->errorString())
                                          );
         ui->statusBar->setText(strError);
@@ -359,6 +405,8 @@ void MyClient::slotReconnect()
 // ----------------------------------------------------------------------
 void MyClient::slotDroppedFiles(QStringList newFiles)
 {
+    QString fileExtension;
+    QString iconPath;
     qDebug() << "SLOT DROPPED";
     ui->solveBtn->setEnabled(true);
     QListWidgetItem* pItem = 0;
@@ -366,6 +414,18 @@ void MyClient::slotDroppedFiles(QStringList newFiles)
     for (QString file : newFiles)
     {
         pItem = new QListWidgetItem(file, ui->filesList);
+        fileExtension = file.section('.', -1);
+        iconPath = ":/Images/Images/" + fileExtension + ".png";
+        if (QFile(iconPath).exists())
+        {
+            qDebug() << "IF";
+            pItem->setIcon(QPixmap(iconPath));
+        }
+        else
+        {
+            qDebug() << "ELSE";
+            pItem->setIcon(QPixmap(":/Images/Images/any.png"));
+        }
     }
 }
 // ----------------------------------------------------------------------
@@ -415,7 +475,8 @@ void MyClient::slotSendFilesToServer()
         delete p_file;
     }
     qDebug() << "msgSize = " << msgSize;
-    mainHeader.setData(msgSize, fPaths.size(), SEND_FILES);
+    int index = ui->comboBox->currentIndex();
+    mainHeader.setData(msgSize, fPaths.size(), SEND_FILES, getBinId(index));
     arrBlock.clear();
     out.device()->seek(0);
     out.writeRawData((char*)&mainHeader, sizeof(MainHeader));
@@ -474,7 +535,7 @@ void MyClient::slotSendDataToServer(TYPE dataType, char* data, unsigned len)
 
     out.setVersion(QDataStream::Qt_5_9);
     out.setByteOrder(QDataStream::LittleEndian);
-    mainHdr.setData(sizeof(MainHeader) + len, 0, dataType);
+    mainHdr.setData(sizeof(MainHeader) + len, 0, dataType, 0);
     out.writeRawData((char*)&mainHdr, sizeof(MainHeader));
     if (data != NULL && len != 0)
         out.writeRawData(data, len);
@@ -489,7 +550,7 @@ void MyClient::slotConnected()
         slotSendDataToServer(RECONNECT, (char*)m_userName.toStdString().c_str(), m_userName.size() + 1);
     }
 
-    ui->statusBar->setText("Received the connected() signal");
+    ui->statusBar->setText("Подключен к серверу");
 }
 
 MyClient::~MyClient()

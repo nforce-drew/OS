@@ -1,6 +1,8 @@
 #ifndef MAINHEADER_H
 #define MAINHEADER_H
 
+#include <string.h>
+
 //=================================================================================
 enum TYPE
 {
@@ -19,6 +21,12 @@ enum TYPE
     SIGN_UP,
     SUCCESS_SIGN_UP,
     LOGIN_ALREADY_EXISTS,
+    USERS_INFO,
+    DELETE_USER,
+    ADD_NEW_USER,
+    CHANGE_PASSWORD,
+    SEND_BIN,
+    BINS_LIST,
     OTHER
 };
 //=================================================================================
@@ -28,20 +36,20 @@ private:
     unsigned    msgSize;
     unsigned    count;
     TYPE        type;
+    int         info;
 
 public:
     MainHeader();
-    MainHeader(unsigned msgSize, unsigned count, TYPE type);
+    MainHeader(unsigned msgSize, unsigned count, TYPE type, int info);
     MainHeader(char* byteArr);
 
 public:
     MainHeader  setByteArr(char* byteArr);
-    MainHeader  setData(unsigned msgSize, unsigned count, TYPE type);
+    MainHeader  setData(unsigned msgSize, unsigned count, TYPE type, int info);
     unsigned    getMsgSize();
     unsigned    getCount();
     TYPE        getType();
-    char*       toBytes(char* byteArr);
-
+    int         getInfo();
 };
 //=================================================================================
 

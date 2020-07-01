@@ -15,6 +15,7 @@ LogInWindow::LogInWindow(QWidget *parent) :
     setWindowTitle("Авторизация");
     setWindowFlags(Qt::Window | Qt::WindowSystemMenuHint | Qt::WindowStaysOnTopHint);
 
+    ui->signUp_btn->hide();
     LogInWindow::connect(ui->cancel_btn, SIGNAL(clicked())
                          , this, SLOT(slotCancelClicked()));
     LogInWindow::connect(ui->login_btn, SIGNAL(clicked())

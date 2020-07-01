@@ -3,6 +3,7 @@
 #include <list>
 #include <thread>
 #include <chrono>
+#include <fstream>
 #include <unistd.h>
 
 
@@ -15,7 +16,23 @@ void threadFunction(list<string>* lst)
     std::advance(it, 1);
     std::cout << *it << "\t" << std::this_thread::get_id() << std::endl;
 }
- 
+
+std::string fileExtension(std::string pathname)
+{
+    int dotPos = pathname.find('.');
+    std::string extension(pathname, dotPos + 1, pathname.size() - dotPos);
+
+    return (extension);
+}
+
+std::string fileNameWithoutExtension(std::string pathname)
+{
+    int dotPos = pathname.find('.');
+    std::string name(pathname, 0, dotPos);
+
+    return (name);
+}
+
 int main()
 {
     // string str = "hello world and people";
@@ -33,10 +50,22 @@ int main()
     // //     auto it = str.find(" ");
     // // }
     // cout << str;
-    char* args[] = {"./b.out", "", "", NULL};
-    std::cout << "Вызывает" << std::endl;
-    execvp("./b.out", args);
-    std::cout << "Продолжил" << std::endl;
+    // std::string filePath = "/home/nspace/OS/Server/Solutions/who_2020-06-30_17:25:51/who_2020-06-30_17:25:51.zarp";
+    // std::cout << fileExtension(filePath) << std::endl;
+    // std::cout << fileNameWithoutExtension(filePath) << std::endl;
+    
+    // char* args[] = {"./b.out", "", "", NULL};
+    // std::cout << "Вызывает" << std::endl;
+    // execvp("./b.out", args);
+    // std::cout << "Продолжил" << std::endl;
     // str.replace()
+    ofstream fout;
+    fout.open("./myfile.txt");
+    if (fout.is_open())
+    {
+        std::cout << "Файл открыт!" << std::endl;
+    }
+    else
+        std::cout << "Error!" << std::endl;
     return 0;
 }

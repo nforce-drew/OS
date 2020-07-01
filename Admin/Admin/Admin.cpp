@@ -91,6 +91,7 @@ Admin::Admin(const QString& strHost, int nPort, QWidget *parent) :
 
     QObject::connect(ui->addBinBtn, SIGNAL(clicked()), this, SLOT(addBinBtnClicked()));
 
+
     ui->tab_queue->setLayout(ui->layout_queue);
     ui->tab_userInfo->setLayout(ui->layout_userInfo);
     centralWidget()->setLayout(ui->layout_main);
@@ -134,7 +135,7 @@ void Admin::slotSendMainHdrToServer(TYPE dataType, unsigned num)
 
     out.setVersion(QDataStream::Qt_5_9);
     out.setByteOrder(QDataStream::LittleEndian);
-    mainHdr.setData(sizeof(MainHeader), num, dataType);
+    mainHdr.setData(sizeof(MainHeader), num, dataType, 0);
     out.writeRawData((char*)&mainHdr, sizeof(MainHeader));
     m_pTcpSocket->write(arrBlock);
 }
@@ -185,11 +186,11 @@ void Admin::slotSendBinToServer()
         delete p_file;
     }
     qDebug() << "msgSize = " << msgSize;
-    mainHeader.setData(msgSize, fPaths.size(), SEND_BIN);
+    mainHeader.setData(msgSize, fPaths.size(), SEND_BIN, 0);
     arrBlock.clear();
     out.device()->seek(0);
     out.writeRawData((char*)&mainHeader, sizeof(MainHeader));
-    totalSent = m_pTcpSocket->write(arrBlock);
+    totalSent += m_pTcpSocket->write(arrBlock);
     qDebug() << "sent =" << totalSent;
     for (int i = 0; i < fPaths.size(); i++)
     {
@@ -205,7 +206,7 @@ void Admin::slotSendBinToServer()
         qDebug() << fileHeader.getFileSize() << fileHeader.getFileName();
         out.device()->seek(0);
         out.writeRawData((char*)&fileHeader, sizeof(FileHeader));
-        totalSent = m_pTcpSocket->write(arrBlock);
+        totalSent += m_pTcpSocket->write(arrBlock);
         qDebug() << "sent =" << totalSent;
         readBytes = 1;
 //        int j = 0;
@@ -221,7 +222,7 @@ void Admin::slotSendBinToServer()
             {
                 out.device()->seek(0);
                 out.writeRawData(arrBlock.data(), arrBlock.size());
-                totalSent = m_pTcpSocket->write(arrBlock);
+                totalSent += m_pTcpSocket->write(arrBlock);
                 qDebug() << "sent =" << totalSent;
             }
 //            j++;
@@ -229,7 +230,7 @@ void Admin::slotSendBinToServer()
         p_file->close();
         delete p_file;
     }
-    qDebug() << "Bytes sent: " << totalSent;
+    qDebug() << "BYTES sent: " << totalSent;
 }
 
 void Admin::setEnabledDeleteBtn(int currentRow, int currentColumn, int previousRow, int previousColumn)
@@ -262,7 +263,7 @@ void Admin::slotSendQueue(QList<TaskHeader>* queueLst)
     out.setVersion(QDataStream::Qt_5_9);
     out.setByteOrder(QDataStream::LittleEndian);
     qDebug() << "=== Queue sended ===";
-    mainHdr.setData(sizeof(MainHeader) + dataSize, queueLst->size(), QUEUE_LIST);
+    mainHdr.setData(sizeof(MainHeader) + dataSize, queueLst->size(), QUEUE_LIST, 0);
     out.writeRawData((char*)&mainHdr, sizeof(MainHeader));
     for (TaskHeader task : *queueLst)
     {
@@ -358,6 +359,7 @@ void Admin::slotReadyRead()
         FileHeader  fileHdr;
         QStringList binsNames;
 
+        qDebug() << "BINS_LIST " << mainHeader.getMsgSize();
         for (int i = 0; i < (int)mainHeader.getCount(); i++)
         {
             in.readRawData((char*)&fileHdr, sizeof(FileHeader));
@@ -412,7 +414,7 @@ void Admin::slotSendDataToServer(TYPE dataType, unsigned count, char* data, unsi
 
     out.setVersion(QDataStream::Qt_5_9);
     out.setByteOrder(QDataStream::LittleEndian);
-    mainHdr.setData(sizeof(MainHeader) + len, count, dataType);
+    mainHdr.setData(sizeof(MainHeader) + len, count, dataType, 0);
     out.writeRawData((char*)&mainHdr, sizeof(MainHeader));
     if (data != NULL && len != 0)
         out.writeRawData(data, len);

@@ -1,6 +1,28 @@
 #include "DropArea.h"
 
 
+int DropArea::deleteFile(QString fileName)
+{
+    QStringList fileNames;
+
+    for (auto filePath : m_files)
+        fileNames.push_back(filePath.section('/', -1));
+    if (fileNames.contains(fileName))
+    {
+        int i = 0;
+        for (auto el : fileNames)
+        {
+            if (el == fileName)
+            {
+                m_files.removeAt(i);
+                return (i);
+            }
+            i++;
+        }
+    }
+    return (0);
+}
+
 DropArea::DropArea(QWidget *pwgt): QLabel("Drop Area", pwgt)
 {
     setAcceptDrops(true);

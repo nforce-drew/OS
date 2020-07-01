@@ -2,17 +2,17 @@
 
 MainHeader::MainHeader(){}
 
-MainHeader::MainHeader(unsigned msgSize, unsigned count, TYPE type)
+MainHeader::MainHeader(unsigned msgSize, unsigned count, TYPE type, int info)
 {
     this->msgSize = msgSize;
     this->count   = count;
     this->type    = type;
+    this->info    = info;
 }
 
 MainHeader::MainHeader(char* byteArr)
 {
-    for (int i = 0; i < 12; i++)
-        ((char*)this)[i] = byteArr[i];
+    memcpy((char*)this, byteArr, sizeof(MainHeader));
 }
 
 MainHeader MainHeader::setByteArr(char* byteArr)
@@ -22,11 +22,12 @@ MainHeader MainHeader::setByteArr(char* byteArr)
     return (*this);
 }
 
-MainHeader MainHeader::setData(unsigned msgSize, unsigned count, TYPE type)
+MainHeader MainHeader::setData(unsigned msgSize, unsigned count, TYPE type, int info)
 {
     this->msgSize = msgSize;
     this->count   = count;
     this->type    = type;
+    this->info    = info;
     return (*this);
 }
 
@@ -45,11 +46,7 @@ TYPE MainHeader::getType()
     return (type);
 }
 
-char* MainHeader::toBytes(char* byteArr)
+int MainHeader::getInfo()
 {
-
-    for (int i = 0; i < 12; i++)
-        byteArr[i] = ((char*)this)[i];
-    byteArr[12] = '\0';
-    return (byteArr);
+    return (info);
 }

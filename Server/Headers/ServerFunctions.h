@@ -19,6 +19,7 @@
 #include <list>
 #include <sys/stat.h>
 #include <ctime>
+#include <thread>
 
 using namespace std;
 
@@ -43,4 +44,4 @@ char*       onlineUsersToChar(list<string>* lst);
 int         sendOnlineUsers(int admin_fd);
 int         sendTasksInfo(int sock_fd, string userName);
 int         sendUsersInfo(int admin_fd);
-int         sendBinsNames(int admin_fd);
+int         sendBinsInfo(int admin_fd);

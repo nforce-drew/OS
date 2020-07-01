@@ -23,7 +23,7 @@ static int callback(void* sock_fd, int argc, char** argv, char** azColName)
     MainHeader  mainHdr;
 
     if (argc == 2)
-        mainHdr.setData(sizeof(MainHeader), 0, PERMISSION_LOGIN);
+        mainHdr.setData(sizeof(MainHeader), 0, PERMISSION_LOGIN, 0);
     int sendBytes = sendData(*((int*)sock_fd), mainHdr, NULL, 0);
     *((int*)sock_fd) = -1;
     std::cout << "Bytes sended: " << sendBytes << std::endl;
@@ -49,7 +49,7 @@ int checkLoginPermission(sqlite3* db, int sock_fd, char* login, char* password)
     rc = sqlite3_exec(db, query.c_str(), callback_result, data, &errMsg);
     if (res->size() != 0)
     {
-        mainHdr.setData(sizeof(MainHeader), 0, BAN_LOGIN);
+        mainHdr.setData(sizeof(MainHeader), 0, BAN_LOGIN, 0);
         sendData(sock_fd, mainHdr, NULL, 0);
         return (rc);
     }
@@ -61,10 +61,10 @@ int checkLoginPermission(sqlite3* db, int sock_fd, char* login, char* password)
     rc = sqlite3_exec(db, query.c_str(), callback_result, data, &errMsg);
 
     if (res->size() == 0)
-        mainHdr.setData(sizeof(MainHeader), 0, BAN_LOGIN);
+        mainHdr.setData(sizeof(MainHeader), 0, BAN_LOGIN, 0);
     else
     {
-        mainHdr.setData(sizeof(MainHeader), 0, PERMISSION_LOGIN);
+        mainHdr.setData(sizeof(MainHeader), 0, PERMISSION_LOGIN, 0);
         //Добавление в онлайн
         query = "INSERT INTO online_users (user_name, sock_num) " \
                 "VALUES ('" + std::string(login) + "', " + std::to_string(sock_fd) + ");";
@@ -228,7 +228,7 @@ int         sendQueue(int admin_fd)
     msgSize = sizeof(MainHeader) + queue->size() * sizeof(TaskHeader);
     // msgSize = sizeof(MainHeader);
     totalBytes = 0;
-    mainHeader.setData(msgSize, queue->size(), QUEUE_LIST);
+    mainHeader.setData(msgSize, queue->size(), QUEUE_LIST, 0);
     sendBytes = sendAll(admin_fd, (char*)&mainHeader, sizeof(MainHeader), 0);
     if (sendBytes <= 0)
     {
@@ -588,9 +588,10 @@ void            changePassword(LoginHeader userInfo)
     sqlite3_close(db);
 }
 
-list<string>    getBinsPathes(list<string> &binsPathes)
+list<FileHeader>    getBinsPathes(list<FileHeader> &binsPathes)
 {
     vector<vector<string>>* res;
+    FileHeader              fileHdr;
     string                  query;
     sqlite3*                db;
     void*                   data;
@@ -598,12 +599,15 @@ list<string>    getBinsPathes(list<string> &binsPathes)
     binsPathes.clear();
     res = new vector<vector<string>>;
     data = (void*)res;
-    query = "SELECT bin_path FROM bins ORDER BY bin_path;";
+    query = "SELECT bin_id, bin_path FROM bins ORDER BY bin_path;";
     db = connectDB((char*)DB_PATH);
     sqlite3_exec(db, query.c_str(), callback_result, data, NULL);
     sqlite3_close(db);
-    for (auto binPath : *res)
-        binsPathes.push_back(binPath[0]);
+    for (auto binInfo : *res)
+    {
+        fileHdr.setData(std::stoi(binInfo[0]), (char*)binInfo[1].c_str());
+        binsPathes.push_back(fileHdr);
+    }
     delete (res);
 
     return (binsPathes);
@@ -615,6 +619,41 @@ void            addNewBin(string binPath)
     sqlite3*    db;
 
     query = "INSERT INTO bins(bin_path) VALUES('" + binPath + "');";
+    std::cout << query << std::endl;
+    db = connectDB((char*)DB_PATH);
+    sqlite3_exec(db, query.c_str(), NULL, NULL, NULL);
+    sqlite3_close(db);
+}
+
+string          getBinPath(int binId)
+{
+    vector<vector<string>>* res;
+    string                  query;
+    sqlite3*                db;
+    void*                   data;
+    string                  binPath;
+
+    res = new vector<vector<string>>;
+    data = (void*)res;
+    query = "SELECT bin_path FROM bins " \
+            "WHERE bin_id == " + std::to_string(binId) + ";";
+    db = connectDB((char*)DB_PATH);
+    sqlite3_exec(db, query.c_str(), callback_result, data, NULL);
+    sqlite3_close(db);
+    binPath = (*res)[0][0];
+    delete (res);
+
+    return (binPath);
+
+}
+
+void            setBinId(int taskId, int binId)
+{
+    string      query;
+    sqlite3*    db;
+
+    query = "UPDATE tasks SET bin_id = " + std::to_string(binId) + " " \
+            "WHERE task_id == " + std::to_string(taskId) + ";";
     std::cout << query << std::endl;
     db = connectDB((char*)DB_PATH);
     sqlite3_exec(db, query.c_str(), NULL, NULL, NULL);

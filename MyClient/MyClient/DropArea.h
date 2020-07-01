@@ -13,8 +13,8 @@ Q_OBJECT
 private:
     QStringList m_files;
 
-
 public:
+    int deleteFile(QString fileName);
     DropArea(QWidget* pwgt = 0);
     QStringList getFiles();
     void clearFiles();

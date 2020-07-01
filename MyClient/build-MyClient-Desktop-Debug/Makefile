@@ -378,10 +378,16 @@ compiler_rcc_clean:
 qrc_Resources.cpp: ../MyClient/Resources.qrc \
 		/usr/lib/qt5/bin/rcc \
 		../MyClient/Images/solving.png \
+		../MyClient/Images/txt.png \
+		../MyClient/Images/any.png \
 		../MyClient/Images/cancel.png \
 		../MyClient/Images/user.png \
+		../MyClient/Images/png.png \
+		../MyClient/Images/zip.png \
 		../MyClient/Images/done.png \
-		../MyClient/Images/in_queue.png
+		../MyClient/Images/in_queue.png \
+		../MyClient/Images/pdf.png \
+		../MyClient/Images/jpg.png
 	/usr/lib/qt5/bin/rcc -name Resources ../MyClient/Resources.qrc -o qrc_Resources.cpp
 
 compiler_moc_predefs_make_all: moc_predefs.h

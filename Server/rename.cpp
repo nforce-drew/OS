@@ -6,6 +6,8 @@
 
 std::string fileName(std::string pathname);
 std::string pathWithoutName(std::string pathname);
+std::string fileExtension(std::string pathname);
+std::string fileNameWithoutExtension(std::string pathname);
 
 int main(int argc, char *argv[])
 {
@@ -46,16 +48,28 @@ int main(int argc, char *argv[])
     }
     std::getline(fin_solInfo, solFolderPath);
     fin_solInfo.close();
+    std::list<std::string> solutions;
     for (auto path : pathesLst)
     {
-        solFilePath = std::string(solFolderPath) + "/" 
-            + fileName(std::string(solFolderPath)) + ".zip";
-        command = "cd " + pathWithoutName(std::string(path))
-            + "; zip -r " + solFilePath + " " + fileName(std::string(path));
+        command = "cp " + path + " " + solFolderPath;
+        
+        // solFilePath = std::string(solFolderPath) + "/" 
+        //     + fileName(std::string(solFolderPath)) + ".zip";
+        // command = "cd " + pathWithoutName(std::string(path))
+        //     + "; zip -r " + solFilePath + " " + fileName(std::string(path));
         std::cout << command << std::endl;
         system(command.c_str());
+        command = "cd " + solFolderPath + ";";
+        std::string newName = fileNameWithoutExtension(fileName(path)) + "\\(ПЕРЕИМЕНОВАН\\)"
+                + "." + fileExtension(fileName(path)); 
+        command += "mv " + fileName(path) + " "
+                + newName;
+        std::cout << command << std::endl;
+        system(command.c_str());
+        solutions.push_back(solFolderPath + "/" + fileNameWithoutExtension(fileName(path)) + "(ПЕРЕИМЕНОВАН)"
+                + "." + fileExtension(fileName(path)));
     }
-    fout_solInfo.open(std::string(argv[2]));
+    fout_solInfo.open(std::string(argv[2]), std::ios_base::trunc);
     if (!fout_solInfo.is_open())
     {
         std::cerr << "File opening error: " << std::string(argv[2])
@@ -63,7 +77,14 @@ int main(int argc, char *argv[])
         std::cout << "===ZIP ENDED===" << std::endl;
         return (0);
     }
-    fout_solInfo.write(solFilePath.c_str(), solFilePath.size());
+    int i = 0;
+    for (auto file : solutions)
+    {
+        fout_solInfo.write(file.c_str(), file.size());
+        if (solutions.size() - 1 != i)
+            fout_solInfo.write("\n", 1);
+        i++;
+    }
     fout_solInfo.close();
     std::cout << "===ZIP ENDED===" << std::endl;
     return (0);
@@ -87,4 +108,20 @@ std::string fileName(std::string pathname)
         pathname.erase(0, last_slash_idx + 1);
     }
     return (pathname);
+}
+
+std::string fileExtension(std::string pathname)
+{
+    int dotPos = pathname.find('.');
+    std::string extension(pathname, dotPos + 1, pathname.size() - dotPos);
+
+    return (extension);
+}
+
+std::string fileNameWithoutExtension(std::string pathname)
+{
+    int dotPos = pathname.find('.');
+    std::string name(pathname, 0, dotPos);
+
+    return (name);
 }

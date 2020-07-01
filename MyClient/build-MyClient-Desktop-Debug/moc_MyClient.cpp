@@ -21,8 +21,8 @@ QT_BEGIN_MOC_NAMESPACE
 QT_WARNING_PUSH
 QT_WARNING_DISABLE_DEPRECATED
 struct qt_meta_stringdata_MyClient_t {
-    QByteArrayData data[14];
-    char stringdata0[198];
+    QByteArrayData data[16];
+    char stringdata0[239];
 };
 #define QT_MOC_LITERAL(idx, ofs, len) \
     Q_STATIC_BYTE_ARRAY_DATA_HEADER_INITIALIZER_WITH_OFFSET(len, \
@@ -44,7 +44,9 @@ QT_MOC_LITERAL(9, 117, 16), // "slotDroppedFiles"
 QT_MOC_LITERAL(10, 134, 8), // "newFiles"
 QT_MOC_LITERAL(11, 143, 17), // "slotCancelClicked"
 QT_MOC_LITERAL(12, 161, 19), // "slotDownloadClicked"
-QT_MOC_LITERAL(13, 181, 16) // "slotSolveClicked"
+QT_MOC_LITERAL(13, 181, 16), // "slotSolveClicked"
+QT_MOC_LITERAL(14, 198, 22), // "setDeleteBtnFileEnable"
+QT_MOC_LITERAL(15, 221, 17) // "deleteFileClicked"
 
     },
     "MyClient\0slotReadyRead\0\0slotError\0"
@@ -52,7 +54,8 @@ QT_MOC_LITERAL(13, 181, 16) // "slotSolveClicked"
     "slotSendFilesToServer\0slotConnected\0"
     "slotReconnect\0slotDroppedFiles\0newFiles\0"
     "slotCancelClicked\0slotDownloadClicked\0"
-    "slotSolveClicked"
+    "slotSolveClicked\0setDeleteBtnFileEnable\0"
+    "deleteFileClicked"
 };
 #undef QT_MOC_LITERAL
 
@@ -62,7 +65,7 @@ static const uint qt_meta_data_MyClient[] = {
        8,       // revision
        0,       // classname
        0,    0, // classinfo
-       9,   14, // methods
+      11,   14, // methods
        0,    0, // properties
        0,    0, // enums/sets
        0,    0, // constructors
@@ -70,15 +73,17 @@ static const uint qt_meta_data_MyClient[] = {
        0,       // signalCount
 
  // slots: name, argc, parameters, tag, flags
-       1,    0,   59,    2, 0x08 /* Private */,
-       3,    1,   60,    2, 0x08 /* Private */,
-       6,    0,   63,    2, 0x08 /* Private */,
-       7,    0,   64,    2, 0x08 /* Private */,
-       8,    0,   65,    2, 0x08 /* Private */,
-       9,    1,   66,    2, 0x08 /* Private */,
-      11,    0,   69,    2, 0x08 /* Private */,
-      12,    0,   70,    2, 0x08 /* Private */,
-      13,    0,   71,    2, 0x08 /* Private */,
+       1,    0,   69,    2, 0x08 /* Private */,
+       3,    1,   70,    2, 0x08 /* Private */,
+       6,    0,   73,    2, 0x08 /* Private */,
+       7,    0,   74,    2, 0x08 /* Private */,
+       8,    0,   75,    2, 0x08 /* Private */,
+       9,    1,   76,    2, 0x08 /* Private */,
+      11,    0,   79,    2, 0x08 /* Private */,
+      12,    0,   80,    2, 0x08 /* Private */,
+      13,    0,   81,    2, 0x08 /* Private */,
+      14,    0,   82,    2, 0x08 /* Private */,
+      15,    0,   83,    2, 0x08 /* Private */,
 
  // slots: parameters
     QMetaType::Void,
@@ -87,6 +92,8 @@ static const uint qt_meta_data_MyClient[] = {
     QMetaType::Void,
     QMetaType::Void,
     QMetaType::Void, QMetaType::QStringList,   10,
+    QMetaType::Void,
+    QMetaType::Void,
     QMetaType::Void,
     QMetaType::Void,
     QMetaType::Void,
@@ -109,6 +116,8 @@ void MyClient::qt_static_metacall(QObject *_o, QMetaObject::Call _c, int _id, vo
         case 6: _t->slotCancelClicked(); break;
         case 7: _t->slotDownloadClicked(); break;
         case 8: _t->slotSolveClicked(); break;
+        case 9: _t->setDeleteBtnFileEnable(); break;
+        case 10: _t->deleteFileClicked(); break;
         default: ;
         }
     } else if (_c == QMetaObject::RegisterMethodArgumentMetaType) {
@@ -154,13 +163,13 @@ int MyClient::qt_metacall(QMetaObject::Call _c, int _id, void **_a)
     if (_id < 0)
         return _id;
     if (_c == QMetaObject::InvokeMetaMethod) {
-        if (_id < 9)
+        if (_id < 11)
             qt_static_metacall(this, _c, _id, _a);
-        _id -= 9;
+        _id -= 11;
     } else if (_c == QMetaObject::RegisterMethodArgumentMetaType) {
-        if (_id < 9)
+        if (_id < 11)
             qt_static_metacall(this, _c, _id, _a);
-        _id -= 9;
+        _id -= 11;
     }
     return _id;
 }

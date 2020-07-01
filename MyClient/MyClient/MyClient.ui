@@ -18,7 +18,7 @@
     <rect>
      <x>10</x>
      <y>20</y>
-     <width>671</width>
+     <width>675</width>
      <height>321</height>
     </rect>
    </property>
@@ -36,12 +36,19 @@
      <number>5</number>
     </property>
     <item>
-     <layout class="QHBoxLayout" name="horizontalLayout" stretch="1,1,1">
+     <widget class="QLabel" name="userName">
+      <property name="text">
+       <string/>
+      </property>
+     </widget>
+    </item>
+    <item>
+     <layout class="QHBoxLayout" name="horizontalLayout" stretch="1,0,0">
       <item>
        <widget class="QListWidget" name="tasksList">
         <property name="minimumSize">
          <size>
-          <width>280</width>
+          <width>290</width>
           <height>0</height>
          </size>
         </property>
@@ -53,36 +60,40 @@
          <enum>QFrame::Box</enum>
         </property>
         <property name="text">
-         <string>DROP AREA</string>
+         <string>Перетащите файлы сюда</string>
+        </property>
+        <property name="alignment">
+         <set>Qt::AlignCenter</set>
         </property>
        </widget>
       </item>
       <item>
-       <widget class="QListWidget" name="filesList"/>
-      </item>
-     </layout>
-    </item>
-    <item>
-     <layout class="QHBoxLayout" name="horizontalLayout_2">
-      <item>
-       <spacer name="horizontalSpacer">
-        <property name="orientation">
-         <enum>Qt::Horizontal</enum>
-        </property>
-        <property name="sizeHint" stdset="0">
-         <size>
-          <width>40</width>
-          <height>20</height>
-         </size>
-        </property>
-       </spacer>
-      </item>
-      <item>
-       <widget class="QPushButton" name="solveBtn">
-        <property name="text">
-         <string>Решить</string>
-        </property>
-       </widget>
+       <layout class="QVBoxLayout" name="verticalLayout_2">
+        <item>
+         <widget class="QListWidget" name="filesList"/>
+        </item>
+        <item>
+         <widget class="QComboBox" name="comboBox"/>
+        </item>
+        <item>
+         <layout class="QHBoxLayout" name="horizontalLayout_2">
+          <item>
+           <widget class="QPushButton" name="deleteFileBtn">
+            <property name="text">
+             <string>Удалить</string>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QPushButton" name="solveBtn">
+            <property name="text">
+             <string>Решить</string>
+            </property>
+           </widget>
+          </item>
+         </layout>
+        </item>
+       </layout>
       </item>
      </layout>
     </item>

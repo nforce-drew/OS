@@ -44,6 +44,7 @@ private:
     QString         m_userName;
     QList<TaskStateHeader> m_tasksList;
     QString         m_dirToSave;
+    QList<FileHeader> m_binsInfo;
 
 public:
     MyClient(const QString& strHost, int nPort, QWidget *pwgt = 0);
@@ -59,6 +60,8 @@ private slots:
     void slotCancelClicked();
     void slotDownloadClicked();
     void slotSolveClicked();
+    void setDeleteBtnFileEnable();
+    void deleteFileClicked();
 public:
     void slotSendMainHdrToServer(TYPE dataType, unsigned num);
     void slotSendDataToServer(TYPE dataType, char* data, unsigned len); //Отправка данных или запроса
@@ -67,6 +70,7 @@ public:
 private:
     void setTasksList(QList<TaskStateHeader> &tasksList);
     void successRecieve();
+    unsigned getBinId(int index);
 
 private:
     Ui::MyClient *ui;

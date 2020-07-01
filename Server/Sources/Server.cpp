@@ -24,7 +24,7 @@
 using namespace std;
 
 #define BUF_SIZE    1024
-#define PORT_NUMBER 5307
+#define PORT_NUMBER 5308
 #define SOLUTIONS_PATH "/home/nspace/OS/Server/Solutions/" // в конце должен быть слэш!!!
 
 int     admin_fd;
@@ -136,7 +136,8 @@ void solver()
         {
             solutionPath.clear();
             std::getline(fin_solInfo, solutionPath);
-            solutionPathes.push_back(solutionPath);
+            if (solutionPath != "")
+                solutionPathes.push_back(solutionPath);
         }
         fin_solInfo.close();
     }
@@ -298,153 +299,168 @@ int main(const int argc, const char** argv)
                     cout << "Connection refused with client." << endl;
                     continue;
                 }
-                // ОБРАБОТКА ДАННЫХ
-                switch (dataType)
+                else
                 {
-                    case CHECK_LOGIN:
+                    // ОБРАБОТКА ДАННЫХ
+                    switch (dataType)
                     {
-                        MainHeader  mainHdr(buf);
-                        LoginHeader loginHdr(buf + sizeof(MainHeader));
-
-                        std::cout << "\t-> CHECK_LOGIN - username: \"" << loginHdr.getUserName()  
-                                << "\" password: " << loginHdr.getUserPassword() << "\"" << std::endl;
-                        sqlite3* db = connectDB((char*)DB_PATH);
-                        checkLoginPermission(db, *it, loginHdr.getUserName(), loginHdr.getUserPassword());
-                        sqlite3_close(db);
-                        sendOnlineUsers(admin_fd);
-                        sendTasksInfo(*it, loginHdr.getUserName());
-                        break;
-                    }
-                    case SEND_FILES:
-                    {
-                        int taskId;
-
-                        cout << "\t-> SEND_FILES - count files: " << lst->size() << endl;
-                        if (admin_fd != -1)
-                            sendQueue(admin_fd);
-                        taskId = *((int*)buf);
-                        std::cout << "\t\t tsk id: " << taskId << std::endl;
-                        addTaskPathes(taskId, *lst);
-                        sendTasksInfo(*it, getUserName(*it));
-                        binPath = "/home/nspace/OS/Server/filesToZip.out";
-                        if (isSolverFree)
+                        case CHECK_LOGIN:
                         {
-                            this_thread::sleep_for(chrono::milliseconds(100));
-                            solverTh = thread(solver);
-                            solverTh.detach();
+                            MainHeader  mainHdr(buf);
+                            LoginHeader loginHdr(buf + sizeof(MainHeader));
+
+                            std::cout << "\t-> CHECK_LOGIN - username: \"" << loginHdr.getUserName()  
+                                    << "\" password: " << loginHdr.getUserPassword() << "\"" << std::endl;
+                            sqlite3* db = connectDB((char*)DB_PATH);
+                            checkLoginPermission(db, *it, loginHdr.getUserName(), loginHdr.getUserPassword());
+                            sqlite3_close(db);
+                            sendOnlineUsers(admin_fd);
+                            sendTasksInfo(*it, loginHdr.getUserName());
+                            sendBinsInfo(*it);
+                            break;
                         }
-                        delete lst;
-                        break;        
-                    }
-                    case SEND_BIN:
-                    {
-                        cout << "\t-> SEND_BIN - count files: " << lst->size() << endl;
-                        binPath = "/home/nspace/OS/Server/filesToZip.out";
-                        addNewBin(*(lst->begin()));
-                        sendBinsNames(admin_fd);
-                        delete lst;
-                        break;        
-                    }
-                    case QUEUE_LIST:
-                    {
-                        cout << "=== Queue sended ===" << endl;
-                        queue = (list<TaskHeader>*)data;
-                        clearQueue();
-                        fillQueue(queue);                        
-                        delete queue;
-                        break;
-                    }
-                    case ADMIN_LOGGED:
-                    {
-                        list<string>*   lst;
-                        MainHeader      mainHdr;
-                        char*           users;
-                        unsigned        msgSize;
-
-                        admin_fd = *it;
-                        cout << "\t-> ADMIN_LOGGED. Socket: " << *it << endl;
-                        sendQueue(admin_fd);                      
-                        sendOnlineUsers(admin_fd);
-                        sendUsersInfo(admin_fd);
-                        sendBinsNames(admin_fd);
-                        break;
-                    }
-                    case RECONNECT:
-                    {
-                        std::cout << "\t-> RECONNECT - user name: \"" 
-                                    << buf << "\"" << std::endl;
-                        // std::cout << bytes(buf, 20) << std::endl;
-                        addOnlineUser(*it, std::string(buf));
-                        if (admin_fd != -1)
+                        case SEND_FILES:
                         {
+                            int taskId;
+                            MainHeader mainHdr;
+
+                            cout << "\t-> SEND_FILES - count files: " << lst->size() << endl;
+                            if (admin_fd != -1)
+                                sendQueue(admin_fd);
+                            mainHdr.setByteArr(buf);
+                            taskId = mainHdr.getCount();
+                            std::cout << "\t\t tsk id: " << taskId << std::endl;
+                            setBinId(taskId, mainHdr.getInfo());
+                            addTaskPathes(taskId, *lst);
+                            sendTasksInfo(*it, getUserName(*it));
+                            binPath = getBinPath(mainHdr.getInfo());
+                            // std::cout << "BIN ID = " << mainHdr.getInfo() << std::endl;
+                            // binPath = "/home/nspace/OS/Server/filesToZip.out";
+                            if (isSolverFree)
+                            {
+                                this_thread::sleep_for(chrono::milliseconds(100));
+                                solverTh = thread(solver);
+                                solverTh.detach();
+                            }
+                            delete lst;
+                            break;        
+                        }
+                        case SEND_BIN:
+                        {
+                            cout << "\t-> SEND_BIN - count files: " << lst->size() << endl;
+                            binPath = "/home/nspace/OS/Server/filesToZip.out";
+                            addNewBin(*(lst->begin()));
+                            sendBinsInfo(admin_fd);
+                            for(set<int>::iterator us_it = clients.begin(); us_it != clients.end(); us_it++)
+                            {
+                                if (*us_it != admin_fd)
+                                    sendBinsInfo(*us_it);
+                            }
+                            delete lst;
+                            break;        
+                        }
+                        case QUEUE_LIST:
+                        {
+                            cout << "=== Queue sended ===" << endl;
+                            queue = (list<TaskHeader>*)data;
+                            clearQueue();
+                            fillQueue(queue);                        
+                            delete queue;
+                            break;
+                        }
+                        case ADMIN_LOGGED:
+                        {
+                            list<string>*   lst;
+                            MainHeader      mainHdr;
+                            char*           users;
+                            unsigned        msgSize;
+
+                            admin_fd = *it;
+                            cout << "\t-> ADMIN_LOGGED. Socket: " << *it << endl;
                             sendQueue(admin_fd);                      
                             sendOnlineUsers(admin_fd);
+                            sendUsersInfo(admin_fd);
+                            sendBinsInfo(admin_fd);
+                            break;
                         }
-                        sendTasksInfo(*it, getUserName(*it));
-                        break;
-                    }
-                    case GET_SOLUTION:
-                    {
-                        MainHeader      mainHdr;
-                        list<string>    files;
-
-                        std::cout << "GET_SOLUTION" << std::endl;
-                        mainHdr.setByteArr(buf);
-                        std::cout << "send taskId = " << mainHdr.getCount() << std::endl;
-                        files = getSolutionPathes(mainHdr.getCount(), files);
-                        sendFiles(*it, files);
-                        break;
-                    }
-                    case CANCEL_TASK:
-                    {
-                        MainHeader      mainHdr;
-                        string          userName;
-                        int             userSock_fd;
-
-                        mainHdr.setByteArr(buf);
-                        std::cout << "CANCEL_TASK" << std::endl;
-                        std::cout << "canceled = " << mainHdr.getCount() << std::endl;
-                        mainHdr.setByteArr(buf);
-                        cancelQueueTask(mainHdr.getCount());
-                        this_thread::sleep_for(std::chrono::milliseconds(500));
-                        if (*it != admin_fd)
+                        case RECONNECT:
                         {
+                            std::cout << "\t-> RECONNECT - user name: \"" 
+                                        << buf << "\"" << std::endl;
+                            // std::cout << bytes(buf, 20) << std::endl;
+                            addOnlineUser(*it, std::string(buf));
+                            if (admin_fd != -1)
+                            {
+                                sendQueue(admin_fd);                      
+                                sendOnlineUsers(admin_fd);
+                            }
                             sendTasksInfo(*it, getUserName(*it));
-                            sendQueue(admin_fd);
+                            sendBinsInfo(*it);
+                            break;
                         }
-                        else
+                        case GET_SOLUTION:
                         {
-                            userName = getUserNameByTaskId(mainHdr.getCount());
-                            userSock_fd = getSockFd(userName);
-                            sendTasksInfo(userSock_fd, userName);
+                            MainHeader      mainHdr;
+                            list<string>    files;
+
+                            std::cout << "GET_SOLUTION" << std::endl;
+                            mainHdr.setByteArr(buf);
+                            std::cout << "send taskId = " << mainHdr.getCount() << std::endl;
+                            files = getSolutionPathes(mainHdr.getCount(), files);
+                            sendFiles(*it, files);
+                            break;
+                        }
+                        case CANCEL_TASK:
+                        {
+                            MainHeader      mainHdr;
+                            string          userName;
+                            int             userSock_fd;
+
+                            mainHdr.setByteArr(buf);
+                            std::cout << "CANCEL_TASK" << std::endl;
+                            std::cout << "canceled = " << mainHdr.getCount() << std::endl;
+                            mainHdr.setByteArr(buf);
+                            cancelQueueTask(mainHdr.getCount());
+                            this_thread::sleep_for(std::chrono::milliseconds(500));
+                            if (*it != admin_fd)
+                            {
+                                sendTasksInfo(*it, getUserName(*it));
+                                sendQueue(admin_fd);
+                            }
+                            else
+                            {
+                                userName = getUserNameByTaskId(mainHdr.getCount());
+                                userSock_fd = getSockFd(userName);
+                                sendTasksInfo(userSock_fd, userName);
+                            }
+                            
+                            break;
+                        }
+                        case DELETE_USER:
+                        {
+                            std::cout << "\t-> DELETE_USER - user name: \"" 
+                                        << string(buf) << "\"" << std::endl;
+                            deleteUser(string(buf));
+                            break;
+                        }
+                        case ADD_NEW_USER:
+                        {
+                            std::cout << "\t-> ADD_NEW_USER - user name: \"" 
+                                        << LoginHeader(buf).getUserName() << "\"" << std::endl;
+                            addNewUser(LoginHeader(buf));
+                            sendUsersInfo(admin_fd);
+                            break;
+                        }
+                        case CHANGE_PASSWORD:
+                        {
+                            std::cout << "\t-> CHANGE_PASSWORD - user name: \"" 
+                                        << LoginHeader(buf).getUserName() << "\"" << std::endl;
+                            changePassword(LoginHeader(buf));
+                            sendUsersInfo(admin_fd);
+                            break;
                         }
                         
-                        break;
                     }
-                    case DELETE_USER:
-                    {
-                        std::cout << "\t-> DELETE_USER - user name: \"" 
-                                    << string(buf) << "\"" << std::endl;
-                        deleteUser(string(buf));
-                        break;
-                    }
-                    case ADD_NEW_USER:
-                    {
-                        std::cout << "\t-> ADD_NEW_USER - user name: \"" 
-                                    << LoginHeader(buf).getUserName() << "\"" << std::endl;
-                        addNewUser(LoginHeader(buf));
-                        sendUsersInfo(admin_fd);
-                        break;
-                    }
-                    case CHANGE_PASSWORD:
-                    {
-                        std::cout << "\t-> CHANGE_PASSWORD - user name: \"" 
-                                    << LoginHeader(buf).getUserName() << "\"" << std::endl;
-                        changePassword(LoginHeader(buf));
-                        sendUsersInfo(admin_fd);
-                        break;
-                    }
-                    
                 }
                 //ОТПРАВЛЯЕМ ФАЙЛЫ
                 // cout << "Отправляемые файлы(" << paths.size() << ")" << endl;

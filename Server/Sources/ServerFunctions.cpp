@@ -94,18 +94,151 @@ int recvAll(int sock, char *strData, TYPE &dataType, void* data)
         readBytes = recv(sock, buf + totalBytes, BUF_SIZE - totalBytes, 0);
         if (readBytes <= 0)
         {
-            cerr << "Error: recvAll() readBytes <= 0" << endl;
+            cerr << "Error: recvAll() readBytes <= 0. ERRNO = " << errno << endl;
             return (readBytes);
         }
         totalBytes += (int)readBytes;
+        std::cout << totalBytes << std::endl;
     }
     mainHeader.setByteArr(buf);
+    std::cout << "MAINHEADER: " 
+                << mainHeader.getMsgSize() 
+                << mainHeader.getCount() 
+                << mainHeader.getType() 
+                << mainHeader.getInfo() << std::endl;
 
     curByte = sizeof(MainHeader);
     blockBytes = totalBytes;
 
     dataType = mainHeader.getType();
-    if (mainHeader.getType() == SEND_FILES)
+    // if (mainHeader.getType() == SEND_FILES || mainHeader.getType() == SEND_BIN)
+    // {
+    //     list<string>*   paths = (list<string>*)data;
+    //     int             taskId;
+    //     string curTime;
+    //     string userName;
+    //     if (mainHeader.getType() == SEND_FILES)
+    //     {
+    //         // Создание папки для сохранения
+    //         curTime = currentTimeInfo();
+    //         userName = getUserName(sock);
+    //         mkdir((char*)SAVE_PATH, S_IRWXU);
+    //         folderName = userName + " " + curTime;
+    //         int i;
+    //         string change = "_";
+    //         for (int j = 0; j < folderName.length() - 1; j++)
+    //         {
+    //             i = folderName.find(" ");
+    //             if(i == j)
+    //                 folderName.replace(i, change.length(), change);
+    //         }
+    //         savePath = (char*)SAVE_PATH + folderName;
+
+    //         mkdir(savePath.c_str(), S_IRWXU);
+    //         folderName += "/";
+    //     }
+    //     string  binSavePath = "/home/nspace/OS/Server/";
+    //     if (mainHeader.getType() == SEND_BIN)
+    //     {
+    //         // Создание папки для сохранения
+    //         folderName = "bins";
+    //         savePath = binSavePath + folderName;
+    //         mkdir(savePath.c_str(), S_IRWXU);
+    //         folderName += "/";
+    //     }
+        
+
+
+    //     for (int i = 0; i < mainHeader.getCount(); i++)
+    //     {
+    //         while (blockBytes - curByte < sizeof(FileHeader))
+    //         {
+    //             memcpy(buf, buf + curByte, blockBytes - curByte);
+    //             blockBytes = blockBytes - curByte;
+    //             curByte = 0;
+    //             readBytes = recv(sock, buf + blockBytes, BUF_SIZE - blockBytes, 0);
+    //             if (readBytes <= 0)
+    //             {
+    //                 cout << "Error: recvAll() readBytes <= 0. ERRNO = " << errno << endl;
+    //                 return (readBytes);
+    //             }
+    //             totalBytes += readBytes;
+    //             std::cout << totalBytes << std::endl;
+    //             blockBytes += readBytes;
+    //         }
+    //         fileHeader.setByteArr(buf + curByte);
+    //         if (mainHeader.getType() == SEND_FILES)
+    //             paths->push_back(string(SAVE_PATH) + folderName + string(fileHeader.getFileName()));
+    //         if (mainHeader.getType() == SEND_BIN)
+    //             paths->push_back(binSavePath + folderName + string(fileHeader.getFileName()));
+    //         ofstream fout;
+    //         fout.open(paths->back(), ios_base::trunc);
+    //         if (!fout.is_open())
+    //         {
+    //             cerr << "ERROR. Файл " << paths->back() << " для очищения не открыт!\n";
+    //             return (0);
+    //         }
+            
+    //         fout.close();
+
+    //         curByte += sizeof(FileHeader);
+    //         writeBytes = 0;
+    //         while (writeBytes != fileHeader.getFileSize())
+    //         {
+    //             if ((curByte == blockBytes))
+    //             {
+    //                 curByte = 0;
+    //                 blockBytes = 0;
+
+    //                 readBytes = recv(sock, buf, BUF_SIZE, 0);
+    //                 if (readBytes <= 0)
+    //                 {
+    //                     cout << "Error: recvAll() readBytes <= 0. ERRNO = " << errno << endl;
+    //                     return (readBytes);
+    //                 }
+    //                 totalBytes += (int)readBytes;
+    //                 std::cout << totalBytes << std::endl;
+    //                 blockBytes = (int)readBytes;
+    //             }
+    //             // this_thread::sleep_for(chrono::milliseconds(500));
+    //             if ((blockBytes - curByte) <= (fileHeader.getFileSize() - writeBytes))
+    //             {
+    //                 if (mainHeader.getType() == SEND_FILES)
+    //                     writeBytes += appFileData(folderName + string(fileHeader.getFileName()), 
+    //                                                 buf + curByte, blockBytes - curByte);
+    //                 if (mainHeader.getType() == SEND_BIN)
+    //                     writeBytes += appBinData(folderName + string(fileHeader.getFileName()), 
+    //                             buf + curByte, blockBytes - curByte);
+    //                 curByte += blockBytes - curByte;
+    //             }
+    //             else
+    //             {
+    //                 int new_writeBytes;
+    //                 new_writeBytes = fileHeader.getFileSize() - writeBytes;
+    //                 if (mainHeader.getType() == SEND_FILES)
+    //                     writeBytes += appFileData(folderName + string(fileHeader.getFileName()), 
+    //                                                 buf + curByte, new_writeBytes);
+    //                 if (mainHeader.getType() == SEND_BIN)
+    //                     writeBytes += appBinData(folderName + string(fileHeader.getFileName()), 
+    //                                                 buf + curByte, new_writeBytes);
+    //                 curByte += new_writeBytes;
+    //             }
+    //         }
+    //     }
+    //     if (mainHeader.getType() == SEND_FILES)
+    //     {
+    //         taskId = createTask(userName, curTime);
+    //         joinQueue(taskId, userName, curTime);
+    //     }
+    //     data = (void*)paths;
+    //     if (mainHeader.getMsgSize() == totalBytes)
+    //         sendData(sock, MainHeader(sizeof(MainHeader), 0, SUCCESS_RECIEVE, 0), NULL, 0);
+    //     std::cout << " 2 BIN ID = " << mainHeader.getInfo() << std::endl;
+    //     mainHeader.setData(mainHeader.getMsgSize(), taskId, mainHeader.getType(), mainHeader.getInfo());
+    //     memcpy(strData, (char*)&mainHeader, sizeof(MainHeader));
+    //     return (totalBytes);
+    // }
+        if (mainHeader.getType() == SEND_FILES)
     {
         list<string>*   paths = (list<string>*)data;
         int             taskId;
@@ -196,9 +329,11 @@ int recvAll(int sock, char *strData, TYPE &dataType, void* data)
             }
         }
         data = (void*)paths;
-        memcpy(strData, (char*)&taskId, sizeof(int));
         if (mainHeader.getMsgSize() == totalBytes)
-            sendData(sock, MainHeader(sizeof(MainHeader), 0, SUCCESS_RECIEVE), NULL, 0);
+            sendData(sock, MainHeader(sizeof(MainHeader), 0, SUCCESS_RECIEVE, 0), NULL, 0);
+        std::cout << " 2 BIN ID = " << mainHeader.getInfo() << std::endl;
+        mainHeader.setData(mainHeader.getMsgSize(), taskId, mainHeader.getType(), mainHeader.getInfo());
+        memcpy(strData, (char*)&mainHeader, sizeof(MainHeader));
         return (totalBytes);
     }
     if (mainHeader.getType() == SEND_BIN)
@@ -208,20 +343,10 @@ int recvAll(int sock, char *strData, TYPE &dataType, void* data)
         string          binSavePath = "/home/nspace/OS/Server/";
         // Создание папки для сохранения
         folderName = "bins";
-        int i;
-        string change = "_";
-        for (int j = 0; j < folderName.length() - 1; j++)
-        {
-            i = folderName.find(" ");
-            if(i == j)
-                folderName.replace(i, change.length(), change);
-        }
         savePath = binSavePath + folderName;
-
         mkdir(savePath.c_str(), S_IRWXU);
         folderName += "/";
         
-        // sendQueue(6); //!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
 
         for (int i = 0; i < mainHeader.getCount(); i++)
@@ -239,6 +364,7 @@ int recvAll(int sock, char *strData, TYPE &dataType, void* data)
                     return (readBytes);
                 }
                 totalBytes += readBytes;
+                std::cout << totalBytes << std::endl;
                 blockBytes += readBytes;
             }
             fileHeader.setByteArr(buf + curByte);
@@ -270,6 +396,7 @@ int recvAll(int sock, char *strData, TYPE &dataType, void* data)
                         return (readBytes);
                     }
                     totalBytes += (int)readBytes;
+                    std::cout << totalBytes << std::endl;
                     blockBytes = (int)readBytes;
                 }
                 if ((blockBytes - curByte) <= (fileHeader.getFileSize() - writeBytes))
@@ -291,10 +418,10 @@ int recvAll(int sock, char *strData, TYPE &dataType, void* data)
         data = (void*)paths;
         memcpy(strData, (char*)&taskId, sizeof(int));
         if (mainHeader.getMsgSize() == totalBytes)
-            sendData(sock, MainHeader(sizeof(MainHeader), 0, SUCCESS_RECIEVE), NULL, 0);
+            sendData(sock, MainHeader(sizeof(MainHeader), 0, SUCCESS_RECIEVE, 0), NULL, 0);
         return (totalBytes);
     }
-    else if (mainHeader.getType() == CHECK_LOGIN)
+    if (mainHeader.getType() == CHECK_LOGIN)
     {
         blockBytes = totalBytes;
         while (blockBytes - curByte < sizeof(LoginHeader))
@@ -305,7 +432,7 @@ int recvAll(int sock, char *strData, TYPE &dataType, void* data)
             readBytes = recv(sock, buf + blockBytes, BUF_SIZE - blockBytes, 0);
             if (readBytes <= 0)
             {
-                cerr << "Error: recvAll() readBytes <= 0" << endl;
+                cout << "Error: recvAll() readBytes <= 0. ERRNO = " << errno << endl;
                 return (readBytes);
             }
             totalBytes += readBytes;
@@ -331,7 +458,7 @@ int recvAll(int sock, char *strData, TYPE &dataType, void* data)
             readBytes = recv(sock, queueData + totalBytes, msgSize - totalBytes, 0);
             if (readBytes <= 0)
             {
-                cerr << "Error: recvAll() readBytes <= 0" << endl;
+                cout << "Error: recvAll() readBytes <= 0. ERRNO = " << errno << endl;
                 return (readBytes);
             }
             totalBytes += (int)readBytes;
@@ -355,7 +482,7 @@ int recvAll(int sock, char *strData, TYPE &dataType, void* data)
             readBytes = recv(sock, buf + curByte, mainHeader.getMsgSize() - totalBytes, 0);
             if (readBytes <= 0)
             {
-                cerr << "Error: recvAll() readBytes <= 0" << endl;
+                cout << "Error: recvAll() readBytes <= 0. ERRNO = " << errno << endl;
                 return (readBytes);
             }
             totalBytes += (int)readBytes;
@@ -448,7 +575,7 @@ int sendFiles(int sock, list<string> &paths)
     int         totalBytes;  
 
     totalBytes = 0;
-    mainHeader.setData(getMessageSize(paths), paths.size(), SEND_FILES);
+    mainHeader.setData(getMessageSize(paths), paths.size(), SEND_FILES, 0);
     sendBytes = sendAll(sock, (char*)&mainHeader, sizeof(MainHeader), 0);
     if (sendBytes <= 0)
     {
@@ -525,7 +652,7 @@ int         sendOnlineUsers(int admin_fd)
     lst = getOnlineUsers(lst);
     users = onlineUsersToChar(lst);
     msgSize = sizeof(MainHeader) + lst->size() * 20;
-    mainHdr.setData(msgSize, lst->size(), ONLINE_USERS);
+    mainHdr.setData(msgSize, lst->size(), ONLINE_USERS, 0);
     for (int i = 0; i < 9999999; i++) {}
     sentBytes = sendData(admin_fd, mainHdr, users, lst->size() * 20);
     delete users;
@@ -542,7 +669,7 @@ int         sendTasksInfo(int sock_fd, string userName)
 
     tasks = getTasksInfo(userName, tasks);
     msgSize = sizeof(MainHeader) + (unsigned)tasks.size() * sizeof(TaskStateHeader);
-    mainHdr.setData(msgSize, (unsigned)tasks.size(), TASKS_INFO);
+    mainHdr.setData(msgSize, (unsigned)tasks.size(), TASKS_INFO, 0);
     buf = new char[msgSize - sizeof(MainHeader)];
     int i = 0;
     for (auto tsk : tasks)
@@ -573,33 +700,30 @@ int         sendUsersInfo(int admin_fd)
         memcpy(data + i * sizeof(LoginHeader), (char*)&(info), sizeof(LoginHeader));
         i++;
     }
-    mainHdr.setData(dataSize + sizeof(MainHeader), usersInfoList.size(), USERS_INFO);
+    mainHdr.setData(dataSize + sizeof(MainHeader), usersInfoList.size(), USERS_INFO, 0);
     bytesSend = sendData(admin_fd, mainHdr, data, dataSize);
     delete data;
     return (bytesSend);
 }
 
-int         sendBinsNames(int admin_fd)
+int         sendBinsInfo(int admin_fd)
 {
-    int bytesSend;
-    list<string> binsPathes;
-    MainHeader mainHdr;
-    unsigned dataSize;
-    FileHeader fileHdr;
-    char* data;
-    int i = 0;
-
+    int                 bytesSend;
+    list<FileHeader>    binsPathes;
+    MainHeader          mainHdr;
+    unsigned            dataSize;
+    char*               data;
+    int                 i = 0;
 
     binsPathes = getBinsPathes(binsPathes);
     dataSize = binsPathes.size() * sizeof(FileHeader);
     data = new char[dataSize];
-    for (auto binPath : binsPathes)
+    for (auto binInfo : binsPathes)
     {
-        fileHdr.setData(0, (char*)binPath.c_str());
-        memcpy(data + i * sizeof(FileHeader), (char*)&fileHdr, sizeof(FileHeader));
+        memcpy(data + i * sizeof(FileHeader), (char*)&binInfo, sizeof(FileHeader));
         i++;
     }
-    mainHdr.setData(sizeof(MainHeader) + dataSize, binsPathes.size(), BINS_LIST);
+    mainHdr.setData(sizeof(MainHeader) + dataSize, binsPathes.size(), BINS_LIST, 0);
     
 
     bytesSend = sendData(admin_fd, mainHdr, data, dataSize);

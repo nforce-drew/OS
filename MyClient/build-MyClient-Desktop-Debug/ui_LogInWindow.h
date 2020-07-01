@@ -48,10 +48,10 @@ public:
     {
         if (LogInWindow->objectName().isEmpty())
             LogInWindow->setObjectName(QString::fromUtf8("LogInWindow"));
-        LogInWindow->resize(341, 243);
+        LogInWindow->resize(380, 243);
         layoutWidget = new QWidget(LogInWindow);
         layoutWidget->setObjectName(QString::fromUtf8("layoutWidget"));
-        layoutWidget->setGeometry(QRect(40, 20, 261, 207));
+        layoutWidget->setGeometry(QRect(40, 20, 301, 207));
         main_VerticalLayout = new QVBoxLayout(layoutWidget);
         main_VerticalLayout->setObjectName(QString::fromUtf8("main_VerticalLayout"));
         main_VerticalLayout->setContentsMargins(0, 0, 0, 0);

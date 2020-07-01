@@ -40,9 +40,11 @@ void            cancelQueueTask(int taskId);
 void            deleteUser(string userName);
 void            addNewUser(LoginHeader userInfo);
 void            changePassword(LoginHeader userInfo);
-list<string>    getBinsPathes(list<string> &binsPathes);
 void            addNewBin(string binPath);
+string          getBinPath(int binId);
+void            setBinId(int taskId, int binId);
 
+list<FileHeader>        getBinsPathes(list<FileHeader> &binsPathes);
 list<LoginHeader>       getUsersInfo(list<LoginHeader> &usersInfoList);
 list<TaskStateHeader>   &getTasksInfo(string userName, list<TaskStateHeader>& tasksList);
 // bool            isSolverFree();

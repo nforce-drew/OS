@@ -5,5 +5,11 @@
         <file>Images/done.png</file>
         <file>Images/solving.png</file>
         <file>Images/in_queue.png</file>
+        <file>Images/png.png</file>
+        <file>Images/any.png</file>
+        <file>Images/pdf.png</file>
+        <file>Images/txt.png</file>
+        <file>Images/zip.png</file>
+        <file>Images/jpg.png</file>
     </qresource>
 </RCC>
